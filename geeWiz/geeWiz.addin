@@ -1,0 +1,11 @@
+﻿<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>geeWiz</Name>
+        <Assembly>geeWiz/geeWiz.dll</Assembly>
+        <AddInId>8FFC127F-9CD7-46E2-8506-C5F36D057B4B</AddInId>
+        <FullClassName>geeWiz.Application</FullClassName>
+        <VendorId>Aussie BIM Guru</VendorId>
+        <VendorDescription>Educational video content</VendorDescription>
+        <VendorEmail>aussiebimguru@gmail.com</VendorEmail>
+    </AddIn>
+</RevitAddIns>

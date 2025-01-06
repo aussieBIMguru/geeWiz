@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using Autodesk.Revit.DB;
+﻿// Revit API
 using Autodesk.Revit.UI;
+// geeWiz libraries
 using gFrm = geeWiz.Forms;
 
 namespace geeWiz.Forms
@@ -11,345 +8,365 @@ namespace geeWiz.Forms
     // These classes all form the front end selection forms in Revit
     public static class Custom
     {
+        // File filter constant values
+        public static string FILTER_TSV = "TSV Files (*.tsv)|*.tsv";
+        public static string FILTER_EXCEL = "Excel Files (*.xls;*.xlsx;*.xlsm)|*.xls;*.xlsx;*.xlsm";
+        public static string FILTER_RFA = "Family Files|*.rfa";
+        public static string FILTER_TXT = "Text Files (*.txt)|*.txt";
+
         /// <summary>
-        /// Processes a generic alert to the user.
+        /// Creates and shows a bubble message.
         /// </summary>
         /// <param name="title">An optional title to display.</param>
         /// <param name="message">An optional message to display.</param>
-        /// <param name="yes_no">Show Yes and No instead (if you cancel).</param>
-        /// <param name="no_cancel">Does not offer a cancel button.</param>
-        /// <param name="warn_icon">Show a warning icon in the message.</param>
-        /// <returns>A true/false outcome if the selection was OK/yes.</returns>
-        public static FormResults Alert(string title = "", string message = "", bool yes_no = false, bool no_cancel = false, bool warn_icon = false)
+        /// <param name="filePath">An optional file path to open when the form is clicked.</param>
+        /// <param name="linkPath">An optional link path to open when the form is clicked.</param>
+        /// <param name="success">Return a successful result.</param>
+        /// <returns>A Result (based on success arg).</returns>
+        public static Result BubbleMessage(string title = "", string message = "",
+            string filePath = null, string linkPath = null, bool success = true)
         {
-            // Final result
-            FormResults formResult = new FormResults();
-            formResult.resultCancelled = false;
-            formResult.resultAffirmative = false;
+            // Process the default title conditions
+            if (title == "")
+            {
+                if (filePath != null) { title = "File path"; }
+                else if (linkPath != null) { title = "Link path"; }
+                else { title = "Default title"; }
+            }
+            
+            // Process the default message conditions
+            if (message == "")
+            {
+                if (filePath != null) { message = "Click here to open file"; }
+                else if (linkPath != null) { message = "Click here to open link"; }
+                else { message = "Default message"; }
+            }
+
+            // Create and show the bubble message
+            var bubbleMessage = new gFrm.BubbleMessage(title: title,
+                message: message,
+                linkPath: linkPath,
+                filePath: filePath);
+            bubbleMessage.Show();
+
+            // Return the result based on intended success
+            if (success) { return Result.Succeeded; }
+            else { return Result.Failed; }
+        }
+
+        /// <summary>
+        /// Processes a generic message to the user.
+        /// </summary>
+        /// <param name="title">An optional title to display.</param>
+        /// <param name="message">An optional message to display.</param>
+        /// <param name="yesNo">Show Yes and No options instead of OK and Cancel.</param>
+        /// <param name="noCancel">Does not offer a cancel button.</param>
+        /// <param name="warning">Display a warning icon.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult Message(string title = "", string message = "",
+            bool yesNo = false, bool noCancel = false, bool warning = false)
+        {
+            // Establish the form result to return
+            FormResult formResult = new FormResult();
+            formResult.Cancelled = false;
+            formResult.Affirmative = false;
+            formResult.Object = null;
+
+            // Variables to set later for buttons/icon
             MessageBoxButtons buttons;
             MessageBoxIcon icon;
-            // Default values
-            if (title == "") { title = "Alert"; }
-            if (message == "") { message = "Message to user."; }
+
+            // Default values if not provided
+            if (title == "") { title = "Message"; }
+            if (message == "") { message = "No description provided."; }
+
             // Set the icon
-            if (warn_icon) { icon = MessageBoxIcon.Warning; } else { icon = MessageBoxIcon.None; }
-            // Set the buttons
-            if (no_cancel)
+            if (warning) { icon = MessageBoxIcon.Warning; }
+            else { icon = MessageBoxIcon.None; }
+
+            // Set the available buttons
+            if (noCancel)
             {
-                // No cancel = only OK
                 buttons = MessageBoxButtons.OK;
             }
             else
             {
-                if (yes_no)
-                {
-                    buttons = MessageBoxButtons.YesNo;
-                }
-                else
-                {
-                    buttons = MessageBoxButtons.OKCancel;
-                }
+                if (yesNo) { buttons = MessageBoxButtons.YesNo; }
+                else { buttons = MessageBoxButtons.OKCancel; }
             }
-            // Create a messagebox, get result
-            DialogResult result = MessageBox.Show(message, title, buttons, icon);
-            // Return if the outcome is OK/Yes
-            if (result == DialogResult.Yes || result == DialogResult.OK)
+
+            // Create a messagebox, process its dialog result
+            DialogResult dialogResult = MessageBox.Show(message, title, buttons, icon);
+
+            // Process the outcomes
+            if (dialogResult == DialogResult.Yes || dialogResult == DialogResult.OK)
             {
-                // True outcome, was not cancelled
-                formResult.resultAffirmative = true;
-                formResult.resultObject = true;
+                formResult.Affirmative = true;
+                formResult.Object = true;
             }
-            else
+            else if (dialogResult == DialogResult.None || dialogResult == DialogResult.Cancel && !noCancel)
             {
-                // Check for cancellation
-                if (result == DialogResult.None || result == DialogResult.Cancel && !no_cancel)
-                {
-                    formResult.resultObject = false;
-                    formResult.resultCancelled = true;
-                }
+                formResult.Object = false;
+                formResult.Cancelled = true;
             }
+            
             // Return the outcome
             return formResult;
         }
 
 
         /// <summary>
-        /// Processes a script cancelled alert to the user.
+        /// Displays a generic cancelled message.
         /// </summary>
-        /// <param name="message">A message to display.</param>
-        /// <returns>A cancelled result, message UI only.</returns>
-        public static Result AlertCancel(string message)
+        /// <param name="message">An optional message to display.</param>
+        /// <returns>Result.Cancelled.</returns>
+        public static Result Cancelled(string message = "")
         {
+            // Default message
+            if (message == "") { message = "Task cancelled."; }
+
             // Show form to user
-            Alert(message: message, title: "Task cancelled", no_cancel: true, warn_icon: true);
+            Message(message: message,
+                title: "Task cancelled",
+                noCancel: true,
+                warning: true);
+            
+            // Return a cancelled result
             return Result.Cancelled;
         }
 
 
         /// <summary>
-        /// Processes a task completed alert to the user.
+        /// Displays a generic completed message.
         /// </summary>
-        /// <param name="message">A message to display.</param>
-        /// <returns>A succeeded result, message UI only.</returns>
-        public static Result AlertCompleted(string message)
+        /// <param name="message">An optional message to display.</param>
+        /// <returns>Result.Succeeded.</returns>
+        public static Result Completed(string message = "")
         {
+            // Default message
+            if (message == "") { message = "Task completed."; }
+
             // Show form to user
-            Alert(message: message, title: "Task completed", no_cancel: true);
+            Message(message: message,
+                title: "Task completed",
+                noCancel: true,
+                warning: true);
+
+            // Return a succeeded result
             return Result.Succeeded;
         }
 
         /// <summary>
-        /// Processes a bubble message alert.
+        /// Select file path(s) from a browser dialog.
+        /// </summary>
+        /// <param name="title">An optional title to display.</param>
+        /// <param name="filter">An optional file type filter.</param>
+        /// <param name="multiSelect">If we want to select more than one file path.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult SelectFilePaths(string title = "", string filter = "", bool multiSelect = true)
+        {
+            // Establish the form result to return
+            FormResult formResult = new FormResult();
+            formResult.Cancelled = false;
+            formResult.Valid = false;
+            formResult.Object = null;
+
+            // Using a dialog object
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                // Default title and filter
+                if (title == "") { title = "Select file(s)"; }
+                if (filter != "") { openFileDialog.Filter = filter; }
+
+                // Set the typical settings
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.Title = title;
+                openFileDialog.Multiselect = multiSelect;
+
+                // Process the results
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    List<object> filePaths = openFileDialog
+                        .FileNames
+                        .Cast<object>()
+                        .ToList();
+
+                    if (multiSelect) { formResult.Objects = filePaths; }
+                    else { formResult.Object = filePaths.First(); }
+                    formResult.Valid = true;
+                }
+                else
+                {
+                    formResult.Cancelled = true;
+                }
+            }
+
+            // Return the outcome
+            return formResult;
+        }
+
+        /// <summary>
+        /// Select a directory path from a browser dialog.
+        /// </summary>
+        /// <param name="title">An optional title to display.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult SelectDirectoryPath(string title = "")
+        {
+            // Establish the form result to return
+            FormResult formResult = new FormResult();
+            formResult.Cancelled = false;
+            formResult.Valid = false;
+            formResult.Object = null;
+
+            // Using a dialog object
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                // Default title and filter
+                if (title == "") { title = "Select folder"; }
+                folderBrowserDialog.Description = title;
+
+                // Process the result
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                {
+                    formResult.Object = folderBrowserDialog.SelectedPath as object;
+                    formResult.Valid = true;
+                }
+                else
+                {
+                    formResult.Cancelled = true;
+                }
+            }
+
+            // Return the outcome
+            return formResult;
+        }
+
+        /// <summary>
+        /// Processes a form for entering text and/or numbers.
         /// </summary>
         /// <param name="title">An optional title to display.</param>
         /// <param name="message">An optional message to display.</param>
-        /// <param name="filePath">An optional file path to attach on click.</param>
-        /// <param name="urlPath">An optional link path to attach on click.</param>
-        /// <param name="success">Return a successful result.</param>
-        /// <returns>A succeeded result.</returns>
-        public static Result BubbleMessage(string title = "", string message = "", string filePath = null, string urlPath = null, bool success = true)
+        /// <param name="defaultValue">An optinoal default value.</param>
+        /// <param name="numberOnly">Enforce a number input only.</param>
+        /// <param name="allowEmptyString">An empty string counts as a valid result.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult EnterValue(string title = "", string message = "",
+            string defaultValue = "", bool numberOnly = false, bool allowEmptyString = false)
         {
-            if (title == "")
-            {
-                if (filePath != null) { title = "File path"; }
-                else if (urlPath != null) { title = "Link URL"; }
-                else { title = "Default title"; }
-            }
-            if (message == "")
-            {
-                if (filePath != null) { message = "Click here to open file"; }
-                else if (urlPath != null) { message = "Click here to open link"; }
-                else { message = "Default message"; }
-            }
-            var bubbleMessage = new gFrm.BubbleMessage(title: title, message: message, urlPath: urlPath, filePath: filePath);
-            bubbleMessage.Show();
-            
-            if (success) { return Result.Succeeded; }
-            else { return Result.Failed; }
-        }
+            // Establish the form result to return
+            FormResult formResult = new FormResult();
+            formResult.Cancelled = false;
+            formResult.Affirmative = false;
+            formResult.Valid = false;
 
-        /// <summary>
-        /// Allows the user to select file paths.
-        /// </summary>
-        /// <param name="title">An optional title to display.</param>
-        /// <param name="filter">An optional file type filter.</param>
-        /// <returns>A list of file paths.</returns>
-        public static List<string> SelectFiles(string title = "", string filter = "")
-        {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                // Settings for dialog
-                if (filter != "") { openFileDialog.Filter = filter; }
-                openFileDialog.RestoreDirectory = true;
-                if (title == "") { title = "Select file(s)"; }
-                openFileDialog.Title = title;
-                openFileDialog.Multiselect = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    return openFileDialog.FileNames.ToList();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Allows the user to select a file path.
-        /// </summary>
-        /// <param name="title">An optional title to display.</param>
-        /// <param name="filter">An optional file type filter.</param>
-        /// <returns>A file path.</returns>
-        public static string SelectFile(string title = "", string filter = "")
-        {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                // Settings for dialog
-                if (filter != "") { openFileDialog.Filter = filter; }
-                openFileDialog.RestoreDirectory = true;
-                if (title == "") { title = "Select a file"; }
-                openFileDialog.Title = title;
-                openFileDialog.Multiselect = false;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    return openFileDialog.FileNames.First();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Allows the user to select a directory path.
-        /// </summary>
-        /// <param name="title">An optional title to display.</param>
-        /// <returns>A directory path.</returns>
-        public static string SelectDirectory(string title = "")
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                // Settings for dialog
-                if (title == "") { title = "Select a folder"; }
-                folderBrowserDialog.Description = title;
-
-                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-                {
-                    return folderBrowserDialog.SelectedPath;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Processes a generic form for entering text.
-        /// </summary>
-        /// <param name="title">An optional title to display.</param>
-        /// <param name="tooltip">An optional tooltip to display.</param>
-        /// <param name="defaultValue">A default value to display.</param>
-        /// <param name="numberOnly">Accept numerical input only.</param>
-        /// <returns>The entered text.</returns>
-        public static FormResults EnterText(string title = "", string tooltip = "", string defaultValue = "", bool numberOnly = false)
-        {
-            // Final result
-            FormResults formResult = new FormResults();
-            formResult.resultCancelled = false;
-            formResult.resultAffirmative = false;
+            // Returned value and number
             string inputValue = "";
             double resultDouble = 0.0;
+            
             // Default values
             if (numberOnly)
             {
                 if (title == "") { title = "Enter text"; }
-                if (tooltip == "") { title = "Enter a text input below:"; }
+                if (message == "") { title = "Enter a text input below:"; }
             }
             else
             {
                 if (title == "") { title = "Enter number"; }
-                if (tooltip == "") { title = "Enter a numerical input below:"; }
+                if (message == "") { title = "Enter a numerical input below:"; }
             }
-            // Run the form
-            try
+
+            // Using an enter value form
+            using (var form = new gFrm.BaseEnterValue(title: title, message: message,
+                defaultValue: defaultValue, numberOnly: numberOnly))
             {
-                using (var form = new gFrm.EnterValue(title: title, tooltip: tooltip, defaultValue: defaultValue, numberOnly: numberOnly))
+                // Process the outcomes
+                if (form.ShowDialog() == DialogResult.OK)
                 {
-                    // If we encountered an OK outcome...
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        // Get the text input from the form
-                        formResult.resultAffirmative = true;
-                        inputValue = form.Tag as string;
-                    }
-                    // Otherwise if the form ran, we cancelled it
-                    else
-                    {
-                        formResult.resultCancelled = true;
-                    }
+                    formResult.Affirmative = true;
+                    inputValue = form.Tag as string;
+                }
+                else
+                {
+                    formResult.Cancelled = true;
+                    return formResult;
                 }
             }
-            catch (Exception ex)
-            {
-                // If we couldn't use it, we failed
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                formResult.resultCancelled = true;
-            }
-            // Process numerical input
+
+            // Process input as number or text
             if (numberOnly)
             {
                 try
                 {
                     resultDouble = double.Parse(inputValue);
-                    formResult.resultValid = true;
+                    formResult.Valid = true;
                 }
                 catch
                 {
                     resultDouble = 0.0;
-                    formResult.resultValid = false;
+                    formResult.Valid = false;
                 }
                 finally
                 {
-                    formResult.resultObject = resultDouble;
+                    formResult.Object = resultDouble as object;
                 }
             }
-            // Process text input
             else
             {
-                formResult.resultObject = inputValue;
-                formResult.resultValid = inputValue != "";
+                formResult.Object = inputValue;
+                formResult.Valid = inputValue != "" || allowEmptyString;
             }
-            // Collect objects, return result
+            
+            // Return the form result
             return formResult;
         }
 
         /// <summary>
-        /// Processes a generic form for showing objects.
+        /// Processes a generic form for showing objects in a list.
         /// </summary>
         /// <param name="keys">A list of keys to display.</param>
-        /// <param name="values">A list of values to pass.</param>
+        /// <param name="values">A list of values to pass by key.</param>
         /// <param name="title">An optional title to display.</param>
-        /// <param name="multi_select">Select more than one item.</param>
-        /// <returns>Object(s) that were selected.</returns>
-        public static FormResults SelectItemsFromList(List<string> keys, List<object> values, string title = "", bool multi_select = true)
+        /// <param name="multiSelect">If we want to select more than one item.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult SelectFromList(List<string> keys, List<object> values,
+            string title = "", bool multiSelect = true)
         {
-            // Final result
-            FormResults formResults = new FormResults();
-            formResults.resultCancelled = false;
-            formResults.resultAffirmative = false;
+            // Establish the form result to return
+            FormResult formResult = new FormResult();
+            formResult.Cancelled = false;
+            formResult.Affirmative = false;
+            formResult.Valid = false;
             List<object> selectedValues = null;
             object selectedValue = null;
 
             // Default title
             if (title == "")
             {
-                if (multi_select) { title = "Select objects:"; }
-                else { title = "Select object:"; }
+                if (multiSelect) { title = "Select objects from list:"; }
+                else { title = "Select object from list:"; }
             }
 
-            // Run the form
-            try
+            // Using a select items form
+            using (var form = new gFrm.BaseListView(keys, values, title: title, multiSelect: multiSelect))
             {
-
-                using (var form = new gFrm.SelectFromList(keys, values, title: title, multi_select: multi_select))
+                // Process the outcome
+                if (form.ShowDialog() == DialogResult.OK)
                 {
-                    // If we encountered an OK outcome...
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        // Get the list of objects from the form tag
-                        formResults.resultAffirmative = true;
-                        if (multi_select)
-                        {
-                            selectedValues = form.Tag as List<object>;
-                        }
-                        else
-                        {
-                            selectedValue = form.Tag as object;
-                        }
-                    }
-                    // Otherwise if the form ran, we cancelled it
-                    else
-                    {
-                        formResults.resultCancelled = true;
-                    }
+                    formResult.Affirmative = true;
+                    formResult.Valid = true;
+                    if (multiSelect) { selectedValues = form.Tag as List<object>; }
+                    else { selectedValue = form.Tag as object; }
+                }
+                else
+                {
+                    formResult.Cancelled = true;
                 }
             }
-            catch (Exception ex)
-            {
-                // If we couldn't use it, we failed
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                formResults.resultCancelled = true;
-            }
 
-            // Collect objects, return result
-            formResults.resultObjects = selectedValues;
-            formResults.resultObject = selectedValue;
-            return formResults;
+            // Set the object values, return the result
+            formResult.Objects = selectedValues;
+            formResult.Object = selectedValue;
+            return formResult;
         }
 
         /// <summary>
@@ -358,84 +375,82 @@ namespace geeWiz.Forms
         /// <param name="keys">A list of keys to display.</param>
         /// <param name="values">A list of values to pass.</param>
         /// <param name="title">An optional title to display.</param>
-        /// <param name="tooltip">An optional tooltip to display.</param>
+        /// <param name="message">An optional message to display.</param>
+        /// <param name="defaultIndex">An optional index to initialize at.</param>
         /// <returns>The selected object.</returns>
-        public static FormResults SelectOneItem(List<string> keys, List <object> values, string title = "", string tooltip = "")
+        public static FormResult SelectFromDropdown(List<string> keys, List <object> values,
+            string title = "", string message = "", int defaultIndex = -1)
         {
-            // Final result
-            FormResults formResults = new FormResults();
-            formResults.resultCancelled = false;
-            formResults.resultAffirmative = false;
-            object selectedValue = new object();
+            // Establish the form result to return
+            FormResult formResult = new FormResult();
+            formResult.Cancelled = false;
+            formResult.Affirmative = false;
+            formResult.Valid = false;
+            formResult.Object = null;
 
-            // Default values
-            if (title == "") { title = "Select item from list"; }
-            if (tooltip == "") { tooltip = "Select an item from the dropdown:"; }
+            // Default title and message
+            if (title == "") { title = "Select object from dropdown"; }
+            if (message == "") { message = "Select an object from the dropdown:"; }
 
-            // Run the form
-            try
+            // Using a dropdown form
+            using (var form = new gFrm.BaseDropdown(keys, values, title: title, message: message, defaultIndex: defaultIndex))
             {
-
-                using (var form = new gFrm.SelectOneItem(keys, values, title: title, tooltip: tooltip))
+                // Process the outcome
+                if (form.ShowDialog() == DialogResult.OK)
                 {
-                    // If we encountered an OK outcome...
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        // Get the list of objects from the form tag
-                        formResults.resultAffirmative = true;
-                        selectedValue = form.Tag as object;
-                    }
-                    // Otherwise if the form ran, we cancelled it
-                    else
-                    {
-                        formResults.resultCancelled = true;
-                    }
+                    formResult.Affirmative = true;
+                    formResult.Valid = true;
+                    formResult.Object = form.Tag as object;
+                }
+                else
+                {
+                    formResult.Cancelled = true;
                 }
             }
-            catch (Exception ex)
-            {
-                // If we couldn't use it, we failed
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                formResults.resultCancelled = true;
-            }
 
-            // Collect sheets, return result
-            formResults.resultObject = selectedValue;
-            return formResults;
+            // Return the result
+            return formResult;
         }
 
         /// <summary>
-        /// Calculates ideal sleep delay.
+        /// Calculates ideal sleep delay for a progress form.
         /// </summary>
-        /// <param name="count">Object/step count.</param>
-        /// <param name="duration">How long you want the process to take.</param>
-        /// <returns>The selected revision.</returns>
-        public static int ProgressStep(int count, int duration = 3000, bool limit = true)
+        /// <param name="steps">Steps to take.</param>
+        /// <param name="duration">The desired overall progress time (in ms).</param>
+        /// <param name="imposeLimit">Keep between realistic min/max of 1 and 200ms.</param>
+        /// <returns>The delay (in ms).</returns>
+        public static int ProgressDelay(int steps, int duration = 3000, bool imposeLimit = true)
         {
-            // Catch zero
-            if (count < 1) { return duration; }
+            // Catch one step or less
+            if (steps < 2) { return duration; }
             
             // Calculate the step
-            int step = duration / count;
+            int step = duration / steps;
 
-            // Ensure no less than 50
-            if (step < 1 && limit) { return 1; }
-            else if (step > 200 && limit) { return 200; }
-            else { return step; }
+            // Catch limit imposed
+            if (imposeLimit)
+            {
+                if (step < 1) { step = 1; }
+                else if (step > 200) { step = 200; }
+            }
+            
+            // Return the step
+            return step;
         }
     }
 
     /// <summary>
-    /// Classes for holding multiple values from form processing outcomes.
+    /// A class for holding form outcomes, used by custom forms.
     /// </summary>
-
-    // Class to return result and objects
-    public class FormResults
+    public class FormResult
     {
-        public List<Object> resultObjects { get; set; }
-        public object resultObject { get; set; }
-        public bool resultCancelled { get; set; }
-        public bool resultValid { get; set; }
-        public bool resultAffirmative { get; set; }
+        // These properties hold the resulting object or objects from the form
+        public List<object> Objects { get; set; }
+        public object Object { get; set; }
+        
+        // These properties allow us to verify the outcome of the form
+        public bool Cancelled { get; set; }
+        public bool Valid { get; set; }
+        public bool Affirmative { get; set; }
     }
 }

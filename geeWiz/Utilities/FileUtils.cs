@@ -1,74 +1,64 @@
 ﻿using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace geeWiz.Utilities
 {
     internal class FileUtils
     {
         /// <summary>
-        /// Checks if a web link is valid.
+        /// Used to verify if a URL is valid (will open).
         /// </summary>
-        /// <param name="linkpath"">The path.</param>
-        /// <returns>If the link was valid.</returns>
-        public static bool UrlIsValid(string linkpath)
+        /// <param name="linkPath"">The path, typically a URL.</param>
+        /// <returns>A boolean.</returns>
+        public static bool CheckLinkPath(string linkPath)
         {
-            // Check if the URL is valid
-            return Uri.TryCreate(linkpath, UriKind.Absolute, out Uri uriResult)
+            return Uri.TryCreate(linkPath, UriKind.Absolute, out Uri uriResult)
                    && (uriResult.Scheme == Uri.UriSchemeHttp
                    || uriResult.Scheme == Uri.UriSchemeHttps);
         }
 
         /// <summary>
-        /// Tries to open a web link.
+        /// Attempts to open a link in the default browser.
         /// </summary>
-        /// <param name="linkpath"">The path.</param>
-        /// <returns>If the link was valid.</returns>
-        public static Result OpenUrl(string linkpath)
+        /// <param name="linkPath"">The path, typically a URL.</param>
+        /// <returns>A result.</returns>
+        public static Result OpenLinkPath(string linkPath)
         {
-            if (UrlIsValid(linkpath)) // Check url is valid
+            if (CheckLinkPath(linkPath))
             {
-                try // to open the link
+                try
                 {
-                    Process.Start(new ProcessStartInfo { FileName = linkpath, UseShellExecute = true });
+                    Process.Start(new ProcessStartInfo { FileName = linkPath, UseShellExecute = true });
                     return Result.Succeeded;
                 }
-                catch (Exception ex) // Link could not be opened
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"An error occurred while trying to open the URL: {ex.Message}");
+                    Console.WriteLine($"An error occurred while trying to open the URL: {ex.Message} ({linkPath})");
                     return Result.Failed;
                 }
             }
-            else // Link not valid
+            else
             {
-                Console.WriteLine($"Invalid URL: {linkpath}");
+                Console.WriteLine($"ERROR: Link path could not be opened ({linkPath})");
                 return Result.Failed;
             }
         }
 
         /// <summary>
-        /// Tries to open a file.
+        /// Attempts to open a file path.
         /// </summary>
-        /// <param name="filePath"">The path to the file.</param>
-        /// <returns>If the file was opened.</returns>
-        public static Result OpenFile(string filePath)
+        /// <param name="filePath"">The file path.</param>
+        /// <returns>A result.</returns>
+        public static Result OpenFilePath(string filePath)
         {
             try
             {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = filePath,
-                    UseShellExecute = true // This is important for opening files
-                });
+                Process.Start(new ProcessStartInfo { FileName = filePath, UseShellExecute = true });
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error launching Excel file: {ex.Message}");
+                Debug.WriteLine($"ERROR: File path could not be opened {ex.Message} ({filePath})");
                 return Result.Failed;
             }
         }

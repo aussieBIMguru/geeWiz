@@ -1,60 +1,92 @@
-﻿using System;
+﻿// Autodesk specific (Adwindows)
 using Autodesk.Revit.UI;
 using ResultClickEventArgs = Autodesk.Internal.InfoCenter.ResultClickEventArgs;
+// geeWiz specific
 using gFil = geeWiz.Utilities.FileUtils;
 
+// The base form will belong to the forms namespace (we decorate in the custom class)
 namespace geeWiz.Forms
 {
+    /// <summary>
+    /// Bubble messages appear at the top right of the screen.
+    /// 
+    /// They are supported by the AdWindows library, but not officially but Autodesk.
+    /// 
+    /// Use method 'Show()' to display after creation.
+    /// If a file or link path is provided on creation, clicking the form will attempt to open it.
+    /// 
+    /// </summary>
     internal class BubbleMessage
     {
+        // Title and message properties
         private string title;
         private string message;
+        // File and link paths to open on click
         private string filePath;
-        private string urlPath;
+        private string linkPath;
 
-        public BubbleMessage(string title, string message, string urlPath = null, string filePath = null)
+        /// <summary>
+        /// Constructs a bubble message object (but does not show it).
+        /// </summary>
+        /// <param name="title"">The title for the form.</param>
+        /// <param name="message"">The message for the form.</param>
+        /// <param name="filePath"">An optional file path to open on click.</param>
+        /// <param name="linkPath"">An optional link path to open on click (file path takes priority).</param>
+        /// <returns>A BubbleMessage form.</returns>
+        public BubbleMessage(string title, string message, string linkPath = null, string filePath = null)
         {
+            // Construct the object, pass its properties
             this.title = title;
             this.message = message;
             this.filePath = filePath;
-            this.urlPath = urlPath;
+            this.linkPath = linkPath;
         }
 
+        /// <summary>
+        /// Shows the bubble message form after construction.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
         public void Show()
         {
-            var ri = new Autodesk.Internal.InfoCenter.ResultItem();
+            // Create the result item, set its properties
+            var resultItem = new Autodesk.Internal.InfoCenter.ResultItem();
+            resultItem.Category = this.title;
+            resultItem.Title = this.message;
+            resultItem.IsFavorite = false;
+            resultItem.IsNew = true;
 
-            ri.Category = this.title;
-            ri.Title = this.message;
-
-            if (this.urlPath != null && gFil.UrlIsValid(this.urlPath))
+            // If the link path is valid, convert to a unique resource identifier (Uri)
+            if (this.linkPath != null && gFil.CheckLinkPath(this.linkPath))
             {
-                ri.Uri = new System.Uri(this.urlPath);
+                resultItem.Uri = new System.Uri(this.linkPath);
             }
 
-            ri.IsFavorite = false;
-            ri.IsNew = true;
-
-            if (this.filePath != null || this.urlPath != null)
+            // If we have a file path, apply the result clicked event to the bubble message
+            if (this.filePath != null || this.linkPath != null)
             {
-                ri.ResultClicked += new EventHandler<ResultClickEventArgs>(ri_ResultClicked);
+                resultItem.ResultClicked += new EventHandler<ResultClickEventArgs>(resultItem_ResultClicked);
             }
 
-            Autodesk.Windows.ComponentManager.InfoCenterPaletteManager.ShowBalloon(ri);
+            // Show the result item
+            Autodesk.Windows.ComponentManager.InfoCenterPaletteManager.ShowBalloon(resultItem);
         }
 
-        private void ri_ResultClicked(object sender, ResultClickEventArgs e)
+        /// <summary>
+        /// Opens the filepath or linkpath attached to the bubble message.
+        /// </summary>
+        /// <param name="sender"">The event sender.</param>
+        /// <param name="e"">The event arguments.</param>
+        /// <returns>Void (nothing).</returns>
+        private void resultItem_ResultClicked(object sender, ResultClickEventArgs e)
         {
+            // Opens either the file or link path
             if (this.filePath != null)
             {
-                if (gFil.OpenFile(this.filePath) == Result.Succeeded)
-                {
-                    return;
-                }
+                gFil.OpenFilePath(this.filePath);
             }
-            if (this.urlPath != null)
+            else
             {
-                gFil.OpenUrl(this.urlPath);
+                gFil.OpenLinkPath(this.linkPath);
             }
         }
     }

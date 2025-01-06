@@ -1,17 +1,21 @@
-﻿using System;
+﻿// System
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 
-// In the forms namespace
+// The base form will belong to the forms namespace
 namespace geeWiz.Forms
 {
-    // Progress bar view class
+    /// <summary>
+    /// Standard class for showing the progress bar Wpf form.
+    /// 
+    /// Use UpdateProgress() to uptick the progress bar.
+    /// Will close when cancelled or maximum tick reached.
+    /// 
+    /// Will run on a separate thread so it can be cancelled even if Revit is idle.
+    /// </summary>
     public partial class ProgressView : Window, IDisposable, INotifyPropertyChanged
     {
-        // Add a handler so the progress updates as we go
+        // Create an event when the property changes of the progress bar
         public event PropertyChangedEventHandler PropertyChanged;
 
         // Handling/detecting change in count, listeners
@@ -26,6 +30,7 @@ namespace geeWiz.Forms
                 OnPropertyChanged(nameof(ProgressText)); // Update label when count changes
             }
         }
+
         // Handling/detecting change in total, listeners
         private int pb_total;
         public int PbTotal
@@ -39,96 +44,50 @@ namespace geeWiz.Forms
             }
         }
 
-        // On property changed event
+        // When properties change, update the displayed values
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // The string for our progress message
+        // The process message
         public string ProgressText => $"Processing: {PbCount} of {PbTotal}";
-        // Other properties such: Did the form close early, placeholder task, cancel token, delay
+
+        // Other properties such: Did the form close early, async task, cancel token, delay
         public bool IsClosed { get; private set; }
         private Task taskDoEvent { get; set; }
         private CancellationTokenSource cancellationTokenSource;
         private int delay;
 
-        // Initialize the class object
+        /// <summary>
+        /// Initialize the progress view class.
+        /// </summary>
+        /// <param name="title"">The title for the form.</param>
+        /// <param name="total"">The total number of ticks to progress through.</param>
+        /// <param name="delay"">The delay between ticks (in ms), in addition to related processing.</param>
+        /// <returns>A progress bar object.</returns>
         public ProgressView(string title = "Progress bar", int total = 100, int delay = 50)
         {
+            // Establish the form and size
             InitializeComponent();
             InitializeSize();
-            // Set title and total count
+
+            // Pass the properties to the form
             this.Title = title;
             this.progressBar.Maximum = total;
             this.delay = delay;
-            // When the window closes, set IsClosed to true
+
+            // Set the IsClosed property when the form closes
             this.Closed += (s, e) => { IsClosed = true;};
+
+            // Apply a cancellation token
             cancellationTokenSource = new CancellationTokenSource();
         }
 
-        // Close the form and dispose of token when disposed
-        public void Dispose()
-        {
-            if (!IsClosed) Close();
-            cancellationTokenSource?.Dispose();
-        }
-
-        // Method to update the progress to given values
-        public bool UpdateProgress(int countIn, int totalIn)
-        {
-            UpdateTaskDoEvent();
-            // Pass in provided values
-            PbCount = countIn;
-            PbTotal = totalIn;
-            // If count is larger than total, set maximum to count
-            if (countIn >= totalIn)
-            {
-                progressBar.Maximum = countIn;
-            }
-            // Update graphical value of progress bar
-            progressBar.Value = PbCount;
-            // Return if form has been closed
-            return IsClosed;
-        }
-
-        // Placeholder event
-        private void UpdateTaskDoEvent()
-        {
-            if (taskDoEvent == null) taskDoEvent = GetTaskUpdateEvent();
-            if (taskDoEvent.IsCompleted)
-            {
-                Show();
-                DoEvents();
-                taskDoEvent = null;
-            }
-        }
-
-        // Runs between tasks, adds slight delay to simulate progress for quick events
-        private Task GetTaskUpdateEvent()
-        {
-            return Task.Run(async () =>
-            {
-                try
-                {
-                    // This adds a slight delay between tasks
-                    await Task.Delay(this.delay, cancellationTokenSource.Token);
-                }
-                catch (TaskCanceledException)
-                {
-                    // Handle cancellation if needed
-                }
-            });
-        }
-
-        // Set the cursor and run events of form
-        private void DoEvents()
-        {
-            System.Windows.Forms.Application.DoEvents();
-            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-        }
-
-        // Set the initial size of the form
+        /// <summary>
+        /// Locate and size the progress bar.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
         private void InitializeSize()
         {
             this.SizeToContent = SizeToContent.WidthAndHeight;
@@ -138,12 +97,119 @@ namespace geeWiz.Forms
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
-        // If user hits the cancel button (not used)
+        /// <summary>
+        /// Runs when the form closes for any reason (if it is open).
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
+        public void Dispose()
+        {
+            if (!this.IsClosed) Close();
+            cancellationTokenSource?.Dispose();
+        }
+
+        /// <summary>
+        /// Runs when the user triggers the cancel button manually.
+        /// </summary>
+        /// <param name="sender"">The event sender.</param>
+        /// <param name="e"">The event arguments.</param>
+        /// <returns>Void (nothing).</returns>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            // Process the cancellation token
             cancellationTokenSource.Cancel();
-            System.Windows.MessageBox.Show("Operation cancelled.", "Cancelled", MessageBoxButton.OK, MessageBoxImage.Information);
+            
+            // Form to the user
+            System.Windows.MessageBox.Show(messageBoxText: "Process cancelled.",
+                caption: "Cancelled",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            
+            // Close the form (also runs the disposal)
             this.Close();
+        }
+
+        /// <summary>
+        /// Update the progress bar values displayed, catching cancellation.
+        /// </summary>
+        /// <param name="countIn"">The count to display.</param>
+        /// <param name="totalIn"">The total to display.</param>
+        /// <returns>A boolean (if the form has been cancelled/closed).</returns>
+        public bool UpdateProgress(int countIn, int totalIn)
+        {
+            // Trigger do events
+            UpdateTaskDoEvent();
+
+            // Update the public properties of the form
+            PbCount = countIn;
+            PbTotal = totalIn;
+
+            // Ensure maximum is not exceeded
+            if (countIn >= totalIn)
+            {
+                progressBar.Maximum = countIn;
+            }
+
+            // Update graphical value of progress bar
+            progressBar.Value = PbCount;
+
+            // Return if the form has closed, to catch early cancellation
+            return IsClosed;
+        }
+
+        /// <summary>
+        /// Verify if we can run the delayed tick, run it if we can.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
+        private void UpdateTaskDoEvent()
+        {
+            // Run the async task if possible
+            if (taskDoEvent == null)
+            {
+                taskDoEvent = GetTaskUpdateEvent();
+            }
+
+            // If we completed the task, do events and reset task
+            if (taskDoEvent.IsCompleted)
+            {
+                Show();
+                DoEvents();
+                taskDoEvent = null;
+            }
+        }
+
+        /// <summary>
+        /// Process the delay between ticks.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
+        private Task GetTaskUpdateEvent()
+        {
+            // Run async progress bar tick
+            return Task.Run(async () =>
+            {
+                // Try to add the delay if not cancelled
+                try
+                {
+                    await Task.Delay(this.delay, cancellationTokenSource.Token);
+                }
+                // If we can't, do nothing
+                catch (TaskCanceledException)
+                {
+                    {; }
+                }
+            });
+        }
+
+        /// <summary>
+        /// Generic do events.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
+        private void DoEvents()
+        {
+            // Do events on the other thread
+            System.Windows.Forms.Application.DoEvents();
+
+            // Update the cursor to the wait cursor
+            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
         }
     }
 }

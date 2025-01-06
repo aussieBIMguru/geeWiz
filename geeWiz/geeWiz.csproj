@@ -30,10 +30,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Resources\Icons\IconList16.ico" />
       <None Remove="Resources\Icons\IconList16.png" />
       <None Remove="Resources\Icons\IconList16_Dark.png" />
       <None Remove="Resources\Icons\IconList32.png" />
       <None Remove="Resources\Icons\IconList32_Dark.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\Icons\IconList16.ico" />
     </ItemGroup>
 
     <ItemGroup>
@@ -54,20 +59,33 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <Resource Include="Resources\Icons\IconList16.png" />
-        <Resource Include="Resources\Icons\IconList16_Dark.png" />
-        <Resource Include="Resources\Icons\IconList32.png" />
-        <Resource Include="Resources\Icons\IconList32_Dark.png" />
-        <Resource Include="Resources\Icons\RibbonIcon16.png" />
-        <Resource Include="Resources\Icons\RibbonIcon32.png" />
+        <EmbeddedResource Include="Resources\Icons\IconList16.png" />
+        <EmbeddedResource Include="Resources\Icons\IconList16_Dark.png" />
+        <EmbeddedResource Include="Resources\Icons\IconList32.png" />
+        <EmbeddedResource Include="Resources\Icons\IconList32_Dark.png" />
+        <EmbeddedResource Include="Resources\Icons\RibbonIcon16.png" />
+        <EmbeddedResource Include="Resources\Icons\RibbonIcon32.png" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Forms\Bases\Wpf\" />
 	  <Folder Include="Forms\Bases\Winforms\" />
 	  <Folder Include="Resources\Images\" />
-	  <Folder Include="Resources\Files\" />
-	  <Folder Include="Utilities\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\Files\Tooltips.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Tooltips.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Files\Tooltips.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Tooltips.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

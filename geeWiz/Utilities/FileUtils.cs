@@ -1,9 +1,16 @@
-﻿using Autodesk.Revit.UI;
+﻿// System
 using System.Diagnostics;
+// Revit API
+using Autodesk.Revit.UI;
 
+// The class belongs to the utility namespace
+// using gFil = geeWiz.Utilities.FileUtils
 namespace geeWiz.Utilities
 {
-    internal class FileUtils
+    /// <summary>
+    /// Methods of this class generally relate to file based operations.
+    /// </summary>
+    public static class FileUtils
     {
         /// <summary>
         /// Used to verify if a URL is valid (will open).

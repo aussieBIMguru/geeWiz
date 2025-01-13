@@ -11,6 +11,15 @@ namespace gSharp.Utilities
     /// </summary>
     public static class AvailabilityUtils
     {
+        // Command is disabled
+        public class Disabled : IExternalCommandAvailability
+        {
+            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            {
+                return false;
+            }
+        }
+
         // Command can only be ran even if a document is not opened
         public class ZeroDoc : IExternalCommandAvailability
         {
@@ -81,8 +90,8 @@ namespace gSharp.Utilities
                     Document doc = uiApp.ActiveUIDocument.Document;
                     if (doc.IsFamilyDocument) { return false; }
 
-                    // Return if at least 1 element is selected
-                    return uiApp.ActiveUIDocument.Selection.GetElementIds().Count > 0;
+                    // Return if at least 1 category is in selection
+                    return categories.Size > 0;
                 }
                 else
                 {

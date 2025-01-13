@@ -30,16 +30,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Resources\Icons\IconList16.ico" />
-      <None Remove="Resources\Icons\IconList16.png" />
-      <None Remove="Resources\Icons\IconList16_Dark.png" />
-      <None Remove="Resources\Icons\IconList32.png" />
-      <None Remove="Resources\Icons\IconList32_Dark.png" />
+		<None Remove="Resources\Icons\*.ico" />
+		<None Remove="Resources\Icons\*.png" />
     </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="Resources\Icons\IconList16.ico" />
-    </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\Icons\*.ico" />
+		<EmbeddedResource Include="Resources\Icons\*.png" />
+	</ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="ClosedXML" Version="0.104.2" />
@@ -51,26 +49,8 @@
         <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
     </ItemGroup>
 
-	<ItemGroup Condition="$(Configuration.Contains('R23'))">
-		<Reference Include="System.Windows.Forms" Version="8.0.0.0" />
-	</ItemGroup>
-	<ItemGroup Condition="$(Configuration.Contains('R24'))">
-		<Reference Include="System.Windows.Forms" Version="8.0.0.0" />
-	</ItemGroup>
-
     <ItemGroup>
-        <EmbeddedResource Include="Resources\Icons\IconList16.png" />
-        <EmbeddedResource Include="Resources\Icons\IconList16_Dark.png" />
-        <EmbeddedResource Include="Resources\Icons\IconList32.png" />
-        <EmbeddedResource Include="Resources\Icons\IconList32_Dark.png" />
-        <EmbeddedResource Include="Resources\Icons\RibbonIcon16.png" />
-        <EmbeddedResource Include="Resources\Icons\RibbonIcon32.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Forms\Bases\Wpf\" />
-	  <Folder Include="Forms\Bases\Winforms\" />
-	  <Folder Include="Resources\Images\" />
+      <Folder Include="Resources\Images\" />
     </ItemGroup>
 
     <ItemGroup>

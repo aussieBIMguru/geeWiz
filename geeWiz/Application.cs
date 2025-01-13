@@ -36,16 +36,16 @@ namespace geeWiz
             }
             catch
             {
-                Globals.uiApp = null;
+                Globals.UiApp = null;
             }
 
             // Store all available global variable values (available anywhere, effectively)
-            Globals.uiCtlApp = application;
-            Globals.ctlApp = application.ControlledApplication;
+            Globals.UiCtlApp = application;
+            Globals.CtlApp = application.ControlledApplication;
             // (uiApp set by idling event)
             Globals.Assembly = Assembly.GetExecutingAssembly();
             Globals.AssemblyPath = Assembly.GetExecutingAssembly().Location;
-            Globals.isIdling = false;
+            Globals.Idling = false;
             Globals.RevitVersion = application.ControlledApplication.VersionNumber;
             Globals.RevitVersionInt = Int32.Parse(Globals.RevitVersion);
             Globals.UsernameWindows = Environment.UserName;
@@ -102,7 +102,7 @@ namespace geeWiz
             // If uiApp was collected, set the related globals
             if (uiApp != null)
             {
-                Globals.uiApp = uiApp;
+                Globals.UiApp = uiApp;
                 Globals.UsernameRevit = uiApp.Application.Username;
             }
         }

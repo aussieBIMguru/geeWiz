@@ -69,18 +69,9 @@ namespace geeWiz.Resources.Files {
         ///Tip:
         ///If you have sheets selected when running the script, you will be asked if you want to use those instead..
         /// </summary>
-        internal static string Cmd_Uprev {
+        internal static string Revisions_Uprev {
             get {
-                return ResourceManager.GetString("Cmd_Uprev", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tooltip not found!.
-        /// </summary>
-        internal static string Missing_tooltip {
-            get {
-                return ResourceManager.GetString("Missing tooltip", resourceCulture);
+                return ResourceManager.GetString("Revisions_Uprev", resourceCulture);
             }
         }
     }

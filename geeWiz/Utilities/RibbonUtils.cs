@@ -1,10 +1,8 @@
 ﻿// System
-using System.IO;
-using System.Windows.Media.Imaging;
+using System.Diagnostics;
 // Revit API
 using Autodesk.Revit.UI;
-// geeWiz libraries
-using gScr = geeWiz.Utilities.ScriptUtils;
+using RibbonPanel = Autodesk.Revit.UI.RibbonPanel;
 
 // The class belongs to the geeWiz namespace
 // using gRib = geeWiz.Utilities.RibbonUtils
@@ -16,67 +14,105 @@ namespace geeWiz.Utilities
     public static class RibbonUtils
     {
         /// <summary>
-        /// Creates a ribbon.
+        /// Adds a new tab to Revit
         /// </summary>
-        // TBA
-
-        /// <summary>
-        /// Creates a panel.
-        /// </summary>
-        // TBA
-
-        /// <summary>
-        /// Creates data for a pushdownbutton.
-        /// </summary>
-        /// <param name="commandName">The command name for the button.</param>
-        /// <param name="buttonName">The name for the button.</param>
-        /// <param name="iconName">The icon resopurce name.</param>
-        /// <param name="commandClass">The icon resopurce name.</param>
-        /// <param name="assemblypath">The icon resopurce name.</param>
-        /// <returns>A pushdownbuttondata object.</returns>
-        public static PushButtonData PushButtonDataToStack(string commandName, string buttonName, string iconName, string commandClass, string assemblypath)
+        /// <param name="tabName">The name of the tab to create.</param>
+        /// <returns>A Result object.</returns>
+        public static Result CreateTab(string tabName)
         {
-            // Construct pushbuttondata object
-            var pushButtonData = new PushButtonData(commandName, buttonName, assemblypath, commandClass);
-
-            // Set the tooltip and large/small image icons
-            pushButtonData.ToolTip = gScr.GetTooltip(commandName);
-            pushButtonData.LargeImage = PngImageSource($"geeWiz.Resources.Icons.{iconName}32.png");
-            pushButtonData.Image = PngImageSource($"geeWiz.Resources.Icons.{iconName}16.png");
-
-            // Return the pushbuttondata object
-            return pushButtonData;
+            // Try to create new tab
+            try
+            {
+                Globals.UiCtlApp.CreateRibbonTab(tabName);
+                return Result.Succeeded;
+            }
+            catch
+            {
+                // If we fail, it probably exists already by name
+                return Result.Failed;
+            }
         }
 
         /// <summary>
-        /// Creates a pushbutton.
+        /// Adds a new ribbon panel to a tab.
         /// </summary>
-        // TBA
+        /// <param name="tabName">The name of the tab.</param>
+        /// /// <param name="panelName">The name of the panel.</param>
+        /// <returns>A RibbonPanel.</returns>
+        public static RibbonPanel CreatePanel(string tabName, string panelName)
+        {
+            // Try to add ribbon panel to tab
+            // NOTE: Create your tab by name before making panels
+            try
+            {
+                return Globals.UiCtlApp.CreateRibbonPanel(tabName, panelName);
+            }
+            catch (Exception ex)
+            {
+                // If we could not, it is likely an error
+                Debug.WriteLine($"\nERROR: {panelName} not created.\nError message: {ex.Message}\n");
+                return null;
+            }
+        }
 
         /// <summary>
-        /// Converts a PNG resource into an imagesource.
+        /// Gets a RibbonPanel from a Tab by names.
         /// </summary>
-        /// <param name="resourcePath">The full resource path.</param>
-        /// <returns>An ImageSource object.</returns>
-        private static System.Windows.Media.ImageSource PngImageSource(string resourcePath)
+        /// <param name="tabName">The name of the tab to check.</param>
+        /// /// <param name="panelName">The name of the panel to find.</param>
+        /// <returns>A RibbonPanel.</returns>
+        public static RibbonPanel GetPanelOnTab(string tabName, string panelName)
         {
-            // Read the resource from its full path
-            using (Stream stream = Globals.Assembly.GetManifestResourceStream(resourcePath))
+            // The list of panels we will try to get
+            List<RibbonPanel> panels;
+
+            // Try to get panels of the tab by name
+            try
             {
-                // If no stream, we didn't find it - throw exception
-                if (stream == null)
-                {
-                    throw new ArgumentException($"Resource not found: {resourcePath}");
-                }
-
-                // Decode the png resource
-                var decoder = new System.Windows.Media.Imaging.PngBitmapDecoder(stream,
-                    BitmapCreateOptions.PreservePixelFormat,
-                    BitmapCacheOption.Default);
-
-                // Get the imagesource from the decoder
-                return decoder.Frames[0];
+                panels = Globals.UiCtlApp.GetRibbonPanels(tabName);
             }
+            catch (Exception ex)
+            {
+                // If we could not, it is likely an error
+                Debug.WriteLine($"\nERROR: {tabName} not found.\nError message: {ex.Message}\n");
+                return null;
+            }
+
+            // Retrieve the ribbon panel object
+            foreach (RibbonPanel panel in panels)
+            {
+                if (panel.Name == panelName)
+                {
+                    return panel;
+                }
+            }
+
+            // If we did not find a match, return null
+            return null;
+        }
+
+        /// <summary>
+        /// Retrieves a PushButton from a panel by name.
+        /// </summary>
+        /// <param name="panel">The panel object to search.</param>
+        /// <param name="buttonName">The name of the button to find.</param>
+        /// <returns>A PushButton object.</returns>
+        public static PushButton GetButtonOnPanel(RibbonPanel panel, string buttonName)
+        {
+            // If we have no panel, early return
+            if (panel == null) { return null; }
+
+            // Check each item on panel, return any valid matches
+            foreach (var item in panel.GetItems())
+            {
+                if (item is PushButton pushButton && pushButton.Name == buttonName)
+                {
+                    return pushButton;
+                }
+            }
+
+            // If we did not find a match, return null
+            return null;
         }
     }
 }

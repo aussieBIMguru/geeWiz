@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Cmd_Uprev" xml:space="preserve">
+  <data name="Revisions_Uprev" xml:space="preserve">
     <value>Prompts the selection of a revision and list of sheets, then proceeds to apply the chosen revision to them.
 
 Context:
@@ -125,8 +125,5 @@ Context:
 
 Tip:
 If you have sheets selected when running the script, you will be asked if you want to use those instead.</value>
-  </data>
-  <data name="Missing tooltip" xml:space="preserve">
-    <value>Tooltip not found!</value>
   </data>
 </root>

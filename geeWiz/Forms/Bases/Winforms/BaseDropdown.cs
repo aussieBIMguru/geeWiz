@@ -24,8 +24,9 @@ namespace geeWiz.Forms
         /// <returns>A BaseDropDown form.</returns>
         public BaseDropdown(List<string> keys, List<object> values, string title = "", string message = "", int defaultIndex = -1)
         {
-            // Initialize form
+            // Initialize form, set the icon
             InitializeComponent();
+            geeWiz.Utilities.FileUtils.SetFormIcon(this);
 
             // Set the key and value properties
             this.keys = keys;

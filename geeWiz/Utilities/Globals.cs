@@ -12,12 +12,12 @@ namespace geeWiz
     public static class Globals
     {
         // Applications
-        public static UIControlledApplication uiCtlApp { get; set; }
-        public static ControlledApplication ctlApp { get; set; }
-        public static UIApplication uiApp { get; set; }
+        public static UIControlledApplication UiCtlApp { get; set; }
+        public static ControlledApplication CtlApp { get; set; }
+        public static UIApplication UiApp { get; set; }
         public static System.Reflection.Assembly Assembly { get; set; }
         public static string AssemblyPath { get; set; }
-        public static bool isIdling { get; set; }
+        public static bool Idling { get; set; }
 
         // Revit versions
         public static string RevitVersion { get; set; }

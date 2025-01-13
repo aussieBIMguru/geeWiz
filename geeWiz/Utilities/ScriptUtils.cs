@@ -1,7 +1,11 @@
 ﻿// System
 using System.Runtime.InteropServices;
+using Clipboard = System.Windows.Forms.Clipboard;
 // Revit API
 using Autodesk.Revit.UI;
+using System.Diagnostics;
+// geeWiz utilities
+using gFrm = geeWiz.Forms;
 
 // The class belongs to the utility namespace
 // using gScr = geeWiz.Utilities.ScriptUtils
@@ -12,6 +16,69 @@ namespace geeWiz.Utilities
     /// </summary>
     public static class ScriptUtils
     {
+        /// <summary>
+        /// Attempts to send a string to the clipboard.
+        /// </summary>
+        /// <param name="text">Text to send.</param>
+        /// <param name="showMessage">Shows error messages (if any).</param>
+        /// <returns>A result.</returns>
+        [STAThread]
+        public static Result ClipboardSend(string text, bool showMessage = true)
+        {
+            // Copy the text to the clipboard
+            try
+            {
+                Clipboard.SetText(text);
+                return Result.Succeeded;
+            }
+            // Catch if it could not be sent
+            catch
+            {
+                // Optional message to user (assume script is cancelled)
+                if (showMessage)
+                {
+                    gFrm.Custom.Cancelled("Clipboard could not be accessed.");
+                }
+                return Result.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to receive text from the clipboard.
+        /// </summary>
+        /// <param name="showMessage">Shows error messages (if any).</param>
+        /// <returns>A result.</returns>
+        [STAThread]
+        public static string ClipboardReceive(bool showMessage = true)
+        {
+            // Receive text from the clipboard
+            try
+            {
+                string clipboardText = Clipboard.GetText();
+                return clipboardText;
+            }
+            // Catch if it could not be received
+            catch
+            {
+                // Optional message to user (assume script is cancelled)
+                if (showMessage)
+                {
+                    gFrm.Custom.Cancelled("Clipboard could not be accessed.");
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Verifies if the user is the developer (change name as desired).
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static bool UserIsDeveloper()
+        {
+            return Globals.UsernameWindows.Equals("gavin.crump",
+                StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Verifies if the user is holding down the shift key.
         /// </summary>

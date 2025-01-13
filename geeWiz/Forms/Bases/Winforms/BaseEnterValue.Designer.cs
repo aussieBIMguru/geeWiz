@@ -28,80 +28,71 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BaseEnterValue));
-            labelTooltip = new Label();
-            textBox = new TextBox();
-            btnCancel = new Button();
-            btnSelect = new Button();
-            SuspendLayout();
+            this.labelTooltip = new System.Windows.Forms.Label();
+            this.textBox = new System.Windows.Forms.TextBox();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnSelect = new System.Windows.Forms.Button();
+            this.SuspendLayout();
             // 
             // labelTooltip
             // 
-            labelTooltip.AutoSize = true;
-            labelTooltip.Location = new System.Drawing.Point(18, 17);
-            labelTooltip.Margin = new Padding(4, 0, 4, 0);
-            labelTooltip.MaximumSize = new Size(507, 0);
-            labelTooltip.MinimumSize = new Size(507, 0);
-            labelTooltip.Name = "labelTooltip";
-            labelTooltip.Size = new Size(507, 15);
-            labelTooltip.TabIndex = 0;
-            labelTooltip.Text = "Default Message";
+            this.labelTooltip.AutoSize = true;
+            this.labelTooltip.Location = new System.Drawing.Point(15, 15);
+            this.labelTooltip.MaximumSize = new System.Drawing.Size(435, 0);
+            this.labelTooltip.MinimumSize = new System.Drawing.Size(435, 0);
+            this.labelTooltip.Name = "labelTooltip";
+            this.labelTooltip.Size = new System.Drawing.Size(435, 13);
+            this.labelTooltip.TabIndex = 0;
+            this.labelTooltip.Text = "Default Message";
             // 
             // textBox
             // 
-            textBox.Location = new System.Drawing.Point(18, 52);
-            textBox.Margin = new Padding(4, 3, 4, 3);
-            textBox.MaxLength = 100;
-            textBox.Name = "textBox";
-            textBox.Size = new Size(507, 23);
-            textBox.TabIndex = 1;
-            textBox.WordWrap = false;
-            textBox.KeyPress += TextBox_KeyPress;
+            this.textBox.Location = new System.Drawing.Point(15, 45);
+            this.textBox.MaxLength = 100;
+            this.textBox.Name = "textBox";
+            this.textBox.Size = new System.Drawing.Size(435, 20);
+            this.textBox.TabIndex = 1;
+            this.textBox.WordWrap = false;
             // 
             // btnCancel
             // 
-            btnCancel.Location = new System.Drawing.Point(350, 110);
-            btnCancel.Margin = new Padding(4, 3, 4, 3);
-            btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(175, 39);
-            btnCancel.TabIndex = 2;
-            btnCancel.Text = "Cancel";
-            btnCancel.UseVisualStyleBackColor = true;
-            btnCancel.Click += btnCancel_Click;
+            this.btnCancel.Location = new System.Drawing.Point(300, 95);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(150, 34);
+            this.btnCancel.TabIndex = 2;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
             // 
             // btnSelect
             // 
-            btnSelect.Location = new System.Drawing.Point(163, 110);
-            btnSelect.Margin = new Padding(4, 3, 4, 3);
-            btnSelect.Name = "btnSelect";
-            btnSelect.Size = new Size(175, 39);
-            btnSelect.TabIndex = 3;
-            btnSelect.Text = "OK";
-            btnSelect.UseVisualStyleBackColor = true;
-            btnSelect.Click += btnSelect_Click;
+            this.btnSelect.Location = new System.Drawing.Point(140, 95);
+            this.btnSelect.Name = "btnSelect";
+            this.btnSelect.Size = new System.Drawing.Size(150, 34);
+            this.btnSelect.TabIndex = 3;
+            this.btnSelect.Text = "OK";
+            this.btnSelect.UseVisualStyleBackColor = true;
             // 
-            // EnterValue
+            // BaseEnterValue
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(541, 163);
-            Controls.Add(btnSelect);
-            Controls.Add(btnCancel);
-            Controls.Add(textBox);
-            Controls.Add(labelTooltip);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = (Icon)resources.GetObject("$this.Icon");
-            ImeMode = ImeMode.Off;
-            Margin = new Padding(4, 3, 4, 3);
-            MaximizeBox = false;
-            MaximumSize = new Size(557, 202);
-            MinimizeBox = false;
-            MinimumSize = new Size(557, 202);
-            Name = "EnterValue";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "Default Title";
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(464, 141);
+            this.Controls.Add(this.btnSelect);
+            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.textBox);
+            this.Controls.Add(this.labelTooltip);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(480, 180);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(480, 180);
+            this.Name = "BaseEnterValue";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Default Title";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion

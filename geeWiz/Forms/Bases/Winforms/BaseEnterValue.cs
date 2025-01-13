@@ -25,8 +25,9 @@ namespace geeWiz.Forms
         /// <returns>A BaseEnterValue form.</returns>
         public BaseEnterValue(string title = "", string message = "", string defaultValue = "", bool numberOnly = false)
         {
-            // Initialize the form
+            // Initialize the form, set the icon
             InitializeComponent();
+            geeWiz.Utilities.FileUtils.SetFormIcon(this);
 
             // Set default values and outcomes
             this.textBox.Text = defaultValue;

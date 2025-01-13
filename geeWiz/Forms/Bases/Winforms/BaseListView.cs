@@ -28,8 +28,9 @@ namespace geeWiz.Forms
         /// <returns>A BaseListView form.</returns>
         public BaseListView(List<string> keys, List<object> values, string title = "", bool multiSelect = true)
         {
-            // Initialize the form
+            // Initialize the form, set the icon
             InitializeComponent();
+            geeWiz.Utilities.FileUtils.SetFormIcon(this);
 
             // Set the key and value properties
             this.keys = keys;

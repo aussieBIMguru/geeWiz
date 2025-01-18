@@ -1,10 +1,6 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-// geeWiz
-using geeWiz.Extensions;
-using gAva = geeWiz.Availability.AvailabilityNames;
-using gRib = geeWiz.Utilities.RibbonUtils;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -23,7 +19,7 @@ namespace geeWiz
         /// </summary>
         public Result OnStartup(UIControlledApplication uiCtlApp)
         {
-            // Collect the uiApp using idling event
+            // Set private variable
             _uiCtlApp = uiCtlApp;
 
             // Try to subscribe to the idling event, which sets uiApp global ASAP
@@ -40,6 +36,8 @@ namespace geeWiz
             Globals.RegisterVariables(uiCtlApp);
             Globals.RegisterTooltips("geeWiz.Files.Tooltips");
 
+            // Register the warden commands
+            Warden.Register(uiCtlApp);
 
             /// <summary>
             /// We will load our commands here later on.

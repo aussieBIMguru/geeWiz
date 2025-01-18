@@ -23,6 +23,10 @@ namespace geeWiz
         public static UIApplication UiApp { get; set; }
         public static bool Idling { get; set; }
 
+        // Warden
+        public static bool WardenActive { get; set; }
+        public static string LastCommandId { get; set; }
+
         // Key paths
         public static System.Reflection.Assembly Assembly { get; set; }
         public static string AssemblyPath { get; set; }
@@ -56,7 +60,11 @@ namespace geeWiz
             UiCtlApp = uiApp;
             CtlApp = uiApp.ControlledApplication;
             // (uiApp set by idling event)
-            Idling = false;
+            Idling = true;
+
+            // Warden
+            WardenActive = true;
+            LastCommandId = null;
 
             // Store all paths
             Assembly = Assembly.GetExecutingAssembly();

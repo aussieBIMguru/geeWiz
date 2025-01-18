@@ -82,9 +82,27 @@ namespace geeWiz.Utilities
         /// Verifies if the user is holding down the shift key.
         /// </summary>
         /// <returns>A boolean.</returns>
-        public static bool ShiftKeyHeld()
+        public static bool KeyHeldShift()
         {
-            return KeyboardHelper.KeyIsPressedShift();
+            return Keyboard.KeyIsPressedShift();
+        }
+
+        /// <summary>
+        /// Verifies if the user is holding down the control key.
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static bool KeyHeldControl()
+        {
+            return Keyboard.KeyIsPressedControl();
+        }
+
+        /// <summary>
+        /// Verifies if the user is holding down the alt key.
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static bool KeyHeldAlt()
+        {
+            return Keyboard.KeyIsPressedAlt();
         }
 
         /// <summary>
@@ -123,13 +141,17 @@ namespace geeWiz.Utilities
     }
 
     /// <summary>
-    /// This class deals with the state of key presses.
+    /// This class deals with the state of the keyboard.
     /// </summary>
-    internal class KeyboardHelper
+    internal class Keyboard
     {
         [DllImport("user32.dll")]
+        
+        // Variables to handle virtual key codes
         private static extern short GetKeyState(int nVirtKey);
-        private const int VK_SHIFT = 0x10; // Virtual key code for Shift key
+        private const int VK_SHIFT = 0x10;
+        private const int VK_CONTROL = 0x11;
+        private const int VK_ALT = 0x12;
 
         /// <summary>
         /// Returns if the shift key is held.
@@ -137,6 +159,22 @@ namespace geeWiz.Utilities
         public static bool KeyIsPressedShift()
         {
             return (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+        }
+
+        /// <summary>
+        /// Returns if the control key is held.
+        /// </summary>
+        public static bool KeyIsPressedControl()
+        {
+            return (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        }
+
+        /// <summary>
+        /// Returns if the alt key is held.
+        /// </summary>
+        public static bool KeyIsPressedAlt()
+        {
+            return (GetKeyState(VK_ALT) & 0x8000) != 0;
         }
     }
 }

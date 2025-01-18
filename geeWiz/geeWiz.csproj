@@ -30,13 +30,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-		<None Remove="Resources\Icons\*.ico" />
-		<None Remove="Resources\Icons\*.png" />
+		<None Remove="Resources\Icons16\*.ico" />
+		<None Remove="Resources\Icons16\*.png" />
+		<None Remove="Resources\Icons32\*.png" />
     </ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\Icons\*.ico" />
-		<EmbeddedResource Include="Resources\Icons\*.png" />
+		<EmbeddedResource Include="Resources\Icons16\*.ico" />
+		<EmbeddedResource Include="Resources\Icons16\*.png" />
+		<EmbeddedResource Include="Resources\Icons32\*.png" />
 	</ItemGroup>
 
     <ItemGroup>
@@ -47,10 +49,6 @@
         <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Resources\Images\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,7 +2,8 @@
 using System.Diagnostics;
 // Revit API
 using Autodesk.Revit.UI;
-using RibbonPanel = Autodesk.Revit.UI.RibbonPanel;
+// geeWiz
+using gFil = geeWiz.Utilities.FileUtils;
 
 // The class belongs to the geeWiz namespace
 // using gRib = geeWiz.Utilities.RibbonUtils
@@ -10,109 +11,64 @@ namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to ribbon setup.
+    /// (Most ribbon construction is under extension methods).
     /// </summary>
     public static class RibbonUtils
     {
         /// <summary>
-        /// Adds a new tab to Revit
+        /// Converts a command class to a base name for tooltip/icon finding.
         /// </summary>
-        /// <param name="tabName">The name of the tab to create.</param>
-        /// <returns>A Result object.</returns>
-        public static Result CreateTab(string tabName)
+        /// <param name="commandClass">The name of the command class.</param>
+        /// <returns>A string.</returns>
+        public static string CommandClassToBaseName(string commandClass)
         {
-            // Try to create new tab
-            try
-            {
-                Globals.UiCtlApp.CreateRibbonTab(tabName);
-                return Result.Succeeded;
-            }
-            catch
-            {
-                // If we fail, it probably exists already by name
-                return Result.Failed;
-            }
+            return commandClass.Replace("geeWiz.", "").Replace(".Cmd", "");
         }
 
         /// <summary>
-        /// Adds a new ribbon panel to a tab.
+        /// Creates PushButtonData (to stack, generally).
         /// </summary>
-        /// <param name="tabName">The name of the tab.</param>
-        /// /// <param name="panelName">The name of the panel.</param>
-        /// <returns>A RibbonPanel.</returns>
-        public static RibbonPanel CreatePanel(string tabName, string panelName)
+        /// <param name="buttonName">The name for the button.</param>
+        /// <param name="commandClass">The command class path.</param>
+        /// <returns>A PushButtonData object.</returns>
+        public static PushButtonData NewPushButtonData(string buttonName, string commandClass)
         {
-            // Try to add ribbon panel to tab
-            // NOTE: Create your tab by name before making panels
-            try
-            {
-                return Globals.UiCtlApp.CreateRibbonPanel(tabName, panelName);
-            }
-            catch (Exception ex)
-            {
-                // If we could not, it is likely an error
-                Debug.WriteLine($"\nERROR: {panelName} not created.\nError message: {ex.Message}\n");
-                return null;
-            }
+            // Strip the command class name to basics
+            string baseName = CommandClassToBaseName(commandClass);
+
+            // Make pushbuttondata
+            PushButtonData pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
+
+            // Set tooltip and icons
+            pushButtonData.ToolTip = gFil.GetTooltip(baseName);
+            pushButtonData.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
+            pushButtonData.Image = gFil.GetImageSource(baseName, resolution: 16);
+
+            // Return the data
+            return pushButtonData;
         }
 
         /// <summary>
-        /// Gets a RibbonPanel from a Tab by names.
+        /// Creates PulldownButtonData (to stack, generally).
         /// </summary>
-        /// <param name="tabName">The name of the tab to check.</param>
-        /// /// <param name="panelName">The name of the panel to find.</param>
-        /// <returns>A RibbonPanel.</returns>
-        public static RibbonPanel GetPanelOnTab(string tabName, string panelName)
+        /// <param name="buttonName">The name for the button.</param>
+        /// <param name="commandClass">The command class path.</param>
+        /// <returns>A PulldownButtonData object.</returns>
+        public static PulldownButtonData NewPulldownButtonData(string buttonName, string commandClass)
         {
-            // The list of panels we will try to get
-            List<RibbonPanel> panels;
+            // Strip the command class name to basics
+            string baseName = CommandClassToBaseName(commandClass);
 
-            // Try to get panels of the tab by name
-            try
-            {
-                panels = Globals.UiCtlApp.GetRibbonPanels(tabName);
-            }
-            catch (Exception ex)
-            {
-                // If we could not, it is likely an error
-                Debug.WriteLine($"\nERROR: {tabName} not found.\nError message: {ex.Message}\n");
-                return null;
-            }
+            // Make pushbuttondata
+            PulldownButtonData pulldownButtonData = new PulldownButtonData(baseName, buttonName);
 
-            // Retrieve the ribbon panel object
-            foreach (RibbonPanel panel in panels)
-            {
-                if (panel.Name == panelName)
-                {
-                    return panel;
-                }
-            }
+            // Set tooltip and icons
+            pulldownButtonData.ToolTip = gFil.GetTooltip(baseName);
+            pulldownButtonData.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
+            pulldownButtonData.Image = gFil.GetImageSource(baseName, resolution: 16);
 
-            // If we did not find a match, return null
-            return null;
-        }
-
-        /// <summary>
-        /// Retrieves a PushButton from a panel by name.
-        /// </summary>
-        /// <param name="panel">The panel object to search.</param>
-        /// <param name="buttonName">The name of the button to find.</param>
-        /// <returns>A PushButton object.</returns>
-        public static PushButton GetButtonOnPanel(RibbonPanel panel, string buttonName)
-        {
-            // If we have no panel, early return
-            if (panel == null) { return null; }
-
-            // Check each item on panel, return any valid matches
-            foreach (var item in panel.GetItems())
-            {
-                if (item is PushButton pushButton && pushButton.Name == buttonName)
-                {
-                    return pushButton;
-                }
-            }
-
-            // If we did not find a match, return null
-            return null;
+            // Return the data
+            return pulldownButtonData;
         }
     }
 }

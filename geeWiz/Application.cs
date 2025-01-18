@@ -1,12 +1,10 @@
-﻿// System
-using System.Collections;
-using System.Globalization;
-using System.Reflection;
-using System.Resources;
-using System.IO;
-// Revit API
+﻿// Revit API
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+// geeWiz
+using geeWiz.Extensions;
+using gAva = geeWiz.Availability.AvailabilityNames;
+using gRib = geeWiz.Utilities.RibbonUtils;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -23,13 +21,12 @@ namespace geeWiz
         /// Runs when the application starts.
         /// We use this part of the interface to initialize geeWiz.
         /// </summary>
-        public Result OnStartup(UIControlledApplication application)
+        public Result OnStartup(UIControlledApplication uiCtlApp)
         {
             // Collect the uiApp using idling event
-            _uiCtlApp = application;
+            _uiCtlApp = uiCtlApp;
 
-            // Try to subscribe to the idling event, which will capture the uiApp global
-            // Idling event = whenever Revit becomes available for commands
+            // Try to subscribe to the idling event, which sets uiApp global ASAP
             try
             {
                 _uiCtlApp.Idling += OnIdling;
@@ -39,34 +36,10 @@ namespace geeWiz
                 Globals.UiApp = null;
             }
 
-            // Store all available global variable values (available anywhere, effectively)
-            Globals.UiCtlApp = application;
-            Globals.CtlApp = application.ControlledApplication;
-            // (uiApp set by idling event)
-            Globals.Assembly = Assembly.GetExecutingAssembly();
-            Globals.AssemblyPath = Assembly.GetExecutingAssembly().Location;
-            Globals.Idling = false;
-            Globals.RevitVersion = application.ControlledApplication.VersionNumber;
-            Globals.RevitVersionInt = Int32.Parse(Globals.RevitVersion);
-            Globals.UsernameWindows = Environment.UserName;
-            Globals.AddinGuid = "{8FFC127F-9CD7-46E2-8506-C5F36D057B4B}";
+            // Store all other global variables and tooltips
+            Globals.RegisterVariables(uiCtlApp);
+            Globals.RegisterTooltips("geeWiz.Files.Tooltips");
 
-            // Construct the assembly, resource and sub-assembly paths
-            string thisAssemblyPath = Globals.AssemblyPath;
-            string thisResourcePath = Path.Combine(Path.GetDirectoryName(thisAssemblyPath), "Resources");
-            string subAssemblyPath = thisAssemblyPath.Replace("\\geeWiz.dll", "");
-
-            // Access the resource manager, for collection of tooltips
-            var resourceManager = new ResourceManager("geeWiz.Files.Tooltips", typeof(Application).Assembly);
-            var resourceSet = resourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
-
-            // Get all tooltip entries, store globally
-            foreach (DictionaryEntry entry in resourceSet)
-            {
-                string key = entry.Key.ToString();
-                string value = entry.Value.ToString().Replace("\\n", Environment.NewLine);
-                Globals.Tooltips[key] = value;
-            }
 
             /// <summary>
             /// We will load our commands here later on.
@@ -96,11 +69,8 @@ namespace geeWiz
             // Unsubscribe from the event (only runs once)
             _uiCtlApp.Idling -= OnIdling;
 
-            // Get the uiApp as the event sender
-            UIApplication uiApp = sender as UIApplication;
-
-            // If uiApp was collected, set the related globals
-            if (uiApp != null)
+            // Register if possible (will generally be)
+            if (sender is UIApplication uiApp)
             {
                 Globals.UiApp = uiApp;
                 Globals.UsernameRevit = uiApp.Application.Username;

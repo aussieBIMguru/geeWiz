@@ -1,0 +1,101 @@
+﻿// System
+using System.Reflection;
+using System.IO;
+// Revit API
+using Autodesk.Revit.UI;
+using Autodesk.Revit.ApplicationServices;
+using System.Collections;
+using System.Globalization;
+using System.Resources;
+
+// The class belongs to the geeWiz namespace
+namespace geeWiz
+{
+    /// <summary>
+    /// Variables that persist beyond the running of commands.
+    /// Many of them are set once at app startup.
+    /// </summary>
+    public static class Globals
+    {
+        // Applications
+        public static UIControlledApplication UiCtlApp { get; set; }
+        public static ControlledApplication CtlApp { get; set; }
+        public static UIApplication UiApp { get; set; }
+        public static bool Idling { get; set; }
+
+        // Key paths
+        public static System.Reflection.Assembly Assembly { get; set; }
+        public static string AssemblyPath { get; set; }
+        public static string SubAssemblyPath { get; set; }
+        public static string ResourcesPath { get; set; }
+
+        // Revit versions
+        public static string RevitVersion { get; set; }
+        public static int RevitVersionInt { get; set; }
+
+        // User names
+        public static string UsernameRevit { get; set; }
+        public static string UsernameWindows { get; set; }
+
+        // Guids and versioning
+        public static string VersionNumber { get; set; }
+        public static string VersionName { get; set; }
+        public static string AddinGuid { get; set; }
+
+        // Tooltips resource
+        public static Dictionary<string, string> Tooltips { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Sets the global values.
+        /// </summary>
+        /// <param name="uiApp"">The UIApplication.</param>
+        /// <returns>Void (nothing).</returns>
+        public static void RegisterVariables(UIControlledApplication uiApp)
+        {
+            // Store all available global variable values (available anywhere, effectively)
+            UiCtlApp = uiApp;
+            CtlApp = uiApp.ControlledApplication;
+            // (uiApp set by idling event)
+            Idling = false;
+
+            // Store all paths
+            Assembly = Assembly.GetExecutingAssembly();
+            AssemblyPath = Assembly.GetExecutingAssembly().Location;
+            SubAssemblyPath = Globals.AssemblyPath.Replace("\\geeWiz.dll", "");
+            ResourcesPath = Path.Combine(Path.GetDirectoryName(Globals.AssemblyPath), "Resources");
+
+            // Store Revit version
+            RevitVersion = uiApp.ControlledApplication.VersionNumber;
+            RevitVersionInt = Int32.Parse(Globals.RevitVersion);
+
+            // Store user names
+            UsernameWindows = Environment.UserName;
+            // (UsernameRevit stored by idling event)
+
+            // Store versions and Ids
+            VersionNumber = "25.01.01";
+            VersionName = "WIP (January 2025)";
+            AddinGuid = "{8FFC127F-9CD7-46E2-8506-C5F36D057B4B}";
+        }
+
+        /// <summary>
+        /// Sets the tooltip values.
+        /// </summary>
+        /// <param name="resourcePath"">The full path to the tooltip resource.</param>
+        /// <returns>Void (nothing).</returns>
+        public static void RegisterTooltips(string resourcePath)
+        {
+            // Construct the assembly, resource and sub-assembly paths
+            var resourceManager = new ResourceManager(resourcePath, typeof(Application).Assembly);
+            var resourceSet = resourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
+
+            // Get all tooltip entries, store globally
+            foreach (DictionaryEntry entry in resourceSet)
+            {
+                string key = entry.Key.ToString();
+                string value = entry.Value.ToString().Replace("\\n", Environment.NewLine);
+                Tooltips[key] = value;
+            }
+        }
+    }
+}

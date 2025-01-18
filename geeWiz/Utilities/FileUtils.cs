@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Media.Imaging;
+using Form = System.Windows.Forms.Form;
 // Revit API
 using Autodesk.Revit.UI;
 
@@ -19,7 +20,7 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="linkPath"">The path, typically a URL.</param>
         /// <returns>A boolean.</returns>
-        public static bool CheckLinkPath(string linkPath)
+        public static bool LinkIsAccessible(string linkPath)
         {
             return Uri.TryCreate(linkPath, UriKind.Absolute, out Uri uriResult)
                    && (uriResult.Scheme == Uri.UriSchemeHttp
@@ -33,7 +34,7 @@ namespace geeWiz.Utilities
         /// <returns>A result.</returns>
         public static Result OpenLinkPath(string linkPath)
         {
-            if (CheckLinkPath(linkPath))
+            if (LinkIsAccessible(linkPath))
             {
                 try
                 {
@@ -103,13 +104,139 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
+        /// Returns the contents of a file, by row.
+        /// </summary>
+        /// <param name="filePath">The file path to read.</param>
+        /// <param name="skipEmpty">Do not write empty rows.</param>
+        /// <returns>A list of strings.</returns>
+        public static List<string> ReadFileAsRows(string filePath, bool skipEmpty = false)
+        {
+            // List of strings to return
+            var rows = new List<string>();
+
+            // Try to read the file...
+            try
+            {
+                // Using a stream reader
+                using (var reader = new StreamReader(filePath))
+                {
+                    // While we have more rows to read
+                    while (!reader.EndOfStream)
+                    {
+                        // If the row is a string, add it
+                        if (reader.ReadLine() is string rowString)
+                        {
+                            rows.Add(rowString);
+                        }
+                        // If it isn't, and we don't skip, add empty
+                        else if (!skipEmpty)
+                        {
+                            rows.Add(string.Empty);
+                        }
+                    }
+                }
+            }
+            // Throw as an exception if we can't
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            // Return the list of strings (rows)
+            return rows;
+        }
+
+        /// <summary>
+        /// Returns the contents of a file, by row.
+        /// </summary>
+        /// <param name="filePath">The file path to read.</param>
+        /// <param name="separator">The separator string.</param>
+        /// <param name="skipEmpty">Do not write empty rows.</param>
+        /// <returns>A list of strings.</returns>
+        public static List<List<string>> ReadFileAsMatrix(string filePath, string separator = ",", bool skipEmpty = false)
+        {
+            // List of list of strings to return
+            var matrix = new List<List<string>>();
+
+            // Separator to array of strings
+            var separators = new[] { separator };
+
+            // Try to read the file...
+            try
+            {
+                // Using a stream reader
+                using (var reader = new StreamReader(filePath))
+                {
+                    // While we have more rows to read
+                    while (!reader.EndOfStream)
+                    {
+                        // If the row is a string, split and add to matrix
+                        if (reader.ReadLine() is string rowString)
+                        {
+                            var values = rowString.Split(separators, StringSplitOptions.None);
+                            matrix.Add(new List<string>(values));
+                        }
+                        // If it isn't, and we don't skip, add empty list
+                        else if (!skipEmpty)
+                        {
+                            matrix.Add(new List<string>());
+                        }
+                    }
+                }
+            }
+            // Throw as an exception if we can't
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            // Return the matrix
+            return matrix;
+        }
+
+        /// <summary>
+        /// Writes a list of strings to a file.
+        /// </summary>
+        /// <param name="filePath">The file path to read.</param>
+        /// <param name="dataRows">A list of strings to write.</param>
+        /// <returns>A Result.</returns>
+        public static Result WriteListToFile(string filePath, List<string> dataRows)
+        {
+            // Make sure file path is valid
+            if (filePath is null || !FileIsAccessible(filePath))
+            {
+                return Result.Failed;
+            }
+
+            // Write to the file as list
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(filePath, false))
+                {
+                    foreach (string row in dataRows)
+                    {
+                        writer.WriteLine(row);
+                    }
+                }
+            }
+            // Throw as an exception if we can't
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            // Return success
+            return Result.Succeeded;
+        }
+
+        /// <summary>
         /// Applies the standard form logo
         /// </summary>
         /// <param name="form"">The form to set the icon for.</param>
         /// <returns>Void (nothing).</returns>
-        public static void SetFormIcon(System.Windows.Forms.Form form)
+        public static void SetFormIcon(Form form)
         {
-            string iconPath = "gSharp.Resources.Icons.IconList16";
+            string iconPath = "geeWiz.Resources.Icons16.IconList16";
 
             using (Stream stream = Globals.Assembly.GetManifestResourceStream(iconPath))
             {

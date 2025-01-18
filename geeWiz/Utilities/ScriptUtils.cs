@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using Clipboard = System.Windows.Forms.Clipboard;
 // Revit API
 using Autodesk.Revit.UI;
-using System.Diagnostics;
 // geeWiz utilities
 using gFrm = geeWiz.Forms;
 

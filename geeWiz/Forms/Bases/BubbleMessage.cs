@@ -56,7 +56,7 @@ namespace geeWiz.Forms
             resultItem.IsNew = true;
 
             // If the link path is valid, convert to a unique resource identifier (Uri)
-            if (this.linkPath != null && gFil.CheckLinkPath(this.linkPath))
+            if (this.linkPath != null && gFil.LinkIsAccessible(this.linkPath))
             {
                 resultItem.Uri = new System.Uri(this.linkPath);
             }

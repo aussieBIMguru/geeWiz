@@ -1,6 +1,6 @@
-﻿// The class belongs to the utility namespace
-// using gErr = geeWiz.Utilities.ErrorSwallower
-namespace geeWiz.Utilities
+﻿// The class belongs to the root namespace
+// using gErr = geeWiz.ErrorSwallower
+namespace geeWiz
 {
     /// <summary>
     /// Methods of this class generally relate to error supression.

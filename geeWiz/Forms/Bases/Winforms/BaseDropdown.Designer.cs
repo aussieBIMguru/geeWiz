@@ -63,6 +63,7 @@
             this.btnCancel.TabIndex = 2;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnSelect
             // 
@@ -73,6 +74,7 @@
             this.btnSelect.TabIndex = 3;
             this.btnSelect.Text = "OK";
             this.btnSelect.UseVisualStyleBackColor = true;
+            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
             // 
             // BaseDropdown
             // 

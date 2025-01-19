@@ -1,5 +1,6 @@
 ﻿// geeWiz utilities
 using gFrm = geeWiz.Forms;
+using geeWiz.Extensions;
 
 // The class belongs to the utility namespace
 // using gWsh = geeWiz.Utilities.WorkshareUtils
@@ -11,35 +12,11 @@ namespace geeWiz.Utilities
     public static class WorkshareUtils
     {
         /// <summary>
-        /// Returns if an element is editable.
-        /// </summary>
-        /// <param name="element">The Element to check.</param>
-        /// <returns>A boolean.</returns>
-        public static bool ElementIsEditable(Element element)
-        {
-            // If document is not workshare, element is editable naturally
-            if (!element.Document.IsWorkshared) { return true; }
-
-            // Get the checkout and model updates status
-            CheckoutStatus checkoutStatus = WorksharingUtils.GetCheckoutStatus(element.Document, element.Id);
-            ModelUpdatesStatus updatesStatus = WorksharingUtils.GetModelUpdatesStatus(element.Document, element.Id);
-
-            // Check if owned by another user
-            if (checkoutStatus == CheckoutStatus.OwnedByOtherUser) { return false; }
-
-            // Check if it is already owned by us
-            else if (checkoutStatus == CheckoutStatus.OwnedByCurrentUser) { return true; }
-
-            // Finally, ensure element is current with central
-            else { return updatesStatus == ModelUpdatesStatus.CurrentWithCentral; }
-        }
-
-        /// <summary>
         /// Reviews multiple elements for editability, allowing for further processing.
         /// </summary>
         /// <param name="elements">Elements to process.</param>
         /// <returns>A WorksharingResult object.</returns>
-        public static WorksharingResult ProcessElements(List<Element> elements)
+        public static WorksharingResult ProcessElements(List<Element> elements, Document doc = null)
         {
             // Variables for use later
             var worksharingResults = new WorksharingResult();
@@ -49,7 +26,7 @@ namespace geeWiz.Utilities
             // Iterate over elements
             foreach (Element element in elements)
             {
-                if (WorkshareUtils.ElementIsEditable(element))
+                if (element.Ext_Editable(doc))
                 {
                     editable.Add(element);
                 }

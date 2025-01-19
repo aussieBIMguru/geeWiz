@@ -53,6 +53,7 @@
             this.textBox.Size = new System.Drawing.Size(435, 20);
             this.textBox.TabIndex = 1;
             this.textBox.WordWrap = false;
+            this.textBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox_KeyPress);
             // 
             // btnCancel
             // 
@@ -62,6 +63,7 @@
             this.btnCancel.TabIndex = 2;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnSelect
             // 
@@ -71,6 +73,7 @@
             this.btnSelect.TabIndex = 3;
             this.btnSelect.Text = "OK";
             this.btnSelect.UseVisualStyleBackColor = true;
+            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
             // 
             // BaseEnterValue
             // 

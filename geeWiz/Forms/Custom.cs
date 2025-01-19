@@ -266,13 +266,13 @@ namespace geeWiz.Forms
             // Default values
             if (numberOnly)
             {
-                if (title == "") { title = "Enter text"; }
-                if (message == "") { title = "Enter a text input below:"; }
+                if (title == "") { title = "Enter number"; }
+                if (message == "") { title = "Enter a numerical input below:"; }
             }
             else
             {
-                if (title == "") { title = "Enter number"; }
-                if (message == "") { title = "Enter a numerical input below:"; }
+                if (title == "") { title = "Enter text"; }
+                if (message == "") { title = "Enter a text input below:"; }
             }
 
             // Using an enter value form

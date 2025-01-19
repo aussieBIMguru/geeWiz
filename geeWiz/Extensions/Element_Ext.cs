@@ -134,6 +134,34 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
+        /// Returns if an element is editable.
+        /// </summary>
+        /// <param name="element">The Element to check (extended).</param>
+        /// <param name="doc">The Revit document (optional).</param>
+        /// <returns>A boolean.</returns>
+        public static bool Ext_Editable(this Element element, Document doc = null)
+        {
+            // Get document if not provided
+            if (doc is null) { doc = element.Document; }
+
+            // If document is not workshare, element is editable naturally
+            if (!doc.IsWorkshared) { return true; }
+
+            // Get the checkout and model updates status
+            CheckoutStatus checkoutStatus = WorksharingUtils.GetCheckoutStatus(doc, element.Id);
+            ModelUpdatesStatus updatesStatus = WorksharingUtils.GetModelUpdatesStatus(doc, element.Id);
+
+            // Check if owned by another user
+            if (checkoutStatus == CheckoutStatus.OwnedByOtherUser) { return false; }
+
+            // Check if it is already owned by us
+            else if (checkoutStatus == CheckoutStatus.OwnedByCurrentUser) { return true; }
+
+            // Finally, ensure element is current with central
+            else { return updatesStatus == ModelUpdatesStatus.CurrentWithCentral; }
+        }
+
+        /// <summary>
         /// Constructs a parameter helper object to get parameter values.
         /// </summary>
         /// <param name="element">A Revit Element (extended).</param>

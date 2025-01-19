@@ -250,7 +250,7 @@ namespace geeWiz.Utilities
                 for (int c = startCol; c < matrix[r].Count + startCol; c++)
                 {
                     // Get the matrix value
-                    var cellValue = matrix[r][c];
+                    var cellValue = matrix[r - 1][c - 1];
 
                     // Write to the cell if its value is not null
                     if (cellValue is not null)

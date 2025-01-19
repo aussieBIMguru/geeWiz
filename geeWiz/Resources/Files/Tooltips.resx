@@ -117,13 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Revisions_Uprev" xml:space="preserve">
-    <value>Prompts the selection of a revision and list of sheets, then proceeds to apply the chosen revision to them.
+  <data name="Testing_Github" xml:space="preserve">
+    <value>Takes you to the project's github.</value>
+  </data>
+  <data name="Testing_Testing" xml:space="preserve">
+    <value>This is just a testing command.
 
-Context:
-- Active document is a project
+It will make all sheet names in the current document uppercase.
 
-Tip:
-If you have sheets selected when running the script, you will be asked if you want to use those instead.</value>
+This command attempts to demonstrate:
+- Ribbon construction logic
+- Collection of elements
+- Worksharing filtering
+- Using the progress bar
+- Using a transaction
+- Use of forms library
+
+More to come in future, but enjoy for now!</value>
   </data>
 </root>

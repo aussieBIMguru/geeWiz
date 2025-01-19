@@ -68,7 +68,7 @@ namespace geeWiz.Forms
         private void ResetKeys()
         {
             // Clear all items and filtered indices
-            listView.Items.Clear();
+            listView.Clear();
             filteredIndices.Clear();
 
             // Re-establish the list view
@@ -103,7 +103,7 @@ namespace geeWiz.Forms
             if (string.IsNullOrEmpty(filter)) { ResetKeys(); return; }
 
             // Clear all items and filtered indices
-            listView.Items.Clear();
+            listView.Clear();
             filteredIndices.Clear();
 
             // Re-establish the list view

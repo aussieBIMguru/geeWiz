@@ -61,17 +61,32 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Prompts the selection of a revision and list of sheets, then proceeds to apply the chosen revision to them.
-        ///
-        ///Context:
-        ///- Active document is a project
-        ///
-        ///Tip:
-        ///If you have sheets selected when running the script, you will be asked if you want to use those instead..
+        ///   Looks up a localized string similar to Takes you to the project&apos;s github..
         /// </summary>
-        internal static string Revisions_Uprev {
+        internal static string Testing_Github {
             get {
-                return ResourceManager.GetString("Revisions_Uprev", resourceCulture);
+                return ResourceManager.GetString("Testing_Github", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is just a testing command.
+        ///
+        ///It will make all sheet names in the current document uppercase.
+        ///
+        ///This command attempts to demonstrate:
+        ///- Ribbon construction logic
+        ///- Collection of elements
+        ///- Worksharing filtering
+        ///- Using the progress bar
+        ///- Using a transaction
+        ///- Use of forms library
+        ///
+        ///More to come in future, but enjoy for now!.
+        /// </summary>
+        internal static string Testing_Testing {
+            get {
+                return ResourceManager.GetString("Testing_Testing", resourceCulture);
             }
         }
     }

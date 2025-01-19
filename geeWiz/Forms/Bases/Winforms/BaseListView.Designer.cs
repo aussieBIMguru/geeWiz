@@ -44,6 +44,7 @@
             this.textFilter.Name = "textFilter";
             this.textFilter.Size = new System.Drawing.Size(435, 20);
             this.textFilter.TabIndex = 0;
+            this.textFilter.TextChanged += new System.EventHandler(this.txtFilter_TextChanged);
             // 
             // listView
             // 
@@ -68,6 +69,7 @@
             this.btnCheckAll.TabIndex = 2;
             this.btnCheckAll.Text = "Check all";
             this.btnCheckAll.UseVisualStyleBackColor = true;
+            this.btnCheckAll.Click += new System.EventHandler(this.btnCheckAll_Click);
             // 
             // btnUncheckAll
             // 
@@ -78,6 +80,7 @@
             this.btnUncheckAll.TabIndex = 3;
             this.btnUncheckAll.Text = "Uncheck all";
             this.btnUncheckAll.UseVisualStyleBackColor = true;
+            this.btnUncheckAll.Click += new System.EventHandler(this.btnUncheckAll_Click);
             // 
             // btnSelect
             // 
@@ -88,6 +91,7 @@
             this.btnSelect.TabIndex = 4;
             this.btnSelect.Text = "Select";
             this.btnSelect.UseVisualStyleBackColor = true;
+            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
             // 
             // btnCancel
             // 
@@ -98,6 +102,7 @@
             this.btnCancel.TabIndex = 5;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // BaseListView
             // 

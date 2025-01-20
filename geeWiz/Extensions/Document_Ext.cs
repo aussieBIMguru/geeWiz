@@ -3,6 +3,8 @@ using View = Autodesk.Revit.DB.View;
 using Room = Autodesk.Revit.DB.Architecture.Room;
 // geeWiz
 using gView = geeWiz.Utilities.ViewUtils;
+using gFrm = geeWiz.Forms;
+using geeWiz.Forms;
 
 // The class belongs to the extensions namespace
 // Document doc.ExtensionMethod()
@@ -13,6 +15,27 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class Document_Ext
     {
+        /// <summary>
+        /// Returns the start view of the document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <returns>A View.</returns>
+        public static View Ext_GetStartView(this Document doc)
+        {
+            // Get start view settings
+            var startingViewSettings = StartingViewSettings.GetStartingViewSettings(doc);
+            
+            // Return the starting view if there is one
+            if (startingViewSettings.ViewId is ElementId elementId)
+            {
+                return doc.GetElement(elementId) as View;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         /// <summary>
         /// Creates a new collector object, with an optional view input.
         /// </summary>
@@ -209,6 +232,50 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
+        /// Select level(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the levels by elevation.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectLevels(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        {
+            // Set the default form title if not provided
+            if (title is null)
+            {
+                // Process based on multiSelect
+                if (multiSelect)
+                {
+                    title = "Select Level(s):";
+                }
+                else
+                {
+                    title = "Select a Level:";
+                }
+            }
+
+            // Get all Levels in document
+            var levels = doc.Ext_GetLevels(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = levels
+                .Select(l => l.Name)
+                .ToList();
+
+            // Process into values (to display)
+            var values = levels
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        /// <summary>
         /// Gets all revisions in the given document.
         /// </summary>
         /// <param name="doc">A Revit document (extended).</param>
@@ -233,6 +300,48 @@ namespace geeWiz.Extensions
             {
                 return revisions;
             }
+        }
+
+        /// <summary>
+        /// Processes a form for showing revisions.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="message">The form message (optional).</param>
+        /// <param name="sorted">Sort the Revisions by sequence.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult Ext_SelectRevision(Document doc, string title = null, string message = null, bool sorted = false)
+        {
+            // Set the default form title if not provided
+            if (title is null)
+            {
+                title = "Select Revision";
+            }
+
+            // Set the default form message if not provided
+            if (message is null)
+            {
+                message = "Select a revision from below:";
+            }
+
+            // Get all Revisions in document
+            var revisions = doc.Ext_GetRevisions(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = revisions
+                .Select(r => $"{r.SequenceNumber} - {r.RevisionDate}: {r.Description}")
+                .ToList();
+
+            // Process into values (to display)
+            var values = revisions
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromDropdown(keys: keys,
+                values: values,
+                title: title,
+                message: message);
         }
 
         /// <summary>
@@ -267,6 +376,36 @@ namespace geeWiz.Extensions
             else
             {
                 return rooms;
+            }
+        }
+
+        /// <summary>
+        /// Gets all Worksets in the given document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="sorted">Sort the Worksets by name.</param>
+        /// <returns>A list of Worksets.</returns>
+        public static List<Workset> Ext_GetWorksets(this Document doc, bool sorted = false)
+        {
+            // If the document is not workshared, return an empty list
+            if (!doc.IsWorkshared) { return new List<Workset>(); }
+
+            // Collect all Worksets in the document
+            List<Workset> worksets = new FilteredWorksetCollector(doc)
+                .OfKind(WorksetKind.UserWorkset)
+                .ToWorksets()
+                .ToList();
+
+            // Return the Worksets sorted or unsorted
+            if (sorted)
+            {
+                return worksets
+                    .OrderBy(w => w.Name)
+                    .ToList();
+            }
+            else
+            {
+                return worksets;
             }
         }
     }

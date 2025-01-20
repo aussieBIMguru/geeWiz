@@ -3,6 +3,8 @@ using Autodesk.Revit.UI;
 // geeWiz libraries
 using gFrm = geeWiz.Forms;
 
+// The class belongs to the forms namespace
+// using gFrm = geeWiz.Forms (+ .Custom)
 namespace geeWiz.Forms
 {
     // These classes all form the front end selection forms in Revit
@@ -377,7 +379,7 @@ namespace geeWiz.Forms
         /// <param name="title">An optional title to display.</param>
         /// <param name="message">An optional message to display.</param>
         /// <param name="defaultIndex">An optional index to initialize at.</param>
-        /// <returns>The selected object.</returns>
+        /// <returns>A FormResult object.</returns>
         public static FormResult SelectFromDropdown(List<string> keys, List <object> values,
             string title = "", string message = "", int defaultIndex = -1)
         {

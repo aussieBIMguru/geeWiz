@@ -1,6 +1,6 @@
 ﻿// System
-using System.Reflection;
 using System.IO;
+using Assembly = System.Reflection.Assembly;
 // Revit API
 using Autodesk.Revit.UI;
 using Autodesk.Revit.ApplicationServices;
@@ -23,12 +23,13 @@ namespace geeWiz
         public static UIApplication UiApp { get; set; }
         public static bool Idling { get; set; }
 
-        // Warden
+        // General utilities
         public static bool WardenActive { get; set; }
         public static string LastCommandId { get; set; }
+        public static bool ColouringTabs { get; set; }
 
         // Key paths
-        public static System.Reflection.Assembly Assembly { get; set; }
+        public static Assembly Assembly { get; set; }
         public static string AssemblyPath { get; set; }
         public static string SubAssemblyPath { get; set; }
         public static string ResourcesPath { get; set; }
@@ -62,9 +63,10 @@ namespace geeWiz
             // (uiApp set by idling event)
             Idling = true;
 
-            // Warden
+            // General utilities
             WardenActive = true;
             LastCommandId = null;
+            ColouringTabs = false;
 
             // Store all paths
             Assembly = Assembly.GetExecutingAssembly();
@@ -81,7 +83,7 @@ namespace geeWiz
             // (UsernameRevit stored by idling event)
 
             // Store versions and Ids
-            VersionNumber = "25.01.01";
+            VersionNumber = "25.01.02";
             VersionName = "WIP (January 2025)";
             AddinGuid = "{8FFC127F-9CD7-46E2-8506-C5F36D057B4B}";
         }

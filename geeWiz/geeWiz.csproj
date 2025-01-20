@@ -52,6 +52,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="UIFramework">
+        <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\UIFramework.dll</HintPath>
+      </Reference>
+      <Reference Include="Xceed.Wpf.AvalonDock">
+        <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\Xceed.Wpf.AvalonDock.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
       <Compile Update="Resources\Files\Tooltips.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>

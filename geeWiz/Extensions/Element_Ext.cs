@@ -162,6 +162,18 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
+        /// Retrieve a parameter from an element via a builtin parameter.
+        /// </summary>
+        /// <param name="element">The Element (extended).</param>
+        /// <param name="builtInParameter">A Revit BuiltInParameter.</param>
+        /// <returns>A Parameter object.</returns>
+        public static Parameter Ext_GetBuiltInParameter(this Element element, BuiltInParameter builtInParameter)
+        {
+            ForgeTypeId forgeTypeId = ParameterUtils.GetParameterTypeId(builtInParameter);
+            return element.GetParameter(forgeTypeId);
+        }
+
+        /// <summary>
         /// Constructs a parameter helper object to get parameter values.
         /// </summary>
         /// <param name="element">A Revit Element (extended).</param>

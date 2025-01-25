@@ -24,6 +24,7 @@ namespace geeWiz
         public static ControlledApplication CtlApp { get; set; }
         public static UIApplication UiApp { get; set; }
         public static bool Idling { get; set; }
+        public static bool IsDarkMode { get; set; }
 
         // General utilities
         public static bool WardenActive { get; set; }
@@ -68,6 +69,7 @@ namespace geeWiz
             CtlApp = uiApp.ControlledApplication;
             // (uiApp set by idling event)
             Idling = true;
+            IsDarkMode = false;
 
             // General utilities
             WardenActive = true;

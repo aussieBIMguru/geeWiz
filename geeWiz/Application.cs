@@ -1,11 +1,9 @@
-﻿#region Usings
-// Revit API
+﻿// Revit API
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 // geeWiz
 using geeWiz.Extensions;
 using gAva = geeWiz.Availability.AvailabilityNames;
-#endregion
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -61,7 +59,7 @@ namespace geeWiz
 
             #endregion
 
-            #region Construct toolbar
+            #region Construct RibbonPanel1
 
             /// <summary>
             /// We will load our commands here later on.
@@ -79,12 +77,23 @@ namespace geeWiz
             // Add Github and Testing buttons
             ribbonPanel1.Ext_AddPushButton(buttonName: "Github", commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_Github", availability: gAva.ZeroDoc);
             ribbonPanel1.Ext_AddPushButton(buttonName: "Testing", commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_Testing", availability: gAva.Project);
+            ribbonPanel1.Ext_AddPushButton(buttonName: "Coloured Tabs", commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_ColourTabs", availability: gAva.Project);
 
-            // Example of version management (not used yet)
+            #endregion
+
+            #region Dark mode (2024+)
+
+            // Add Dark/Light mode if in 2024 or higher
             #if REVIT2024_OR_GREATER
-            // TESTING
-            #else
-            //TESTING 2
+
+            // Set dark mode global variable
+            Globals.IsDarkMode = UIThemeManager.CurrentTheme == UITheme.Dark;
+
+            // Add UiToggle button
+            ribbonPanel1.Ext_AddPushButton(buttonName: Globals.IsDarkMode ? "Light mode" : "Dark mode",
+                commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_UiToggle", availability: gAva.ZeroDoc,
+                suffix: Globals.IsDarkMode ? "" : "_Dark");
+
             #endif
 
             #endregion
@@ -99,8 +108,16 @@ namespace geeWiz
         /// </summary>
         public Result OnShutdown(UIControlledApplication application)
         {
-            // Still to add - Unsubscriptions
-            
+            #region Unsubscribe from events
+
+            // Deregister coloured tabs
+            if (Globals.ColouringTabs) { ColouredTabs.DeRegister(); }
+
+            // Deregister Warden
+            if (Globals.WardenActive) { Warden.DeRegister(Globals.UiCtlApp); }
+
+            #endregion
+
             // Return succeeded
             return Result.Succeeded;
         }

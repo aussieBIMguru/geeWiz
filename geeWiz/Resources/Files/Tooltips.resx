@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Testing_ColourTabs" xml:space="preserve">
+    <value>Toggles the colouring of view tabs by document.
+
+Note:
+Tab colouring will override default Revit tab colouring behavior. Whilst this setting can be disabled afterwards, you will need to restart Revit to reinstate default tab colouring afterwards.</value>
+  </data>
   <data name="Testing_Github" xml:space="preserve">
     <value>Takes you to the project's github.</value>
   </data>
@@ -134,5 +140,11 @@ This command attempts to demonstrate:
 - Use of forms library
 
 More to come in future, but enjoy for now!</value>
+  </data>
+  <data name="Testing_UiToggle" xml:space="preserve">
+    <value>Toggles between light and dark mode.
+
+Shift + Click:
+Sets the canvas theme to Dark instead of light.</value>
   </data>
 </root>

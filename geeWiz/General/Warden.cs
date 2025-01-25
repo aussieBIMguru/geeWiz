@@ -12,7 +12,7 @@ namespace geeWiz
     /// </summary>
     public static class Warden
     {
-        #region Register commands
+        #region Register/deregister commands
 
         /// <summary>
         /// Registers all commands to Warden.
@@ -26,9 +26,21 @@ namespace geeWiz
             WatchCommand(uiApp, commandName: "ID_EDIT_PAINT");
         }
 
+        /// <summary>
+        /// Registers all commands to Warden.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <returns>Void (nothing).</returns>
+        public static void DeRegister(UIControlledApplication uiApp)
+        {
+            IgnoreCommand(uiApp, commandName: "ID_INPLACE_COMPONENT");
+            IgnoreCommand(uiApp, commandName: "ID_FILE_IMPORT");
+            IgnoreCommand(uiApp, commandName: "ID_EDIT_PAINT");
+        }
+
         #endregion
 
-        #region Watch command
+        #region Watch/ignore command
 
         /// <summary>
         /// Try to add a command to Warden.
@@ -46,6 +58,25 @@ namespace geeWiz
             {
                 // If we can, create the binding
                 uiApp.CreateAddInCommandBinding(commandId).Executed += new EventHandler<ExecutedEventArgs>(CatchCommand);
+            }
+        }
+
+        /// <summary>
+        /// Try to remove a command from Warden.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="commandName">The internal name of the Command to watch.</param>
+        /// <returns>Void (nothing).</returns>
+        public static void IgnoreCommand(UIControlledApplication uiApp, string commandName)
+        {
+            // Look up the command Id by name
+            var commandId = RevitCommandId.LookupCommandId(commandName);
+
+            // Check if we can bind to the command
+            if (commandId.CanHaveBinding && commandId.HasBinding)
+            {
+                // If we can, remove the binding
+                uiApp.CreateAddInCommandBinding(commandId).Executed -= new EventHandler<ExecutedEventArgs>(CatchCommand);
             }
         }
 

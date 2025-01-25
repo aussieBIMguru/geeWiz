@@ -61,6 +61,18 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Toggles the colouring of view tabs by document.
+        ///
+        ///Note:
+        ///Tab colouring will override default Revit tab colouring behavior. Whilst this setting can be disabled afterwards, you will need to restart Revit to reinstate default tab colouring afterwards..
+        /// </summary>
+        internal static string Testing_ColourTabs {
+            get {
+                return ResourceManager.GetString("Testing_ColourTabs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Takes you to the project&apos;s github..
         /// </summary>
         internal static string Testing_Github {
@@ -87,6 +99,18 @@ namespace geeWiz.Resources.Files {
         internal static string Testing_Testing {
             get {
                 return ResourceManager.GetString("Testing_Testing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles between light and dark mode.
+        ///
+        ///Shift + Click:
+        ///Sets the canvas theme to Dark instead of light..
+        /// </summary>
+        internal static string Testing_UiToggle {
+            get {
+                return ResourceManager.GetString("Testing_UiToggle", resourceCulture);
             }
         }
     }

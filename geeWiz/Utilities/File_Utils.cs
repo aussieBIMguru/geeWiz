@@ -146,10 +146,10 @@ namespace geeWiz.Utilities
                     }
                 }
             }
-            // Throw as an exception if we can't
+            // Report exception
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine($"An error occurred while trying to read the file: {ex.Message}");
             }
 
             // Return the list of strings (rows)
@@ -194,10 +194,10 @@ namespace geeWiz.Utilities
                     }
                 }
             }
-            // Throw as an exception if we can't
+            // Report exception
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine($"An error occurred while trying to read file: {ex.Message}");
             }
 
             // Return the matrix
@@ -233,10 +233,11 @@ namespace geeWiz.Utilities
                     }
                 }
             }
-            // Throw as an exception if we can't
+            // Report exception
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine($"An error occurred while trying to write file: {ex.Message}");
+                return Result.Failed;
             }
 
             // Return success
@@ -283,7 +284,7 @@ namespace geeWiz.Utilities
                 // Throw exception if stream not made
                 if (stream == null)
                 {
-                    throw new ArgumentException($"Png resource not found: {resourcePath}");
+                    return null;
                 }
 
                 // Decode the png resource

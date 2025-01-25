@@ -151,8 +151,7 @@ namespace geeWiz.Forms
             // Show form to user
             Message(message: message,
                 title: "Task completed",
-                noCancel: true,
-                warning: true);
+                noCancel: true);
 
             // Return a succeeded result
             return Result.Succeeded;

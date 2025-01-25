@@ -23,8 +23,9 @@ namespace geeWiz.Extensions
         /// <param name="buttonName">The name for the button.</param>
         /// <param name="commandClass">The command the button will run.</param>
         /// <param name="availability">The availability name.</param>
+        /// <param name="suffix">The icon suffix (none by default).</param>
         /// <returns>A Pushbutton object.</returns>
-        public static PushButton Ext_AddPushButton(this RibbonPanel ribbonPanel, string buttonName, string commandClass, string availability = "")
+        public static PushButton Ext_AddPushButton(this RibbonPanel ribbonPanel, string buttonName, string commandClass, string availability = "", string suffix = "")
         {
             // Return an error message if panel is null
             if (ribbonPanel == null)
@@ -50,8 +51,8 @@ namespace geeWiz.Extensions
 
                 // Set tooltip and icons
                 pushButton.ToolTip = gFil.GetTooltip(baseName);
-                pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
-                pushButton.Image = gFil.GetImageSource(baseName, resolution: 16);
+                pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
+                pushButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 
                 // Return the PushButton
                 return pushButton;
@@ -70,8 +71,9 @@ namespace geeWiz.Extensions
         /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
         /// <param name="baseName">The base name of the pulldown.</param>
         /// <param name="buttonName">The displayed name of the pulldown.</param>
+        /// <param name="suffix">The icon suffix (none by default).</param>
         /// <returns>A pulldownButton object.</returns>
-        public static PulldownButton Ext_AddPulldownButton(this RibbonPanel ribbonPanel, string baseName, string buttonName)
+        public static PulldownButton Ext_AddPulldownButton(this RibbonPanel ribbonPanel, string baseName, string buttonName, string suffix = "")
         {
             // Return an error message if panel is null
             if (ribbonPanel == null)
@@ -88,8 +90,8 @@ namespace geeWiz.Extensions
             {
                 // Set tooltip and icons
                 pulldownButton.ToolTip = gFil.GetTooltip(baseName);
-                pulldownButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
-                pulldownButton.Image = gFil.GetImageSource(baseName, resolution: 16);
+                pulldownButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
+                pulldownButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 
                 // Return the pulldown
                 return pulldownButton;
@@ -139,6 +141,28 @@ namespace geeWiz.Extensions
                 if (ribbonItem.Name == buttonName && ribbonItem is PulldownButton pulldownButton)
                 {
                     return pulldownButton;
+                }
+            }
+
+            // If not found, we finally return null
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a PushButton from a RibbonPanel.
+        /// </summary>
+        /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
+        /// <param name="buttonText">The text of the button to find.</param>
+        /// <returns>A PushButton.</returns>
+        public static PushButton Ext_GetPushButtonByText(this RibbonPanel ribbonPanel, string buttonText)
+        {
+            // For each panel in the tab
+            foreach (RibbonItem ribbonItem in ribbonPanel.GetItems())
+            {
+                // If the name matches, return it
+                if (ribbonItem.ItemText == buttonText && ribbonItem is PushButton pushButton)
+                {
+                    return pushButton;
                 }
             }
 

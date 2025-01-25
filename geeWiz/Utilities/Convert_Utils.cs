@@ -80,5 +80,58 @@ namespace geeWiz.Utilities
         }
 
         #endregion
+
+        #region ElementId <=> Integer
+
+        // In Revit 2024, deprecations occured for the ElementId class
+        // We handle them here using preprocessor directives
+
+        /// <summary>
+        /// Creates an ElementId from an integer (in 2024+ needs to be Int64).
+        /// </summary>
+        /// <param name="integer">The integer value.</param>
+        /// <returns>An ElementId.</returns>
+        public static ElementId IntToElementId(int integer)
+        {
+            // ElementId begins as null
+            ElementId elementId = null;
+
+            #if REVIT2024_OR_GREATER
+            // Try to get ElementId using Int64
+            try
+            {
+                elementId = new ElementId((Int64)integer);
+            }
+            catch {; }
+            #else
+            // Try to get ElementId using Int
+            try
+            {
+                return new ElementId(integer);
+            }
+            catch{; }
+            #endif
+
+            // Return the elementId
+            return elementId;
+        }
+
+        /// <summary>
+        /// Returns the integer value of an ElementId (in 2024+ needs to come from Value).
+        /// </summary>
+        /// <param name="elementId">The ElementId.</param>
+        /// <returns>An integer.</returns>
+        public static int ElementIdToInt(ElementId elementId)
+        {
+            #if REVIT2024_OR_GREATER
+            // Return the Value
+            return (int)elementId.Value;
+            #else
+            // Return the IntegerValue
+            return elementId.IntegerValue;
+            #endif
+        }
+
+        #endregion
     }
 }

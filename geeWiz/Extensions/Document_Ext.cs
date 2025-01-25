@@ -1,20 +1,23 @@
 ﻿// Revit API
-using View = Autodesk.Revit.DB.View;
 using Room = Autodesk.Revit.DB.Architecture.Room;
+using View = Autodesk.Revit.DB.View;
 // geeWiz
-using gView = geeWiz.Utilities.ViewUtils;
 using gFrm = geeWiz.Forms;
-using geeWiz.Forms;
+using gSpa = geeWiz.Utilities.Spatial_Utils;
+using gView = geeWiz.Utilities.View_Utils;
+using Autodesk.Revit.UI;
 
 // The class belongs to the extensions namespace
 // Document doc.ExtensionMethod()
 namespace geeWiz.Extensions
 {
     /// <summary>
-    /// Methods of this class generally relate to collecting objects.
+    /// Methods of this class generally relate to collecting and selecting objects.
     /// </summary>
     public static class Document_Ext
     {
+        #region Document properties
+
         /// <summary>
         /// Returns the start view of the document.
         /// </summary>
@@ -35,6 +38,102 @@ namespace geeWiz.Extensions
                 return null;
             }
         }
+
+        #endregion
+
+        #region Delete element(s)
+
+        // DeleteElement has 2 overloads (Element / ElementId)
+
+        /// <summary>
+        /// Attempts to delete an element from the document.
+        /// </summary>
+        /// <param name="doc">The Document to delete from (extended).</param>
+        /// <param name="element">A Revit Element.</param>
+        /// <returns>A Result object.</returns>
+        public static Result Ext_DeleteElement(this Document doc, Element element)
+        {
+            // Try to delete the element
+            try
+            {
+                doc.Delete(element.Id);
+                return Result.Succeeded;
+            }
+            catch
+            {
+                return Result.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to delete an element from the document by Id.
+        /// </summary>
+        /// <param name="doc">The Document to delete from (extended).</param>
+        /// <param name="elementId">A Revit ElementId.</param>
+        /// <returns>A Result object.</returns>
+        public static Result Ext_DeleteElement(this Document doc, ElementId elementId)
+        {
+            // Try to delete the element
+            try
+            {
+                doc.Delete(elementId);
+                return Result.Succeeded;
+            }
+            catch
+            {
+                return Result.Failed;
+            }
+        }
+
+        // DeleteElements has 2 overloads (Elements / ElementIds)
+
+        /// <summary>
+        /// Attempts to delete elements from the document.
+        /// </summary>
+        /// <param name="doc">The Document to delete from (extended).</param>
+        /// <param name="elements">Revit Elements.</param>
+        /// <returns>A list of Results.</returns>
+        public static List<Result> Ext_DeleteElements(this Document doc, List<Element> elements)
+        {
+            // Result list to return
+            var results = new List<Result>();
+            
+            // For each element
+            foreach (Element element in elements)
+            {
+                // Try to delete, add result
+                results.Add(doc.Ext_DeleteElement(element));
+            }
+
+            // Return the results
+            return results;
+        }
+
+        /// <summary>
+        /// Attempts to delete elements by Id from the document.
+        /// </summary>
+        /// <param name="doc">The Document to delete from (extended).</param>
+        /// <param name="elementIds">Revit ElementIds.</param>
+        /// <returns>A list of Results.</returns>
+        public static List<Result> Ext_DeleteElements(this Document doc, List<ElementId> elementIds)
+        {
+            // Result list to return
+            var results = new List<Result>();
+
+            // For each element
+            foreach (ElementId elementId in elementIds)
+            {
+                // Try to delete, add result
+                results.Add(doc.Ext_DeleteElement(elementId));
+            }
+
+            // Return the results
+            return results;
+        }
+
+        #endregion
+
+        #region Generic collectors
 
         /// <summary>
         /// Creates a new collector object, with an optional view input.
@@ -68,6 +167,10 @@ namespace geeWiz.Extensions
                 .WhereElementIsNotElementType()
                 .ToList();
         }
+
+        #endregion
+
+        #region Sheet collector/selection
 
         /// <summary>
         /// Gets all sheets in the given document.
@@ -107,6 +210,58 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
+        /// Select sheet(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="sheets">An optional list of sheets to show.</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the levels by elevation.</param>
+        /// <param name="includePlaceholders">Include placeholder sheets.</param>
+        /// <param name="includeId">Append the ElementId to the end.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectSheets(this Document doc, List<ViewSheet> sheets = null, string title = null,
+            bool multiSelect = true, bool sorted = false, bool includePlaceholders = false, bool includeId = false)
+        {
+            // Set the default form title if not provided
+            if (title is null)
+            {
+                // Process based on multiSelect
+                if (multiSelect)
+                {
+                    title = "Select Sheets(s):";
+                }
+                else
+                {
+                    title = "Select a Sheet:";
+                }
+            }
+
+            // Get all Sheets in document if none provided
+            sheets ??= doc.Ext_GetSheets(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = sheets
+                .Select(s => s.Ext_ToSheetKey(includeId))
+                .ToList();
+
+            // Process into values (to display)
+            var values = sheets
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        #endregion
+
+        #region View collector/selection
+
+        /// <summary>
         /// Gets all views in the given document.
         /// </summary>
         /// <param name="doc">A Revit document (extended).</param>
@@ -116,7 +271,7 @@ namespace geeWiz.Extensions
         public static List<View> Ext_GetViews(this Document doc, List<ViewType> viewTypes = null, bool sorted = false)
         {
             // Set default types if not provided
-            if (viewTypes == null) { viewTypes = gView.VIEWTYPES_GRAPHICAL; }
+            viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
             
             // Collect all views in document
             List<View> views = doc.Ext_Collector()
@@ -138,6 +293,47 @@ namespace geeWiz.Extensions
                 return views;
             }
         }
+
+        /// <summary>
+        /// Select sheet(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="views">An optional list of views to show.</param>
+        /// <param name="viewTypes">View types to include.</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the levels by elevation.</param>
+        /// <param name="includeId">Append the ElementId to the end.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectViews(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
+            string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select View(s):" : "Select a View:";
+
+            // Get all Views in document if none provided
+            views ??= doc.Ext_GetViews(viewTypes: viewTypes, sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = views
+                .Select(v => v.Ext_ToViewKey(includeId))
+                .ToList();
+
+            // Process into values (to display)
+            var values = views
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        #endregion
+
+        #region View Template collector/selection
 
         /// <summary>
         /// Gets all views templates in the given document.
@@ -173,11 +369,36 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
+        /// Select sheet(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="views">An optional list of views to show.</param>
+        /// <param name="viewTypes">View types to include.</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the levels by elevation.</param>
+        /// <param name="includeId">Append the ElementId to the end.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectViewTemplates(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
+            string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
+        {
+            // Filter to just view templates
+            views = views.Where(v => v.IsTemplate).ToList();
+            
+            // Same routine as Views, key handles view template identification
+            return doc.Ext_SelectViews(views, viewTypes, title, multiSelect, sorted, includeId);
+        }
+
+        #endregion
+
+        #region VewFamilyType collector/selection
+
+        /// <summary>
         /// Gets all ViewFamilyTypes in the given document.
         /// </summary>
         /// <param name="doc">A Revit document (extended).</param>
-        /// <param name="sorted">Sort the ViewFamilyTypes by name.</param>
         /// <param name="viewFamilies">ViewFamilies to include.</param>
+        /// <param name="sorted">Sort the ViewFamilyTypes by name.</param>
         /// <returns>A list of ViewFamilyTypes.</returns>
         public static List<ViewFamilyType> Ext_GetViewFamilyTypes(this Document doc, List<ViewFamily> viewFamilies = null, bool sorted = false)
         {
@@ -203,6 +424,46 @@ namespace geeWiz.Extensions
                 return viewFamilyTypes;
             }
         }
+
+        /// <summary>
+        /// Select sheet(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="viewFamilies">ViewFamilies to include.</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the levels by elevation.</param>
+        /// <param name="includeId">Append the ElementId to the end.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectViewFamilyTypes(this Document doc, List<ViewFamily> viewFamilies= null,
+            string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select ViewFamilyType(s):" : "Select a ViewFamilyType:";
+
+            // Get all ViewFamilyTypes in document
+            var viewFamilyTypes = doc.Ext_GetViewFamilyTypes(viewFamilies: viewFamilies, sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = viewFamilyTypes
+                .Select(v => v.Ext_ToViewFamilyTypeKey(includeId))
+                .ToList();
+
+            // Process into values (to display)
+            var values = viewFamilyTypes
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        #endregion
+
+        #region Level collector/selection
 
         /// <summary>
         /// Gets all levels in the given document.
@@ -242,18 +503,7 @@ namespace geeWiz.Extensions
         public static gFrm.FormResult Ext_SelectLevels(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
         {
             // Set the default form title if not provided
-            if (title is null)
-            {
-                // Process based on multiSelect
-                if (multiSelect)
-                {
-                    title = "Select Level(s):";
-                }
-                else
-                {
-                    title = "Select a Level:";
-                }
-            }
+            title ??= multiSelect ? "Select Level(s):" : "Select a Level:";
 
             // Get all Levels in document
             var levels = doc.Ext_GetLevels(sorted: sorted);
@@ -274,6 +524,10 @@ namespace geeWiz.Extensions
                 title: title,
                 multiSelect: multiSelect);
         }
+
+        #endregion
+
+        #region Revision collector/selection
 
         /// <summary>
         /// Gets all revisions in the given document.
@@ -303,33 +557,58 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
-        /// Processes a form for showing revisions.
+        /// Select revision(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the revisions by sequence.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectRevisions(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select Revision(s):" : "Select a Revision:";
+
+            // Get all revisions in document
+            var revisions = doc.Ext_GetRevisions(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = revisions
+                .Select(r => r.Ext_ToRevisionKey())
+                .ToList();
+
+            // Process into values (to display)
+            var values = revisions
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        /// <summary>
+        /// Select a revision from the document.
         /// </summary>
         /// <param name="doc">A Revit document (extended).</param>
         /// <param name="title">The form title (optional).</param>
         /// <param name="message">The form message (optional).</param>
         /// <param name="sorted">Sort the Revisions by sequence.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult Ext_SelectRevision(Document doc, string title = null, string message = null, bool sorted = false)
+        public static gFrm.FormResult Ext_SelectRevision(Document doc, string title = null, string message = null, bool sorted = false)
         {
-            // Set the default form title if not provided
-            if (title is null)
-            {
-                title = "Select Revision";
-            }
-
-            // Set the default form message if not provided
-            if (message is null)
-            {
-                message = "Select a revision from below:";
-            }
+            // Set the default form title/message if not provided
+            title ??= "Select Revision";
+            message ??= "Select a revision from below:";
 
             // Get all Revisions in document
             var revisions = doc.Ext_GetRevisions(sorted: sorted);
 
             // Process into keys (to return)
             var keys = revisions
-                .Select(r => $"{r.SequenceNumber} - {r.RevisionDate}: {r.Description}")
+                .Select(r => r.Ext_ToRevisionKey())
                 .ToList();
 
             // Process into values (to display)
@@ -344,13 +623,23 @@ namespace geeWiz.Extensions
                 message: message);
         }
 
+        #endregion
+
+        #region Room collector/selection
+
         /// <summary>
-        /// Gets all revisions in the given document.
+        /// Gets all rooms in the given document.
         /// </summary>
         /// <param name="doc">A Revit document (extended).</param>
-        /// <param name="sorted">Sort the revisions by sequence number.</param>
-        /// <returns>A list of Revisions.</returns>
-        public static List<Room> Ext_GetRooms(this Document doc, View view = null, bool includeUnplaced = false, bool sorted = false)
+        /// <param name="view">An optional View to collect visible rooms from.</param>
+        /// <param name="sorted">Sort the rooms by name.</param>
+        /// <param name="includePlaced">Include valid rooms.</param>
+        /// <param name="includeRedundant">Include redundant rooms.</param>
+        /// <param name="includeUnenclosed">Include unenclosed rooms.</param>
+        /// <param name="includeUnplaced">Include unplaced rooms.</param>
+        /// <returns>A list of Rooms.</returns>
+        public static List<Room> Ext_GetRooms(this Document doc, View view = null, bool sorted = false,
+            bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Collect all rooms in document
             List<Room> rooms = doc.Ext_Collector(view)
@@ -358,26 +647,74 @@ namespace geeWiz.Extensions
                 .Cast<Room>()
                 .ToList();
 
-            // Handle unplaced rooms if needed
-            if (!includeUnplaced)
-            {
-                rooms = rooms
-                    .Where(r => r.Area > 0)
-                    .ToList();
-            }
+            // New list to construct by placement
+            var roomsFinal = new List<Room>();
+
+            // Filter the rooms, then rebuild the list by placement types
+            var roomMatrixByPlacement = gSpa.RoomsMatrixByPlacement(rooms, doc);
+            if (includePlaced) { roomsFinal.AddRange(roomMatrixByPlacement[0]); }
+            if (includeRedundant) { roomsFinal.AddRange(roomMatrixByPlacement[1]); }
+            if (includeUnenclosed) { roomsFinal.AddRange(roomMatrixByPlacement[2]); }
+            if (includeUnplaced) { roomsFinal.AddRange(roomMatrixByPlacement[3]); }
 
             // Return the rooms sorted or unsorted
             if (sorted)
             {
-                return rooms
-                    .OrderBy(r => r.Name)
+                return roomsFinal
+                    .OrderBy(r => r.Ext_ToRoomKey())
                     .ToList();
             }
             else
             {
-                return rooms;
+                return roomsFinal;
             }
         }
+
+        /// <summary>
+        /// Select room(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the revisions by sequence.</param>
+        /// <param name="includePlaced">Include valid rooms.</param>
+        /// <param name="includeRedundant">Include redundant rooms.</param>
+        /// <param name="includeUnenclosed">Include unenclosed rooms.</param>
+        /// <param name="includeUnplaced">Include unplaced rooms.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectRooms(this Document doc, string title = null, bool multiSelect = true, bool sorted = false,
+            bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select Room(s):" : "Select a Room:";
+
+            // Get all rooms in document
+            var rooms = doc.Ext_GetRooms(sorted: sorted,
+                includePlaced: includePlaced,
+                includeRedundant: includeRedundant,
+                includeUnenclosed: includeUnenclosed,
+                includeUnplaced: includeUnplaced);
+
+            // Process into keys (to return)
+            var keys = rooms
+                .Select(r => r.Ext_ToRoomKey())
+                .ToList();
+
+            // Process into values (to display)
+            var values = rooms
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        #endregion
+
+        #region Workset collector/selection
 
         /// <summary>
         /// Gets all Worksets in the given document.
@@ -408,5 +745,40 @@ namespace geeWiz.Extensions
                 return worksets;
             }
         }
+
+        /// <summary>
+        /// Select Workset(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the revisions by sequence.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectWorksets(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select Workset(s):" : "Select a Workset:";
+
+            // Get all worksets in document
+            var worksets = doc.Ext_GetWorksets(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = worksets
+                .Select(w => $"{w.Name}")
+                .ToList();
+
+            // Process into values (to display)
+            var values = worksets
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        #endregion
     }
 }

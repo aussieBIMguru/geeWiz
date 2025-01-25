@@ -3,17 +3,17 @@ using System.Diagnostics;
 // Revit API
 using Autodesk.Revit.UI;
 // geeWiz
-using gFil = geeWiz.Utilities.FileUtils;
+using gFil = geeWiz.Utilities.File_Utils;
 
 // The class belongs to the geeWiz namespace
-// using gRib = geeWiz.Utilities.RibbonUtils
+// using gRib = geeWiz.Utilities.Ribbon_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to ribbon setup.
     /// (Most ribbon construction is under extension methods).
     /// </summary>
-    public static class RibbonUtils
+    public static class Ribbon_Utils
     {
         /// <summary>
         /// Converts a command class to a base name for tooltip/icon finding.

@@ -18,6 +18,8 @@ namespace geeWiz
     /// </summary>
     public class ColouredTabs
     {
+        #region Constants
+
         // A list of colours (will wrap around to start if needed)
         private static readonly List<Brush> COLOURS = new List<Brush>()
         {
@@ -41,6 +43,10 @@ namespace geeWiz
         // List of unique document titles we will add to and index
         private static List<string> DOC_TITLES = new List<string>();
 
+        #endregion
+
+        #region Event triggered methods
+
         /// <summary>
         /// Activated when a document is opened (if tabs are being coloured).
         /// </summary>
@@ -62,6 +68,10 @@ namespace geeWiz
         {
             ColorTabs();
         }
+
+        #endregion
+
+        #region Color tabs method
 
         /// <summary>
         /// Runs the tab recolouring routine.
@@ -115,6 +125,10 @@ namespace geeWiz
 
         }
 
+        #endregion
+
+        #region Registration to events
+
         /// <summary>
         /// Register the events to the document opened/activated events.
         /// </summary>
@@ -134,6 +148,10 @@ namespace geeWiz
             Globals.CtlApp.DocumentOpened -= new EventHandler<Autodesk.Revit.DB.Events.DocumentOpenedEventArgs>(DocumentOpened);
             Globals.UiApp.ViewActivated -= new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(ViewActivated);
         }
+
+        #endregion
+
+        #region Tooltip to document title
 
         /// <summary>
         /// Given a valid tooltip value, returns the document title.
@@ -163,5 +181,7 @@ namespace geeWiz
                 return ERROR_TITLE;
             }
         }
+
+        #endregion
     }
 }

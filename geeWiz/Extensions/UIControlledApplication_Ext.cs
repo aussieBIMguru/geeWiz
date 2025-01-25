@@ -12,6 +12,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class UIControlledApplication_Ext
     {
+        #region Tabs
+
         /// <summary>
         /// Adds a new tab to the Ribbon.
         /// </summary>
@@ -33,6 +35,10 @@ namespace geeWiz.Extensions
                 return Result.Failed;
             }
         }
+
+        #endregion
+
+        #region RibbonPanels
 
         /// <summary>
         /// Adds a new RibbonPanel to the tab.
@@ -80,5 +86,7 @@ namespace geeWiz.Extensions
             // If not found, we finally return null
             return null;
         }
+
+        #endregion
     }
 }

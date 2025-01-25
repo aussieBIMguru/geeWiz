@@ -7,14 +7,16 @@ using Autodesk.Revit.UI;
 using gFrm = geeWiz.Forms;
 
 // The class belongs to the utility namespace
-// using gScr = geeWiz.Utilities.ScriptUtils
+// using gScr = geeWiz.Utilities.Script_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to script behavior and states.
     /// </summary>
-    public static class ScriptUtils
+    public static class Script_Utils
     {
+        #region Clipboard send/receive
+
         /// <summary>
         /// Attempts to send a string to the clipboard.
         /// </summary>
@@ -68,15 +70,9 @@ namespace geeWiz.Utilities
             }
         }
 
-        /// <summary>
-        /// Verifies if the user is the developer (change name as desired).
-        /// </summary>
-        /// <returns>A boolean.</returns>
-        public static bool UserIsDeveloper()
-        {
-            return Globals.UsernameWindows.Equals("gavin.crump",
-                StringComparison.OrdinalIgnoreCase);
-        }
+        #endregion
+
+        #region Keyboard key checks
 
         /// <summary>
         /// Verifies if the user is holding down the shift key.
@@ -103,6 +99,20 @@ namespace geeWiz.Utilities
         public static bool KeyHeldAlt()
         {
             return Keyboard.KeyIsPressedAlt();
+        }
+
+        #endregion
+
+        #region Other
+
+        /// <summary>
+        /// Verifies if the user is the developer (change name as desired).
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static bool UserIsDeveloper()
+        {
+            return Globals.UsernameWindows.Equals("gavin.crump",
+                StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -138,7 +148,11 @@ namespace geeWiz.Utilities
             }
             return "Tooltip not found.";
         }
+
+        #endregion
     }
+
+    #region Keyboard Class
 
     /// <summary>
     /// This class deals with the state of the keyboard.
@@ -177,4 +191,6 @@ namespace geeWiz.Utilities
             return (GetKeyState(VK_ALT) & 0x8000) != 0;
         }
     }
+
+    #endregion
 }

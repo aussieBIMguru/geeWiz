@@ -4,12 +4,14 @@ using Autodesk.Revit.UI;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
-using gFil = geeWiz.Utilities.FileUtils;
-using gWsh = geeWiz.Utilities.WorkshareUtils;
+using gFil = geeWiz.Utilities.File_Utils;
+using gWsh = geeWiz.Utilities.Workshare_Utils;
 
 // The class belongs to the Commands namespace
 namespace geeWiz.Testing
 {
+    #region Command - Github
+
     /// <summary>
     /// Opens the project Github page.
     /// </summary>
@@ -23,6 +25,10 @@ namespace geeWiz.Testing
             return gFil.OpenLinkPath(linkPath);
         }
     }
+
+    #endregion
+
+    #region Command - Testing
 
     /// <summary>
     /// Testing command. Makes all sheet names in model uppercase.
@@ -93,5 +99,7 @@ namespace geeWiz.Testing
             return gFrm.Custom.Completed("Test script completed.\n\n" +
                 "(Sheet names are now upper case)");
         }
+
+        #endregion
     }
 }

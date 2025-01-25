@@ -15,121 +15,72 @@ namespace geeWiz.Extensions
     public static class Element_Ext
     {
         /// <summary>
-        /// Constructs a name key based on the class the Element is.
+        /// Constructs a name key, checking for common inheritances.
         /// </summary>
         /// <param name="element">A Revit Element.</param>
         /// <param name="includeId">Append the ElementId to the end.</param>
         /// <returns>A string.</returns>
-        public static string Ext_ToNameKey(this Element element, bool includeId)
+        public static string Ext_ToInheritedKey(this Element element, bool includeId)
         {
             // Catch null element
-            if (element is null)
-            {
-                if (includeId)
-                {
-                    return "???: ??? [-1]";
-                }
-                else
-                {
-                    return "???: ???";
-                }
-            }
-            
-            // Default state of values
-            string prefix = "???";
-            string suffix = "???";
+            if (element is null) { return "???"; }
 
-            // Check if element is a sheet
-            if (element is ViewSheet sheet)
-            {
-                prefix = "Sheet";
-                suffix = $"{sheet.SheetNumber} - {sheet.Name}";
-            }
-            // Check if element is a viewfamilytype
-            else if (element is ViewFamilyType viewFamilyType)
-            {
-                prefix = viewFamilyType.ViewFamily.ToString();
-                suffix = viewFamilyType.Name;
-            }
-            // Check if element is a view
-            else if (element is View view)
-            {
-                prefix = view.ViewType.ToString();
-                if (view.IsTemplate)
-                {
-                    prefix += " template";
-                }
-                suffix = view.Name;
-            }
-            // Check if element is a family type
-            else if (element is FamilySymbol familySymbol)
-            {
-                prefix = familySymbol.Family.FamilyCategory.Name;
-                suffix = $"{familySymbol.Family.Name} - {familySymbol.Name}";
-            }
-            // Check if element is a family instance
-            else if (element is FamilyInstance familyInstance)
-            {
-                var symbol = familyInstance.Symbol;
-                prefix = symbol.Family.FamilyCategory.Name;
-                suffix = $"{symbol.Family.Name} - {symbol.Name}";
-            }
-            // Otherwise process as an element
-            else
-            {
-                // Try to get category name
-                if (element.Category is Category category)
-                {
-                    prefix = category.Name;
-                }
-                // Otherwise try to get element type name
-                else
-                {
-                    try
-                    {
-                        prefix = element.GetType().Name;
-                    }
-                    catch {; }
-                }
-                
-                // Try to get element name
-                try
-                {
-                    suffix = element.Name;
-                }
-                catch {; }
-            }
+            // Check typical inheritances in order
+            if (element is ViewSheet sheet) { return sheet.Ext_ToSheetKey(includeId); }
+            if (element is ViewFamilyType viewFamilyType) { return viewFamilyType.Ext_ToViewFamilyTypeKey(includeId); }
+            if (element is View view) { return view.Ext_ToViewKey(includeId); }
+            if (element is FamilySymbol familySymbol) { return familySymbol.Ext_ToFamilySymbolKey(includeId); }
+            if (element is FamilyInstance familyInstance) { return familyInstance.Ext_ToFamilyInstanceKey(includeId); }
 
-            // If we include element id
-            if (includeId && element.Id is ElementId id)
-            {
-                suffix += $" [{id.ToString()}]";
-            }
-
-            // Return the key
-            return $"{prefix}: {suffix}";
+            // Return the element key if it did not inherit before
+            return element.Ext_ToElementKey(includeId);
         }
 
         /// <summary>
-        /// Constructs a parameter helper object to get parameter values.
+        /// Constructs a name key for the given Element.
         /// </summary>
         /// <param name="element">A Revit Element.</param>
-        /// <param name="doc">The Document to delete from (optional).</param>
-        /// <returns>A ParameterHelper object.</returns>
-        public static Result Ext_TryToDelete(this Element element, Document doc = null)
+        /// <param name="includeId">Append the ElementId to the end.</param>
+        /// <returns>A string.</returns>
+        public static string Ext_ToElementKey(this Element element, bool includeId)
         {
-            // Get the document if null
-            if (doc is null) { doc = element.Document; }
-            
-            // Try to delete the element
+            // Catch null element
+            if (element is null) { return "???"; }
+
+            // Default state of values
+            string categoryName = "???";
+            string typeName = "???";
+            string elementName = "???";
+
+            // Get category name
+            if (element.Category is Category category)
+            {
+                categoryName = category.Name;
+            }
+
+            // Get element type name
             try
             {
-                doc.Delete(element.Id);
-                return Result.Succeeded;
+                typeName = element.GetType().Name;
             }
-            catch
+            catch {; }
+
+            // Get element name
+            try
             {
-                return Result.Failed;
+                elementName = element.Name;
+            }
+            catch {; }
+
+            // Return key with Id
+            if (includeId)
+            {
+                return $"{categoryName}: {typeName} - {elementName} [{element.Id.ToString()}]";
+            }
+            // Return key without Id
+            else
+            {
+                return $"{categoryName}: {typeName} - {elementName}";
             }
         }
 
@@ -139,10 +90,10 @@ namespace geeWiz.Extensions
         /// <param name="element">The Element to check (extended).</param>
         /// <param name="doc">The Revit document (optional).</param>
         /// <returns>A boolean.</returns>
-        public static bool Ext_Editable(this Element element, Document doc = null)
+        public static bool Ext_IsEditable(this Element element, Document doc = null)
         {
             // Get document if not provided
-            if (doc is null) { doc = element.Document; }
+            doc ??= element.Document;
 
             // If document is not workshare, element is editable naturally
             if (!doc.IsWorkshared) { return true; }

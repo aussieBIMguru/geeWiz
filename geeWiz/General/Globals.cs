@@ -17,6 +17,8 @@ namespace geeWiz
     /// </summary>
     public static class Globals
     {
+        #region Global properties
+
         // Applications
         public static UIControlledApplication UiCtlApp { get; set; }
         public static ControlledApplication CtlApp { get; set; }
@@ -49,6 +51,10 @@ namespace geeWiz
 
         // Tooltips resource
         public static Dictionary<string, string> Tooltips { get; set; } = new Dictionary<string, string>();
+
+        #endregion
+
+        #region Register variables
 
         /// <summary>
         /// Sets the global values.
@@ -88,6 +94,10 @@ namespace geeWiz
             AddinGuid = "{8FFC127F-9CD7-46E2-8506-C5F36D057B4B}";
         }
 
+        #endregion
+
+        #region Register tooltips
+
         /// <summary>
         /// Sets the tooltip values.
         /// </summary>
@@ -107,5 +117,7 @@ namespace geeWiz
                 Tooltips[key] = value;
             }
         }
+
+        #endregion
     }
 }

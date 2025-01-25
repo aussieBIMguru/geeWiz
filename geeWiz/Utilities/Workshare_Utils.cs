@@ -3,14 +3,16 @@ using gFrm = geeWiz.Forms;
 using geeWiz.Extensions;
 
 // The class belongs to the utility namespace
-// using gWsh = geeWiz.Utilities.WorkshareUtils
+// using gWsh = geeWiz.Utilities.Workshare_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to checking for editability.
     /// </summary>
-    public static class WorkshareUtils
+    public static class Workshare_Utils
     {
+        #region Editable processing routine
+
         /// <summary>
         /// Reviews multiple elements for editability, allowing for further processing.
         /// </summary>
@@ -26,7 +28,7 @@ namespace geeWiz.Utilities
             // Iterate over elements
             foreach (Element element in elements)
             {
-                if (element.Ext_Editable(doc))
+                if (element.Ext_IsEditable(doc))
                 {
                     editable.Add(element);
                 }
@@ -67,14 +69,20 @@ namespace geeWiz.Utilities
             return worksharingResults;
         }
 
-        /// <summary>
-        /// Class to store and process editable element checks.
-        /// </summary>
-        public class WorksharingResult
-        {
-            public List<Element> Editable { get; set; }
-            public List<Element> NotEditable { get; set; }
-            public bool Cancelled { get; set; }
-        }
+        #endregion
     }
+
+    #region WorksharingResult class
+
+    /// <summary>
+    /// Class to store and process editable element checks.
+    /// </summary>
+    public class WorksharingResult
+    {
+        public List<Element> Editable { get; set; }
+        public List<Element> NotEditable { get; set; }
+        public bool Cancelled { get; set; }
+    }
+
+    #endregion
 }

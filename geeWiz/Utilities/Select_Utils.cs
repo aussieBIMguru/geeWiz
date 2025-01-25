@@ -3,14 +3,16 @@ using Autodesk.Revit.UI.Selection;
 using View = Autodesk.Revit.DB.View;
 
 // The class belongs to the utility namespace
-// using gSel = geeWiz.Utilities.SelectUtils
+// using gSel = geeWiz.Utilities.Select_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to selection based operations.
     /// </summary>
-    public static class SelectUtils
+    public static class Select_Utils
     {
+        #region ISelectionFilters
+
         /// <summary>
         /// ISelectionFilter that filters by provided builtincategory.
         /// </summary>
@@ -91,5 +93,7 @@ namespace geeWiz.Utilities
                 return false;
             }
         }
+
+        #endregion
     }
 }

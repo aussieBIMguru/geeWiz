@@ -2,7 +2,7 @@
 using Autodesk.Revit.UI;
 using ResultClickEventArgs = Autodesk.Internal.InfoCenter.ResultClickEventArgs;
 // geeWiz specific
-using gFil = geeWiz.Utilities.FileUtils;
+using gFil = geeWiz.Utilities.File_Utils;
 
 // The base form will belong to the forms namespace (we decorate in the custom class)
 namespace geeWiz.Forms

@@ -1,9 +1,11 @@
-﻿// Revit API
+﻿#region Usings
+// Revit API
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 // geeWiz
 using geeWiz.Extensions;
 using gAva = geeWiz.Availability.AvailabilityNames;
+#endregion
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -13,6 +15,8 @@ namespace geeWiz
     /// </summary>
     public class Application : IExternalApplication
     {
+        #region Class properties
+
         // Temporary variable to pass the UI controlled app to an idling event
         private static UIControlledApplication _uiCtlApp;
 
@@ -21,12 +25,16 @@ namespace geeWiz
         private const string PANEL1_NAME = "Testing";
         private string COMMANDCLASS_CURRENT = "";
 
+        #endregion
+
         /// <summary>
         /// Runs when the application starts.
         /// We use this part of the interface to initialize geeWiz.
         /// </summary>
         public Result OnStartup(UIControlledApplication uiCtlApp)
         {
+            #region Register UiApp
+
             // Set private variable
             _uiCtlApp = uiCtlApp;
 
@@ -40,12 +48,20 @@ namespace geeWiz
                 Globals.UiApp = null;
             }
 
+            #endregion
+
+            #region Register Globals and Warden
+
             // Store all other global variables and tooltips
             Globals.RegisterVariables(uiCtlApp);
             Globals.RegisterTooltips("geeWiz.Resources.Files.Tooltips");
 
             // Register the warden commands
             Warden.Register(uiCtlApp);
+
+            #endregion
+
+            #region Construct toolbar
 
             /// <summary>
             /// We will load our commands here later on.
@@ -71,6 +87,8 @@ namespace geeWiz
             //TESTING 2
             #endif
 
+            #endregion
+
             // Return succeeded
             return Result.Succeeded;
         }
@@ -81,8 +99,13 @@ namespace geeWiz
         /// </summary>
         public Result OnShutdown(UIControlledApplication application)
         {
+            // Still to add - Unsubscriptions
+            
+            // Return succeeded
             return Result.Succeeded;
         }
+
+        #region Register UiApp on Idling
 
         /// <summary>
         /// Registers the uiApp global whenever first possible.
@@ -102,5 +125,7 @@ namespace geeWiz
                 Globals.UsernameRevit = uiApp.Application.Username;
             }
         }
+
+        #endregion
     }
 }

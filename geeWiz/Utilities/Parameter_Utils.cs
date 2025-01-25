@@ -2,13 +2,13 @@
 using Autodesk.Revit.UI;
 
 // The class belongs to the utilities namespace
-// gPar = geeWiz.Utilities.ParameterUtils
+// gPar = geeWiz.Utilities.Parameter_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to string based operations.
     /// </summary>
-    public static class ParameterUtils
+    public static class Parameter_Utils
     {
         /// <summary>
         /// Try to set a parameter using a ParameterHelper object.
@@ -45,12 +45,16 @@ namespace geeWiz.Utilities
             return Result.Failed;
         }
     }
-    
+
+    #region ParameterHelper class
+
     /// <summary>
     /// A class to assess parameter values in various representations.
     /// </summary>
     public class ParameterHelper
     {
+        #region Class Properties
+
         // Representations of the parameter
         public Element Element { get; set; }
         public Parameter Parameter { get; set; }
@@ -59,6 +63,10 @@ namespace geeWiz.Utilities
         public double AsDouble { get; set; }
         public string AsString { get; set; }
         public ElementId AsElementId { get; set; }
+
+        #endregion
+
+        #region Constructor - Get Value
 
         // Constructor for get value
         public ParameterHelper(Element element, string parameterName)
@@ -94,6 +102,7 @@ namespace geeWiz.Utilities
                 if (parameter.AsInteger() is int value)
                 {
                     this.AsInteger = value;
+                    this.AsDouble = (double)value;
                     this.AsString = value.ToString();
                 }
             }
@@ -118,6 +127,10 @@ namespace geeWiz.Utilities
                 }
             }
         }
+
+        #endregion
+
+        #region Constructor - Set String value
 
         // Constructor to set as string
         public ParameterHelper(Element element, string parameterName, string value)
@@ -148,6 +161,10 @@ namespace geeWiz.Utilities
             }
         }
 
+        #endregion
+
+        #region Constructor - Set Integer value
+
         // Constructor to set as integer
         public ParameterHelper(Element element, string parameterName, int value)
         {
@@ -176,6 +193,10 @@ namespace geeWiz.Utilities
                 return Result.Failed;
             }
         }
+
+        #endregion
+
+        #region Constructor - Set Double value
 
         // Constructor to set as double
         public ParameterHelper(Element element, string parameterName, double value)
@@ -206,6 +227,10 @@ namespace geeWiz.Utilities
             }
         }
 
+        #endregion
+
+        #region Constructor - Set ElementId value
+
         // Constructor to set as element Id
         public ParameterHelper(Element element, string parameterName, ElementId value)
         {
@@ -234,5 +259,9 @@ namespace geeWiz.Utilities
                 return Result.Failed;
             }
         }
+
+        #endregion
     }
+
+    #endregion
 }

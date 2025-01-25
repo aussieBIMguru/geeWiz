@@ -3,20 +3,22 @@ using System.IO;
 // Revit API
 using Autodesk.Revit.UI;
 // geeWiz
-using gFil = geeWiz.Utilities.FileUtils;
 using gFrm = geeWiz.Forms;
+using gFil = geeWiz.Utilities.File_Utils;
 // ClosedXML
 using ClosedXML.Excel;
 
 // The class belongs to the utility namespace
-// using gXcl = geeWiz.Utilities.ExcelUtils
+// using gXcl = geeWiz.Utilities.Excel_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to Excel based operations.
     /// </summary>
-    public static class ExcelUtils
+    public static class Excel_Utils
     {
+        #region Verification
+
         /// <summary>
         /// Checks that an Excel file can be accessed.
         /// </summary>
@@ -55,6 +57,10 @@ namespace geeWiz.Utilities
             return Result.Succeeded;
         }
 
+        #endregion
+
+        #region Workbook
+
         /// <summary>
         /// Gets a Workbook object from a filepath.
         /// </summary>
@@ -92,6 +98,10 @@ namespace geeWiz.Utilities
                 return new XLWorkbook();
             }
         }
+
+        #endregion
+
+        #region Worksheet
 
         /// <summary>
         /// Gets a worksheet by name from a workbook.
@@ -174,6 +184,10 @@ namespace geeWiz.Utilities
                 .ToList();
         }
 
+        #endregion
+
+        #region Read Worksheet
+
         /// <summary>
         /// Reads a matrix of strings from a worksheet.
         /// </summary>
@@ -230,6 +244,10 @@ namespace geeWiz.Utilities
             return matrix;
         }
 
+        #endregion
+
+        #region Write to Worksheet
+
         /// <summary>
         /// Writes matrix of strings to a worksheet.
         /// </summary>
@@ -260,5 +278,7 @@ namespace geeWiz.Utilities
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -4,8 +4,8 @@ using System.Diagnostics;
 using Autodesk.Revit.UI;
 using PushButton = Autodesk.Revit.UI.PushButton;
 // geeWiz
-using gFil = geeWiz.Utilities.FileUtils;
-using gRib = geeWiz.Utilities.RibbonUtils;
+using gFil = geeWiz.Utilities.File_Utils;
+using gRib = geeWiz.Utilities.Ribbon_Utils;
 
 // The class belongs to the extensions namespace
 // RibbonPanel ribbonPanel.ExtensionMethod()

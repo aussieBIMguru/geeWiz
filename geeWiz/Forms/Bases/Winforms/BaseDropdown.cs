@@ -26,7 +26,7 @@ namespace geeWiz.Forms
         {
             // Initialize form, set the icon
             InitializeComponent();
-            geeWiz.Utilities.FileUtils.SetFormIcon(this);
+            geeWiz.Utilities.File_Utils.SetFormIcon(this);
 
             // Set the key and value properties
             this.keys = keys;

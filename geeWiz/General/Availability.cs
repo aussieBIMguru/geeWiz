@@ -11,6 +11,8 @@ namespace geeWiz
     /// </summary>
     public static class Availability
     {
+        #region AvailabilityNames class
+
         // Availability class prefix
         internal static string PATH_AVAILABILITY = "geeWiz.Availability";
 
@@ -27,6 +29,10 @@ namespace geeWiz
             public static string SelectionIncludesSheets { get { return $"{PATH_AVAILABILITY}+SelectionIncludesSheets"; } }
             public static string SelectionOnlyRooms { get { return $"{PATH_AVAILABILITY}+SelectionOnlyRooms"; } }
         }
+
+        #endregion
+
+        #region Availability classes
 
         // Command is disabled
         public class Disabled : IExternalCommandAvailability
@@ -158,5 +164,7 @@ namespace geeWiz
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -6,14 +6,16 @@ using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI;
 
 // The class belongs to the utility namespace
-// using gStr = geeWiz.Utilities.StringUtils
+// using gStr = geeWiz.Utilities.String_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to string based operations.
     /// </summary>
-    public static class StringUtils
+    public static class String_Utils
     {
+        #region List/Matrix conversion
+
         /// <summary>
         /// Joins each row of a matrix of strings, returning a list.
         /// </summary>
@@ -70,6 +72,10 @@ namespace geeWiz.Utilities
             return new List<List<string>>() { dataRows };
         }
 
+        #endregion
+
+        #region Matrix modification
+
         /// <summary>
         /// Fills the end of each list in a matrix to the longest list.
         /// </summary>
@@ -93,7 +99,7 @@ namespace geeWiz.Utilities
 
                 // We store the pad string, and make sure it isn't null
                 var safePadString = padString;
-                if (safePadString is null) { safePadString = ""; }
+                safePadString ??= "";
 
                 // Check if we should pad with last string in list
                 if (rowLength > 0 && padString is null)
@@ -161,6 +167,10 @@ namespace geeWiz.Utilities
             return newMatrix;
         }
 
+        #endregion
+
+        #region Replace nulls
+
         /// <summary>
         /// Replaces all nulls in a list of strings.
         /// </summary>
@@ -205,7 +215,11 @@ namespace geeWiz.Utilities
                 .Select(r => ReplaceListNulls(r, replaceString: replaceString))
                 .ToList();
         }
+
+        #endregion
     }
+
+    #region MatrixProperties class
 
     /// <summary>
     /// A class to assess matrix properties for use.
@@ -242,4 +256,6 @@ namespace geeWiz.Utilities
             }
         }
     }
+
+    #endregion
 }

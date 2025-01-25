@@ -12,6 +12,8 @@ namespace geeWiz
     /// </summary>
     public static class Warden
     {
+        #region Register commands
+
         /// <summary>
         /// Registers all commands to Warden.
         /// </summary>
@@ -23,7 +25,11 @@ namespace geeWiz
             WatchCommand(uiApp, commandName: "ID_FILE_IMPORT");
             WatchCommand(uiApp, commandName: "ID_EDIT_PAINT");
         }
-        
+
+        #endregion
+
+        #region Watch command
+
         /// <summary>
         /// Try to add a command to Warden.
         /// </summary>
@@ -39,9 +45,13 @@ namespace geeWiz
             if (commandId.CanHaveBinding && !commandId.HasBinding)
             {
                 // If we can, create the binding
-                uiApp.CreateAddInCommandBinding(commandId).Executed += new EventHandler<ExecutedEventArgs>(StopCommand);
+                uiApp.CreateAddInCommandBinding(commandId).Executed += new EventHandler<ExecutedEventArgs>(CatchCommand);
             }
         }
+
+        #endregion
+
+        #region Catch command
 
         /// <summary>
         /// This fires whenever the watched command is ran.
@@ -49,7 +59,7 @@ namespace geeWiz
         /// <param name="sender">The event sender (command).</param>
         /// <param name="args">The event arguments.</param>
         /// <returns>Void (nothing).</returns>
-        public static void StopCommand(object sender, ExecutedEventArgs args)
+        public static void CatchCommand(object sender, ExecutedEventArgs args)
         {
             // A variable as to whether we will let the command execute
             bool permit = true;
@@ -83,6 +93,10 @@ namespace geeWiz
             }
         }
 
+        #endregion
+
+        #region Rebind command
+
         /// <summary>
         /// This fires to rebind the command after being permitted.
         /// </summary>
@@ -107,5 +121,7 @@ namespace geeWiz
             // Tell the app it is idling as soon as this runs
             Globals.Idling = true;
         }
+
+        #endregion
     }
 }

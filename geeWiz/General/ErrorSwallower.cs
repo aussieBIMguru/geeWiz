@@ -8,6 +8,8 @@ namespace geeWiz
     /// </summary>
     public class ErrorSwallower : IFailuresPreprocessor
     {
+        #region Process failures
+
         /// <summary>
         /// Part of the interface, suppresses warnings.
         /// </summary>
@@ -37,6 +39,10 @@ namespace geeWiz
             return FailureProcessingResult.Continue;
         }
 
+        #endregion
+
+        #region Add to transaction
+
         /// <summary>
         /// Attach a new error swallower to an open transaction.
         /// </summary>
@@ -49,5 +55,7 @@ namespace geeWiz
             options.SetFailuresPreprocessor(new ErrorSwallower());
             transaction.SetFailureHandlingOptions(options);
         }
+
+        #endregion
     }
 }

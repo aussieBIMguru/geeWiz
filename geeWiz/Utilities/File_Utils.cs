@@ -7,14 +7,16 @@ using Form = System.Windows.Forms.Form;
 using Autodesk.Revit.UI;
 
 // The class belongs to the utility namespace
-// using gFil = geeWiz.Utilities.FileUtils
+// using gFil = geeWiz.Utilities.File_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
     /// Methods of this class generally relate to file based operations.
     /// </summary>
-    public static class FileUtils
+    public static class File_Utils
     {
+        #region Access links
+
         /// <summary>
         /// Used to verify if a URL is valid (will open).
         /// </summary>
@@ -53,6 +55,10 @@ namespace geeWiz.Utilities
                 return Result.Failed;
             }
         }
+
+        #endregion
+
+        #region Access files
 
         /// <summary>
         /// Runs an accessibility check on a file path.
@@ -102,6 +108,10 @@ namespace geeWiz.Utilities
                 return Result.Failed;
             }
         }
+
+        #endregion
+
+        #region Read files
 
         /// <summary>
         /// Returns the contents of a file, by row.
@@ -194,6 +204,10 @@ namespace geeWiz.Utilities
             return matrix;
         }
 
+        #endregion
+
+        #region Write to files
+
         /// <summary>
         /// Writes a list of strings to a file.
         /// </summary>
@@ -247,6 +261,10 @@ namespace geeWiz.Utilities
             }
         }
 
+        #endregion
+
+        #region Ribbon management
+
         /// <summary>
         /// Prepares an image source from a Png resource.
         /// </summary>
@@ -291,5 +309,7 @@ namespace geeWiz.Utilities
             }
             return "Tooltip missing!";
         }
+
+        #endregion
     }
 }

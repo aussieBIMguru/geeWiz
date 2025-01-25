@@ -27,7 +27,7 @@ namespace geeWiz.Forms
         {
             // Initialize the form, set the icon
             InitializeComponent();
-            geeWiz.Utilities.FileUtils.SetFormIcon(this);
+            geeWiz.Utilities.File_Utils.SetFormIcon(this);
 
             // Set default values and outcomes
             this.textBox.Text = defaultValue;

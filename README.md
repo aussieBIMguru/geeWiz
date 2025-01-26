@@ -3,3 +3,6 @@
 
 # Check out the wiki
 More information can be found at the related [geeWiz Wiki](https://github.com/aussieBIMguru/geeWiz/wiki).
+
+# License
+Refer to [here](https://github.com/aussieBIMguru/geeWiz/tree/main?tab=MIT-1-ov-file).

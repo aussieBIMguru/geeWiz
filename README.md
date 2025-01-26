@@ -1,2 +1,5 @@
 # geeWiz
- A custom C# revit toolbar for Revit 2023-2025.
+ ... is a custom C# revit toolbar for Revit 2023-2025 by Gavin Crump.
+
+## Check out the wiki
+More information can be found at the related [geeWiz Wiki](https://github.com/aussieBIMguru/geeWiz/wiki).

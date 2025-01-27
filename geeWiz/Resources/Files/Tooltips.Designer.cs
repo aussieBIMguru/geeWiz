@@ -61,6 +61,51 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deletes all Fill and Line Patterns found in the current document that begin with the word &apos;Import&apos;.
+        ///
+        ///Warning:
+        ///This tool will not provide a list to choose from - it will go straight to deletion..
+        /// </summary>
+        internal static string Audit_DeletePatterns {
+            get {
+                return ResourceManager.GetString("Audit_DeletePatterns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model..
+        /// </summary>
+        internal static string Audit_DeleteRooms {
+            get {
+                return ResourceManager.GetString("Audit_DeleteRooms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provides a list of all unused View Filters in the current document, from which you can choose which ones to delete from the model.
+        ///
+        ///Note:
+        ///This tool will check all Views and View Templates for used filters..
+        /// </summary>
+        internal static string Audit_PurgeFilters {
+            get {
+                return ResourceManager.GetString("Audit_PurgeFilters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provides a list of all unused View Templates in the current document, from which you can choose which ones to delete from the model.
+        ///
+        ///Note:
+        ///This tool will check all Views and View Family Types for assigned and default templates..
+        /// </summary>
+        internal static string Audit_PurgeTemplates {
+            get {
+                return ResourceManager.GetString("Audit_PurgeTemplates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Takes you to the project&apos;s github..
         /// </summary>
         internal static string General_About {

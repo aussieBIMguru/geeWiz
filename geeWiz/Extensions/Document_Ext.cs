@@ -6,6 +6,8 @@ using gFrm = geeWiz.Forms;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
 using Autodesk.Revit.UI;
+using DocumentFormat.OpenXml.Spreadsheet;
+using geeWiz.Cmds_Audit;
 
 // The class belongs to the extensions namespace
 // Document doc.ExtensionMethod()
@@ -129,6 +131,80 @@ namespace geeWiz.Extensions
 
             // Return the results
             return results;
+        }
+
+        /// <summary>
+        /// Attempts to delete elements from the document with a transaction and progress bar.
+        /// </summary>
+        /// <param name="doc">The Document to delete from (extended).</param>
+        /// <param name="elements">Revit ElementIds.</param>
+        /// <param name="typeName">Name of element type to delete.</param>
+        /// <param name="showMessage">Show messages to the user.</param>
+        /// <returns>A result.</returns>
+        public static Result Ext_DeleteElementsRoutine(this Document doc, List<Element> elements, string typeName = "Element", bool showMessage = true)
+        {
+            // If no elements, we are finished
+            if (elements.Count == 0)
+            {
+                // Optional message
+                if (showMessage)
+                {
+                    gFrm.Custom.Completed($"No {typeName}s available for deletion.");
+                }
+
+                // Return success
+                return Result.Succeeded;
+            }
+
+            // Progress bar properties
+            int pbTotal = elements.Count;
+            int pbCount = 1;
+            int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
+            int deleteCount = 0;
+
+            // Using a progress bar
+            using (var pb = new gFrm.ProgressView($"Deleting {typeName}(s)...", total: pbTotal))
+            {
+                // Using a transaction
+                using (var t = new Transaction(doc, $"geeWiz: Delete {typeName}(s)"))
+                {
+                    // Start the transaction
+                    t.Start();
+
+                    // For each element
+                    foreach (var element in elements)
+                    {
+                        // Check for cancellation
+                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        {
+                            t.RollBack();
+                            return Result.Cancelled;
+                        }
+
+                        // Try to delete the element, uptick deletCount if we do
+                        if (doc.Ext_DeleteElement(element) == Result.Succeeded)
+                        {
+                            deleteCount++;
+                        }
+
+                        // Increase progress
+                        Thread.Sleep(pbStep);
+                        pbCount++;
+                    }
+
+                    // Commit the transaction
+                    t.Commit();
+                }
+            }
+
+            // Optional message
+            if (showMessage)
+            {
+                gFrm.Custom.Completed($"{deleteCount}/{pbTotal} {typeName}s deleted.");
+            }
+
+            // Return the result
+            return Result.Succeeded;
         }
 
         #endregion
@@ -674,6 +750,7 @@ namespace geeWiz.Extensions
         /// Select room(s) from the document.
         /// </summary>
         /// <param name="doc">The Document (extended).</param>
+        /// <param name="rooms">Rooms to select from (optional).</param>
         /// <param name="title">The form title (optional).</param>
         /// <param name="multiSelect">Select more than one item.</param>
         /// <param name="sorted">Sort the revisions by sequence.</param>
@@ -682,18 +759,21 @@ namespace geeWiz.Extensions
         /// <param name="includeUnenclosed">Include unenclosed rooms.</param>
         /// <param name="includeUnplaced">Include unplaced rooms.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectRooms(this Document doc, string title = null, bool multiSelect = true, bool sorted = false,
-            bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
+        public static gFrm.FormResult Ext_SelectRooms(this Document doc, List<Room> rooms = null, string title = null, bool multiSelect = true,
+            bool sorted = false, bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Set the default form title if not provided
             title ??= multiSelect ? "Select Room(s):" : "Select a Room:";
 
-            // Get all rooms in document
-            var rooms = doc.Ext_GetRooms(sorted: sorted,
+            // Get all rooms in document if not provided
+            if (rooms is null)
+            {
+                rooms = doc.Ext_GetRooms(sorted: sorted,
                 includePlaced: includePlaced,
                 includeRedundant: includeRedundant,
                 includeUnenclosed: includeUnenclosed,
                 includeUnplaced: includeUnplaced);
+            }
 
             // Process into keys (to return)
             var keys = rooms

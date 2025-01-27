@@ -4,6 +4,7 @@ using Autodesk.Revit.UI.Events;
 // geeWiz
 using geeWiz.Extensions;
 using gAva = geeWiz.Availability.AvailabilityNames;
+using gRib = geeWiz.Utilities.Ribbon_Utils;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -19,9 +20,12 @@ namespace geeWiz
         private static UIControlledApplication _uiCtlApp;
 
         // Ribbon construction constants
-        private const string TAB_NAME = "geeWiz";
-        private const string PANEL1_NAME = "Testing";
-        private string COMMANDCLASS_CURRENT = "";
+        public const string TAB_NAME = "geeWiz";
+        public const string PANEL1_NAME = "General";
+        public const string PANEL2_NAME = "Tools";
+        public const string COMMANDCLASS_1A = "geeWiz.Cmds_General";
+        public const string COMMANDCLASS_1B = "geeWiz.Cmds_Settings";
+        public const string COMMANDCLASS_2A = "geeWiz.Cmds_Tools";
 
         #endregion
 
@@ -59,7 +63,7 @@ namespace geeWiz
 
             #endregion
 
-            #region Construct RibbonPanel1
+            #region Construct Panel 1
 
             /// <summary>
             /// We will load our commands here later on.
@@ -71,30 +75,51 @@ namespace geeWiz
             // Add Panel1 to the tab
             var ribbonPanel1 = uiCtlApp.Ext_AddRibbonPanelToTab(TAB_NAME, PANEL1_NAME);
 
-            // Set the current command class prefix (handy for many tools)
-            COMMANDCLASS_CURRENT = "geeWiz.Testing";
+            // Panel 1 - Add Cmd_About button
+            ribbonPanel1.Ext_AddPushButton(buttonName: "About",
+                commandClass: $"{COMMANDCLASS_1A}.Cmd_About",
+                availability: gAva.ZeroDoc);
 
-            // Add Github and Testing buttons
-            ribbonPanel1.Ext_AddPushButton(buttonName: "Github", commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_Github", availability: gAva.ZeroDoc);
-            ribbonPanel1.Ext_AddPushButton(buttonName: "Testing", commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_Testing", availability: gAva.Project);
-            ribbonPanel1.Ext_AddPushButton(buttonName: "Coloured Tabs", commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_ColourTabs", availability: gAva.Project);
+            // Panel 1 - Add Settings pulldown
+            var pullDownSettings = ribbonPanel1.Ext_AddPulldownButton(
+                baseName: "Settings",
+                buttonName: "Settings");
+
+            // Panel 1 - Add Cmd_Warden button to Settings pulldown
+            pullDownSettings.Ext_AddPushButton(
+                buttonName: "Warden",
+                commandClass: $"{COMMANDCLASS_1B}.Cmd_Warden",
+                availability: gAva.Document);
+
+            // Panel 1 - Add Cmd_ColourTabs button to Settings pulldown
+            pullDownSettings.Ext_AddPushButton(
+                buttonName: "Coloured Tabs",
+                commandClass: $"{COMMANDCLASS_1B}.Cmd_ColourTabs",
+                availability: gAva.Document);
+
+            // Panel 1 - Add Cmd_UiToggle button to Settings pulldown
+            gRib.AddButton_UiToggle(
+                pulldownButton: pullDownSettings,
+                commandClass: $"{COMMANDCLASS_1B}.Cmd_UiToggle",
+                availability: gAva.ZeroDoc);
+
+            // Panel 1 - Add separator
+            ribbonPanel1.AddSeparator();
+
+            // Panel 1 - Add Cmd_Testing button
+            ribbonPanel1.Ext_AddPushButton(
+                buttonName: "Testing",
+                commandClass: $"{COMMANDCLASS_2A}.Cmd_Testing",
+                availability: gAva.Project);
 
             #endregion
 
-            #region Dark mode (2024+)
+            #region Construct Panel 2
 
-            // Add Dark/Light mode if in 2024 or higher
-            #if REVIT2024_OR_GREATER
+            // Add Panel2 to the tab
+            var ribbonPanel2 = uiCtlApp.Ext_AddRibbonPanelToTab(TAB_NAME, PANEL2_NAME);
 
-            // Set dark mode global variable
-            Globals.IsDarkMode = UIThemeManager.CurrentTheme == UITheme.Dark;
-
-            // Add UiToggle button
-            ribbonPanel1.Ext_AddPushButton(buttonName: Globals.IsDarkMode ? "Light mode" : "Dark mode",
-                commandClass: $"{COMMANDCLASS_CURRENT}.Cmd_UiToggle", availability: gAva.ZeroDoc,
-                suffix: Globals.IsDarkMode ? "" : "_Dark");
-
-            #endif
+            // Further tools TBA
 
             #endregion
 

@@ -5,15 +5,26 @@ using System.Windows.Forms;
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms
 {
+    #region Class summary
+
     /// <summary>
     /// Standard class for showing a form for entering values.
     /// 
     /// This is implemented in the Custom form, do not use this class directly.
     /// </summary>
+
+    #endregion
+
     public partial class BaseEnterValue : System.Windows.Forms.Form
     {
+        #region Class properties
+
         // Properties belonging to the form
         private bool numberOnly;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Constructs an enter value form.
@@ -41,6 +52,10 @@ namespace geeWiz.Forms
             labelTooltip.Text = message;
         }
 
+        #endregion
+
+        #region Click OK button
+
         /// <summary>
         /// Event handler when OK button is clicked.
         /// </summary>
@@ -54,6 +69,10 @@ namespace geeWiz.Forms
             this.Close();
         }
 
+        #endregion
+
+        #region Click cancel button
+
         /// <summary>
         /// Event handler when Cancel button is clicked.
         /// </summary>
@@ -65,6 +84,10 @@ namespace geeWiz.Forms
             this.Tag = null;
             this.Close();
         }
+
+        #endregion
+
+        #region Key pressed in textbox
 
         /// <summary>
         /// Event handler when a character would be entered into the textbox.
@@ -81,6 +104,10 @@ namespace geeWiz.Forms
                 e.Handled = true;
             }
         }
+
+        #endregion
+
+        #region Validate character
 
         /// <summary>
         /// Return it a character is numerically acceptable.
@@ -114,5 +141,7 @@ namespace geeWiz.Forms
             // Otherwise not valid
             return false;
         }
+
+        #endregion
     }
 }

@@ -10,11 +10,17 @@ namespace geeWiz.Forms
     // These classes all form the front end selection forms in Revit
     public static class Custom
     {
+        #region File filter constants
+
         // File filter constant values
         public static string FILTER_TSV = "TSV Files (*.tsv)|*.tsv";
         public static string FILTER_EXCEL = "Excel Files (*.xls;*.xlsx;*.xlsm)|*.xls;*.xlsx;*.xlsm";
         public static string FILTER_RFA = "Family Files|*.rfa";
         public static string FILTER_TXT = "Text Files (*.txt)|*.txt";
+
+        #endregion
+
+        #region BubbleMessage
 
         /// <summary>
         /// Creates and shows a bubble message.
@@ -55,6 +61,10 @@ namespace geeWiz.Forms
             if (success) { return Result.Succeeded; }
             else { return Result.Failed; }
         }
+
+        #endregion
+
+        #region Message (+ variants)
 
         /// <summary>
         /// Processes a generic message to the user.
@@ -157,6 +167,10 @@ namespace geeWiz.Forms
             return Result.Succeeded;
         }
 
+        #endregion
+
+        #region Select files / directory
+
         /// <summary>
         /// Select file path(s) from a browser dialog.
         /// </summary>
@@ -242,6 +256,10 @@ namespace geeWiz.Forms
             return formResult;
         }
 
+        #endregion
+
+        #region EnterValue
+
         /// <summary>
         /// Processes a form for entering text and/or numbers.
         /// </summary>
@@ -321,6 +339,10 @@ namespace geeWiz.Forms
             return formResult;
         }
 
+        #endregion
+
+        #region SelectFromList
+
         /// <summary>
         /// Processes a generic form for showing objects in a list.
         /// </summary>
@@ -370,6 +392,10 @@ namespace geeWiz.Forms
             return formResult;
         }
 
+        #endregion
+
+        #region SelectFromDropdown
+
         /// <summary>
         /// Processes a generic object from list.
         /// </summary>
@@ -413,6 +439,10 @@ namespace geeWiz.Forms
             return formResult;
         }
 
+        #endregion
+
+        #region Progress bar delay
+
         /// <summary>
         /// Calculates ideal sleep delay for a progress form.
         /// </summary>
@@ -438,7 +468,11 @@ namespace geeWiz.Forms
             // Return the step
             return step;
         }
+
+        #endregion
     }
+
+    #region FormResult class
 
     /// <summary>
     /// A class for holding form outcomes, used by custom forms.
@@ -454,4 +488,6 @@ namespace geeWiz.Forms
         public bool Valid { get; set; }
         public bool Affirmative { get; set; }
     }
+
+    #endregion
 }

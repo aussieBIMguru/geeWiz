@@ -5,6 +5,8 @@ using System.Windows;
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms
 {
+    #region Class summary
+
     /// <summary>
     /// Standard class for showing the progress bar Wpf form.
     /// 
@@ -13,8 +15,13 @@ namespace geeWiz.Forms
     /// 
     /// Will run on a separate thread so it can be cancelled even if Revit is idle.
     /// </summary>
+
+    #endregion
+
     public partial class ProgressView : Window, IDisposable, INotifyPropertyChanged
     {
+        #region Class properties and handlers
+
         // Create an event when the property changes of the progress bar
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -59,6 +66,10 @@ namespace geeWiz.Forms
         private CancellationTokenSource cancellationTokenSource;
         private int delay;
 
+        #endregion
+
+        #region Constructor
+
         /// <summary>
         /// Initialize the progress view class.
         /// </summary>
@@ -97,6 +108,10 @@ namespace geeWiz.Forms
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
+        #endregion
+
+        #region Disposer
+
         /// <summary>
         /// Runs when the form closes for any reason (if it is open).
         /// </summary>
@@ -106,6 +121,10 @@ namespace geeWiz.Forms
             if (!this.IsClosed) Close();
             cancellationTokenSource?.Dispose();
         }
+
+        #endregion
+
+        #region Click Cancel button
 
         /// <summary>
         /// Runs when the user triggers the cancel button manually.
@@ -127,6 +146,10 @@ namespace geeWiz.Forms
             // Close the form (also runs the disposal)
             this.Close();
         }
+
+        #endregion
+
+        #region Update/check for cancellation
 
         /// <summary>
         /// Update the progress bar values displayed, catching cancellation.
@@ -155,6 +178,10 @@ namespace geeWiz.Forms
             // Return if the form has closed, to catch early cancellation
             return IsClosed;
         }
+
+        #endregion
+
+        #region Run async task
 
         /// <summary>
         /// Verify if we can run the delayed tick, run it if we can.
@@ -211,5 +238,7 @@ namespace geeWiz.Forms
             // Update the cursor to the wait cursor
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
         }
+
+        #endregion
     }
 }

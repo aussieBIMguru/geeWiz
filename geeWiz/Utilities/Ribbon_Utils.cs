@@ -1,8 +1,7 @@
-﻿// System
-using System.Diagnostics;
-// Revit API
+﻿// Revit API
 using Autodesk.Revit.UI;
 // geeWiz
+using geeWiz.Extensions;
 using gFil = geeWiz.Utilities.File_Utils;
 
 // The class belongs to the geeWiz namespace
@@ -15,6 +14,8 @@ namespace geeWiz.Utilities
     /// </summary>
     public static class Ribbon_Utils
     {
+        #region Command class to base name
+
         /// <summary>
         /// Converts a command class to a base name for tooltip/icon finding.
         /// </summary>
@@ -22,8 +23,15 @@ namespace geeWiz.Utilities
         /// <returns>A string.</returns>
         public static string CommandClassToBaseName(string commandClass)
         {
-            return commandClass.Replace("geeWiz.", "").Replace(".Cmd", "");
+            // Example: geeWiz.Cmds_Settings.Cmd_UiToggle
+            // Step 1: Settings.Cmd_UiToggle
+            // Step 2: Settings_UiToggle
+            return commandClass.Replace("geeWiz.Cmds_", "").Replace(".Cmd", "");
         }
+
+        #endregion
+
+        #region Button data
 
         /// <summary>
         /// Creates PushButtonData (to stack, generally).
@@ -70,5 +78,39 @@ namespace geeWiz.Utilities
             // Return the data
             return pulldownButtonData;
         }
+
+        #endregion
+
+        #region Special buttons
+
+        /// <summary>
+        /// Creates the UiToggle button (Revit 2024+).
+        /// </summary>
+        /// <param name="pulldownButton">The PulldownButton to add it to.</param>
+        /// <param name="commandClass">The command class path.</param>
+        /// <param name="availability">The availability string.</param>
+        /// <returns>Void (nothing).</returns>
+        public static void AddButton_UiToggle(PulldownButton pulldownButton, string commandClass, string availability)
+        {
+            // Add Dark/Light mode if in 2024 or higher
+            #if REVIT2024_OR_GREATER
+
+            // Set dark mode global variable
+            Globals.IsDarkMode = UIThemeManager.CurrentTheme == UITheme.Dark;
+
+            // Add UiToggle button
+            pulldownButton.Ext_AddPushButton(
+                buttonName: Globals.IsDarkMode ? "Light mode" : "Dark mode",
+                commandClass: commandClass,
+                availability: availability,
+                suffix: Globals.IsDarkMode ? "" : "_Dark");
+
+            #endif
+            
+            // Return either way
+            return;
+        }
+
+        #endregion
     }
 }

@@ -21,6 +21,7 @@ namespace geeWiz
         {
             public static string Disabled {get { return $"{PATH_AVAILABILITY}+Disabled";} }
             public static string ZeroDoc { get { return $"{PATH_AVAILABILITY}+ZeroDoc"; } }
+            public static string Document { get { return $"{PATH_AVAILABILITY}+Document"; } }
             public static string Project { get { return $"{PATH_AVAILABILITY}+Project"; } }
             public static string Family { get { return $"{PATH_AVAILABILITY}+Family"; } }
             public static string Workshared { get { return $"{PATH_AVAILABILITY}+Workshared"; } }
@@ -49,6 +50,15 @@ namespace geeWiz
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
                 return true;
+            }
+        }
+
+        // Command can only be ran in a document
+        public class Document : IExternalCommandAvailability
+        {
+            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            {
+                return uiApp.ActiveUIDocument is UIDocument uiDoc;
             }
         }
 

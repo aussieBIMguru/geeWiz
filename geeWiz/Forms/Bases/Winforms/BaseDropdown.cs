@@ -8,10 +8,16 @@ namespace geeWiz.Forms
     /// </summary>
     public partial class BaseDropdown : System.Windows.Forms.Form
     {
+        #region Class properties
+
         // Properties belonging to the form
         private List<string> keys;
         private List<object> values;
         private int defaultIndex;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Constructs a listview form.
@@ -46,6 +52,10 @@ namespace geeWiz.Forms
             // Load the keys into the combobox
             InitializeKeys(defaultIndex);
         }
+
+        #endregion
+
+        #region Initialize keys
 
         /// <summary>
         /// Load the keys into the dropdown.
@@ -82,6 +92,10 @@ namespace geeWiz.Forms
             }
         }
 
+        #endregion
+
+        #region Click OK button
+
         /// <summary>
         /// Event handler when OK button is clicked.
         /// </summary>
@@ -105,6 +119,10 @@ namespace geeWiz.Forms
             this.Close();
         }
 
+        #endregion
+
+        #region Click Cancel button
+
         /// <summary>
         /// Event handler when cancel button is clicked.
         /// </summary>
@@ -115,5 +133,7 @@ namespace geeWiz.Forms
         {
             this.Close();
         }
+
+        #endregion
     }
 }

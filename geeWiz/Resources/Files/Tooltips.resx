@@ -117,16 +117,30 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Testing_ColourTabs" xml:space="preserve">
+  <data name="General_About" xml:space="preserve">
+    <value>Takes you to the project's github.</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>This menu contains various tools to toggle geeWiz's features.</value>
+  </data>
+  <data name="Settings_ColourTabs" xml:space="preserve">
     <value>Toggles the colouring of view tabs by document.
 
 Note:
 Tab colouring will override default Revit tab colouring behavior. Whilst this setting can be disabled afterwards, you will need to restart Revit to reinstate default tab colouring afterwards.</value>
   </data>
-  <data name="Testing_Github" xml:space="preserve">
-    <value>Takes you to the project's github.</value>
+  <data name="Settings_UiToggle" xml:space="preserve">
+    <value>Toggles between light and dark mode.
+
+Shift + Click:
+Sets the canvas theme to Dark instead of light.</value>
   </data>
-  <data name="Testing_Testing" xml:space="preserve">
+  <data name="Settings_Warden" xml:space="preserve">
+    <value>Toggles the Warden feature.
+
+Warden is a simple command interceptor, which will verify if you want to use bad practice commands before they execute.</value>
+  </data>
+  <data name="Tools_Testing" xml:space="preserve">
     <value>This is just a testing command.
 
 It will make all sheet names in the current document uppercase.
@@ -140,11 +154,5 @@ This command attempts to demonstrate:
 - Use of forms library
 
 More to come in future, but enjoy for now!</value>
-  </data>
-  <data name="Testing_UiToggle" xml:space="preserve">
-    <value>Toggles between light and dark mode.
-
-Shift + Click:
-Sets the canvas theme to Dark instead of light.</value>
   </data>
 </root>

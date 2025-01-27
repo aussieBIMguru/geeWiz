@@ -1,6 +1,7 @@
 ﻿// The base form will belong to the forms namespace
 namespace geeWiz.Forms
 {
+    #region Class summary
     /// <summary>
     /// Standard class for showing a form for selecting from a listview.
     /// 
@@ -10,13 +11,21 @@ namespace geeWiz.Forms
     /// 
     /// This is implemented in the Custom form, do not use this class directly.
     /// </summary>
+#endregion
+
     public partial class BaseListView : System.Windows.Forms.Form
     {
+        #region Class properties
+
         // Properties belonging to the form
         private List<string> keys;
         private List<object> values;
         private bool multiSelect;
         private List<int> filteredIndices;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Constructs a listview form.
@@ -61,6 +70,10 @@ namespace geeWiz.Forms
             ResetKeys();
         }
 
+        #endregion
+
+        #region Reset list view
+
         /// <summary>
         /// Load all keys into the listview.
         /// </summary>
@@ -87,6 +100,10 @@ namespace geeWiz.Forms
                 filteredIndices.Add(i);
             }
         }
+
+        #endregion
+
+        #region Text filter changed
 
         /// <summary>
         /// Event handler when text filter changes.
@@ -127,6 +144,10 @@ namespace geeWiz.Forms
             }
         }
 
+        #endregion
+
+        #region Click check all button
+
         /// <summary>
         /// Event handler when check all button is clicked.
         /// </summary>
@@ -142,6 +163,10 @@ namespace geeWiz.Forms
             }
         }
 
+        #endregion
+
+        #region Click uncheck all button
+
         /// <summary>
         /// Event handler when uncheck all button is clicked.
         /// </summary>
@@ -156,6 +181,10 @@ namespace geeWiz.Forms
                 item.Selected = false;
             }
         }
+
+        #endregion
+
+        #region Click OK button
 
         /// <summary>
         /// Event handler when OK button is clicked.
@@ -204,6 +233,10 @@ namespace geeWiz.Forms
             }
         }
 
+        #endregion
+
+        #region Click Cancel button
+
         /// <summary>
         /// Event handler when cancel button is clicked.
         /// </summary>
@@ -215,5 +248,7 @@ namespace geeWiz.Forms
             this.Tag = null;
             this.Close();
         }
+
+        #endregion
     }
 }

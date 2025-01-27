@@ -61,23 +61,55 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Takes you to the project&apos;s github..
+        /// </summary>
+        internal static string General_About {
+            get {
+                return ResourceManager.GetString("General_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This menu contains various tools to toggle geeWiz&apos;s features..
+        /// </summary>
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Toggles the colouring of view tabs by document.
         ///
         ///Note:
         ///Tab colouring will override default Revit tab colouring behavior. Whilst this setting can be disabled afterwards, you will need to restart Revit to reinstate default tab colouring afterwards..
         /// </summary>
-        internal static string Testing_ColourTabs {
+        internal static string Settings_ColourTabs {
             get {
-                return ResourceManager.GetString("Testing_ColourTabs", resourceCulture);
+                return ResourceManager.GetString("Settings_ColourTabs", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Takes you to the project&apos;s github..
+        ///   Looks up a localized string similar to Toggles between light and dark mode.
+        ///
+        ///Shift + Click:
+        ///Sets the canvas theme to Dark instead of light..
         /// </summary>
-        internal static string Testing_Github {
+        internal static string Settings_UiToggle {
             get {
-                return ResourceManager.GetString("Testing_Github", resourceCulture);
+                return ResourceManager.GetString("Settings_UiToggle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles the Warden feature.
+        ///
+        ///Warden is a simple command interceptor, which will verify if you want to use bad practice commands before they execute..
+        /// </summary>
+        internal static string Settings_Warden {
+            get {
+                return ResourceManager.GetString("Settings_Warden", resourceCulture);
             }
         }
         
@@ -96,21 +128,9 @@ namespace geeWiz.Resources.Files {
         ///
         ///More to come in future, but enjoy for now!.
         /// </summary>
-        internal static string Testing_Testing {
+        internal static string Tools_Testing {
             get {
-                return ResourceManager.GetString("Testing_Testing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Toggles between light and dark mode.
-        ///
-        ///Shift + Click:
-        ///Sets the canvas theme to Dark instead of light..
-        /// </summary>
-        internal static string Testing_UiToggle {
-            get {
-                return ResourceManager.GetString("Testing_UiToggle", resourceCulture);
+                return ResourceManager.GetString("Tools_Testing", resourceCulture);
             }
         }
     }

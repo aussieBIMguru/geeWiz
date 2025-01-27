@@ -23,8 +23,9 @@ namespace geeWiz.Extensions
         /// <param name="buttonName">The name for the button.</param>
         /// <param name="commandClass">The command the button will run.</param>
         /// <param name="availability">The availability name.</param>
+        /// <param name="suffix">The icon suffix (if any).</param>
         /// <returns>A Pushbutton object.</returns>
-        public static PushButton Ext_AddPushButton(this PulldownButton pulldownButton, string buttonName, string commandClass, string availability = "")
+        public static PushButton Ext_AddPushButton(this PulldownButton pulldownButton, string buttonName, string commandClass, string availability = "", string suffix = "")
         {
             // Return an error message if the pulldownbutton is null
             if (pulldownButton == null)
@@ -50,8 +51,8 @@ namespace geeWiz.Extensions
 
                 // Set tooltip and icons
                 pushButton.ToolTip = gFil.GetTooltip(baseName);
-                pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
-                pushButton.Image = gFil.GetImageSource(baseName, resolution: 16);
+                pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
+                pushButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 
                 // Return the PushButton
                 return pushButton;
@@ -77,6 +78,28 @@ namespace geeWiz.Extensions
             {
                 // If the name matches, return it
                 if (pushButton.Name == buttonName)
+                {
+                    return pushButton;
+                }
+            }
+
+            // If not found, we finally return null
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a PushButton from a PulldownButton.
+        /// </summary>
+        /// <param name="pulldownButton">The PulldownButton (extended).</param>
+        /// <param name="buttonText">The text of the button to search for.</param>
+        /// <returns>A PushButton.</returns>
+        public static PushButton Ext_GetPushButtonByText(this PulldownButton pulldownButton, string buttonText)
+        {
+            // For each item in the pulldownButton
+            foreach (PushButton pushButton in pulldownButton.GetItems())
+            {
+                // If the name matches, return it
+                if (pushButton.ItemText == buttonText)
                 {
                     return pushButton;
                 }

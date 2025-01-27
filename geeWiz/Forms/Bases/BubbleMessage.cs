@@ -1,5 +1,4 @@
 ﻿// Autodesk specific (Adwindows)
-using Autodesk.Revit.UI;
 using ResultClickEventArgs = Autodesk.Internal.InfoCenter.ResultClickEventArgs;
 // geeWiz specific
 using gFil = geeWiz.Utilities.File_Utils;
@@ -7,6 +6,8 @@ using gFil = geeWiz.Utilities.File_Utils;
 // The base form will belong to the forms namespace (we decorate in the custom class)
 namespace geeWiz.Forms
 {
+    #region Class summary
+
     /// <summary>
     /// Bubble messages appear at the top right of the screen.
     /// 
@@ -16,14 +17,23 @@ namespace geeWiz.Forms
     /// If a file or link path is provided on creation, clicking the form will attempt to open it.
     /// 
     /// </summary>
+
+    #endregion
+
     internal class BubbleMessage
     {
+        #region Class properties
+
         // Title and message properties
         private string title;
         private string message;
         // File and link paths to open on click
         private string filePath;
         private string linkPath;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Constructs a bubble message object (but does not show it).
@@ -41,6 +51,10 @@ namespace geeWiz.Forms
             this.filePath = filePath;
             this.linkPath = linkPath;
         }
+
+        #endregion
+
+        #region Show method
 
         /// <summary>
         /// Shows the bubble message form after construction.
@@ -71,6 +85,10 @@ namespace geeWiz.Forms
             Autodesk.Windows.ComponentManager.InfoCenterPaletteManager.ShowBalloon(resultItem);
         }
 
+        #endregion
+
+        #region On click event
+
         /// <summary>
         /// Opens the filepath or linkpath attached to the bubble message.
         /// </summary>
@@ -89,5 +107,7 @@ namespace geeWiz.Forms
                 gFil.OpenLinkPath(this.linkPath);
             }
         }
+
+        #endregion
     }
 }

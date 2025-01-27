@@ -80,6 +80,9 @@ namespace geeWiz
                 commandClass: $"{COMMANDCLASS_1A}.Cmd_About",
                 availability: gAva.ZeroDoc);
 
+            // Panel 1 - Add separator
+            ribbonPanel1.AddSeparator();
+
             // Panel 1 - Add Settings pulldown
             var pullDownSettings = ribbonPanel1.Ext_AddPulldownButton(
                 baseName: "Settings",
@@ -103,15 +106,6 @@ namespace geeWiz
                 commandClass: $"{COMMANDCLASS_1B}.Cmd_UiToggle",
                 availability: gAva.ZeroDoc);
 
-            // Panel 1 - Add separator
-            ribbonPanel1.AddSeparator();
-
-            // Panel 1 - Add Cmd_Testing button
-            ribbonPanel1.Ext_AddPushButton(
-                buttonName: "Testing",
-                commandClass: $"{COMMANDCLASS_2A}.Cmd_Testing",
-                availability: gAva.Project);
-
             #endregion
 
             #region Construct Panel 2
@@ -119,7 +113,41 @@ namespace geeWiz
             // Add Panel2 to the tab
             var ribbonPanel2 = uiCtlApp.Ext_AddRibbonPanelToTab(TAB_NAME, PANEL2_NAME);
 
-            // Further tools TBA
+            // Panel 2 - Add Cmd_Testing button
+            ribbonPanel2.Ext_AddPushButton(
+                buttonName: "Testing",
+                commandClass: $"{COMMANDCLASS_2A}.Cmd_Testing",
+                availability: gAva.Project);
+
+            // Panel 2 - Add Audit pulldown
+            // Panel 2 - Add Cmd_DeletePatterns to Audit pulldown
+            // Panel 2 - Add Cmd_PurgeRooms to Audit pulldown
+            // Panel 2 - Add Cmd_PurgeTemplates to Audit pulldown
+            // Panel 2 - Add Cmd_PurgeFilters to Audit pulldown
+
+            // Panel 2 - Add Revision pulldown
+            // Panel 2 - Add Cmd_BulkRev to Revision pulldown
+            // Panel 2 - Add Cmd_RevSet to Revision pulldown
+            // Panel 2 - Add Cmd_DocTrans to Revision pulldown
+
+            // Panel 2 - Add Import pulldown
+            // Panel 2 - Add Cmd_ExcelTemplate to Import pulldown
+            // Panel 2 - Add Cmd_ImportSheets to Import pulldown
+
+            // Panel 2 - Add Export pulldown
+            // Panel 2 - Add Cmd_ExportSchedule to Export pulldown
+            // Panel 2 - Add Cmd_ExportPdf to Export pulldown
+            // Panel 2 - Add Cmd_ExportDwg to Export pulldown
+
+            // Panel 2 - Add Select pulldown
+            // Panel 2 - Add Cmd_PickRooms to Select pulldown
+            // Panel 2 - Add Cmd_PickWalls to Select pulldown
+            // Panel 2 - Add Cmd_GetHidden to Select pulldown
+            // Panel 2 - Add Cmd_GetTtbs to Select pulldown
+            // Panel 2 - Add Cmd_RemoveGrouped to Select pulldown
+
+            // Panel 2 - Add Worksets pulldown
+            // Panel 2 - Add Cmd_CreateWorksets to Select pulldown
 
             #endregion
 

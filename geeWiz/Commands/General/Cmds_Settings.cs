@@ -205,7 +205,7 @@ namespace geeWiz.Cmds_Settings
             // Return message to user
             return gFrm.Custom.BubbleMessage(title: "Task completed",
                 message: $"Revit theme set to {oldButtonName}.\n\nClick me to see how this works!",
-                linkPath: @"https://github.com/aussieBIMguru/geeWiz/blob/main/geeWiz");
+                linkPath: @"https://github.com/aussieBIMguru/geeWiz/blob/main/geeWiz/Commands/General/Cmds_Settings.cs#L171");
         }
     }
 

@@ -117,17 +117,29 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Audit" xml:space="preserve">
+    <value>Tools relating to cleaning the model.</value>
+  </data>
   <data name="Audit_DeletePatterns" xml:space="preserve">
     <value>Deletes all Fill and Line Patterns found in the current document that begin with the word 'Import'.
+
+Condition(s) to run:
+- User is in a project or family document
 
 Warning:
 This tool will not provide a list to choose from - it will go straight to deletion.</value>
   </data>
   <data name="Audit_DeleteRooms" xml:space="preserve">
-    <value>Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.</value>
+    <value>Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.
+
+Condition(s) to run:
+- Current document is a project</value>
   </data>
   <data name="Audit_PurgeFilters" xml:space="preserve">
     <value>Provides a list of all unused View Filters in the current document, from which you can choose which ones to delete from the model.
+
+Condition(s) to run:
+- Current document is a project
 
 Note:
 This tool will check all Views and View Templates for used filters.</value>
@@ -135,11 +147,41 @@ This tool will check all Views and View Templates for used filters.</value>
   <data name="Audit_PurgeTemplates" xml:space="preserve">
     <value>Provides a list of all unused View Templates in the current document, from which you can choose which ones to delete from the model.
 
+Condition(s) to run:
+- Current document is a project
+
 Note:
 This tool will check all Views and View Family Types for assigned and default templates.</value>
   </data>
   <data name="General_About" xml:space="preserve">
     <value>Takes you to the project's github.</value>
+  </data>
+  <data name="Revision" xml:space="preserve">
+    <value>Tools relating to revision management.</value>
+  </data>
+  <data name="Revision_BulkRev" xml:space="preserve">
+    <value>Adds a chosen revision to sheets, selected from a list. If the revision is already applied to a sheet, it will skip that sheet.
+
+Condition(s) to run:
+- Current document is a project
+
+Shift + click:
+Removes the chosen revision instead.</value>
+  </data>
+  <data name="Revision_DocTrans" xml:space="preserve">
+    <value>Given chosen revisions and sheets, will generate an Excel based document transmittal ('doctrans') that summarizes the revision numbers on those sheets.
+
+Condition(s) to run:
+- Current document is a project</value>
+  </data>
+  <data name="Revision_RevSet" xml:space="preserve">
+    <value>Given a chosen revision, creates a new sheet set for all sheets with that revision.
+
+Condition(s) to run:
+- Current document is a project
+
+Note:
+If the sheet set already exists, it will be deleted and re-created.</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>This menu contains various tools to toggle geeWiz's features.</value>
@@ -161,19 +203,17 @@ Sets the canvas theme to Dark instead of light.</value>
 
 Warden is a simple command interceptor, which will verify if you want to use bad practice commands before they execute.</value>
   </data>
-  <data name="Tools_Testing" xml:space="preserve">
-    <value>This is just a testing command.
+  <data name="Workset" xml:space="preserve">
+    <value>Tools relating to worksets.</value>
+  </data>
+  <data name="Workset_Create" xml:space="preserve">
+    <value>Creates worksets from a fixed standard, chosen from a list of names.
 
-It will make all sheet names in the current document uppercase.
+Condition(s) to run:
+- The current document is a project
+- The current document is workshared
 
-This command attempts to demonstrate:
-- Ribbon construction logic
-- Collection of elements
-- Worksharing filtering
-- Using the progress bar
-- Using a transaction
-- Use of forms library
-
-More to come in future, but enjoy for now!</value>
+Notes:
+The tool will offer to rename the 'Shared Levels and Grids' workset if it is found.</value>
   </data>
 </root>

@@ -61,7 +61,19 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tools relating to cleaning the model..
+        /// </summary>
+        internal static string Audit {
+            get {
+                return ResourceManager.GetString("Audit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deletes all Fill and Line Patterns found in the current document that begin with the word &apos;Import&apos;.
+        ///
+        ///Condition(s) to run:
+        ///- User is in a project or family document
         ///
         ///Warning:
         ///This tool will not provide a list to choose from - it will go straight to deletion..
@@ -73,7 +85,10 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model..
+        ///   Looks up a localized string similar to Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.
+        ///
+        ///Condition(s) to run:
+        ///- Current document is a project.
         /// </summary>
         internal static string Audit_DeleteRooms {
             get {
@@ -83,6 +98,9 @@ namespace geeWiz.Resources.Files {
         
         /// <summary>
         ///   Looks up a localized string similar to Provides a list of all unused View Filters in the current document, from which you can choose which ones to delete from the model.
+        ///
+        ///Condition(s) to run:
+        ///- Current document is a project
         ///
         ///Note:
         ///This tool will check all Views and View Templates for used filters..
@@ -95,6 +113,9 @@ namespace geeWiz.Resources.Files {
         
         /// <summary>
         ///   Looks up a localized string similar to Provides a list of all unused View Templates in the current document, from which you can choose which ones to delete from the model.
+        ///
+        ///Condition(s) to run:
+        ///- Current document is a project
         ///
         ///Note:
         ///This tool will check all Views and View Family Types for assigned and default templates..
@@ -111,6 +132,57 @@ namespace geeWiz.Resources.Files {
         internal static string General_About {
             get {
                 return ResourceManager.GetString("General_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools relating to revision management..
+        /// </summary>
+        internal static string Revision {
+            get {
+                return ResourceManager.GetString("Revision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adds a chosen revision to sheets, selected from a list. If the revision is already applied to a sheet, it will skip that sheet.
+        ///
+        ///Condition(s) to run:
+        ///- Current document is a project
+        ///
+        ///Shift + click:
+        ///Removes the chosen revision instead..
+        /// </summary>
+        internal static string Revision_BulkRev {
+            get {
+                return ResourceManager.GetString("Revision_BulkRev", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Given chosen revisions and sheets, will generate an Excel based document transmittal (&apos;doctrans&apos;) that summarizes the revision numbers on those sheets.
+        ///
+        ///Condition(s) to run:
+        ///- Current document is a project.
+        /// </summary>
+        internal static string Revision_DocTrans {
+            get {
+                return ResourceManager.GetString("Revision_DocTrans", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Given a chosen revision, creates a new sheet set for all sheets with that revision.
+        ///
+        ///Condition(s) to run:
+        ///- Current document is a project
+        ///
+        ///Note:
+        ///If the sheet set already exists, it will be deleted and re-created..
+        /// </summary>
+        internal static string Revision_RevSet {
+            get {
+                return ResourceManager.GetString("Revision_RevSet", resourceCulture);
             }
         }
         
@@ -159,23 +231,27 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is just a testing command.
-        ///
-        ///It will make all sheet names in the current document uppercase.
-        ///
-        ///This command attempts to demonstrate:
-        ///- Ribbon construction logic
-        ///- Collection of elements
-        ///- Worksharing filtering
-        ///- Using the progress bar
-        ///- Using a transaction
-        ///- Use of forms library
-        ///
-        ///More to come in future, but enjoy for now!.
+        ///   Looks up a localized string similar to Tools relating to worksets..
         /// </summary>
-        internal static string Tools_Testing {
+        internal static string Workset {
             get {
-                return ResourceManager.GetString("Tools_Testing", resourceCulture);
+                return ResourceManager.GetString("Workset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creates worksets from a fixed standard, chosen from a list of names.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project
+        ///- The current document is workshared
+        ///
+        ///Notes:
+        ///The tool will offer to rename the &apos;Shared Levels and Grids&apos; workset if it is found..
+        /// </summary>
+        internal static string Workset_Create {
+            get {
+                return ResourceManager.GetString("Workset_Create", resourceCulture);
             }
         }
     }

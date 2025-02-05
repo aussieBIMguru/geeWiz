@@ -23,9 +23,6 @@ namespace geeWiz
         public const string TAB_NAME = "geeWiz";
         public const string PANEL1_NAME = "General";
         public const string PANEL2_NAME = "Tools";
-        public const string COMMANDCLASS_1A = "geeWiz.Cmds_General";
-        public const string COMMANDCLASS_1B = "geeWiz.Cmds_Settings";
-        public const string COMMANDCLASS_2A = "geeWiz.Cmds_Tools";
 
         #endregion
 
@@ -77,7 +74,7 @@ namespace geeWiz
 
             // Panel 1 - Add Cmd_About button
             ribbonPanel1.Ext_AddPushButton(buttonName: "About",
-                commandClass: $"{COMMANDCLASS_1A}.Cmd_About",
+                commandClass: "geeWiz.Cmds_General.Cmd_About",
                 availability: gAva.ZeroDoc);
 
             // Panel 1 - Add separator
@@ -91,19 +88,19 @@ namespace geeWiz
             // Panel 1 - Add Cmd_Warden button to Settings pulldown
             pullDownSettings.Ext_AddPushButton(
                 buttonName: "Warden",
-                commandClass: $"{COMMANDCLASS_1B}.Cmd_Warden",
+                commandClass: "geeWiz.Cmds_Settings.Cmd_Warden",
                 availability: gAva.Document);
 
             // Panel 1 - Add Cmd_ColourTabs button to Settings pulldown
             pullDownSettings.Ext_AddPushButton(
                 buttonName: "Coloured Tabs",
-                commandClass: $"{COMMANDCLASS_1B}.Cmd_ColourTabs",
+                commandClass: "geeWiz.Cmds_Settings.Cmd_ColourTabs",
                 availability: gAva.Document);
 
             // Panel 1 - Add Cmd_UiToggle button to Settings pulldown
             gRib.AddButton_UiToggle(
                 pulldownButton: pullDownSettings,
-                commandClass: $"{COMMANDCLASS_1B}.Cmd_UiToggle",
+                commandClass: "geeWiz.Cmds_Settings.Cmd_UiToggle",
                 availability: gAva.ZeroDoc);
 
             #endregion
@@ -113,22 +110,102 @@ namespace geeWiz
             // Add Panel2 to the tab
             var ribbonPanel2 = uiCtlApp.Ext_AddRibbonPanelToTab(TAB_NAME, PANEL2_NAME);
 
-            // Panel 2 - Add Cmd_Testing button
-            ribbonPanel2.Ext_AddPushButton(
-                buttonName: "Testing",
-                commandClass: $"{COMMANDCLASS_2A}.Cmd_Testing",
+            #region Construct PulldownButton data
+
+            // Construct pulldown data objects
+            var dataAudit = gRib.NewPulldownButtonData(
+                buttonName: "Audit",
+                commandClass: "geeWiz.Cmds_Audit");
+            var dataRevision = gRib.NewPulldownButtonData(
+                buttonName: "Revision",
+                commandClass: "geeWiz.Cmds_Revision");
+            var dataSelect = gRib.NewPulldownButtonData(
+                buttonName: "Select",
+                commandClass: "geeWiz.Cmds_Select");
+            var dataWorkset = gRib.NewPulldownButtonData(
+                buttonName: "Workset",
+                commandClass: "geeWiz.Cmds_Workset");
+            var dataImport = gRib.NewPulldownButtonData(
+                buttonName: "Import",
+                commandClass: "geeWiz.Cmds_Import");
+            var dataExport = gRib.NewPulldownButtonData(
+                buttonName: "Export",
+                commandClass: "geeWiz.Cmds_Export");
+
+            #endregion
+
+            #region Stack pulldowns
+
+            // Construct stacks
+            var stackedGroup2a = ribbonPanel2.AddStackedItems(dataAudit, dataRevision, dataSelect);
+            var stackedGroup2b = ribbonPanel2.AddStackedItems(dataWorkset, dataImport, dataExport);
+
+            // Retrieve pulldownbuttons
+            var pulldownAudit = (PulldownButton)stackedGroup2a[0];
+            var pulldownRevision = (PulldownButton)stackedGroup2a[1];
+            var pulldownSelect = (PulldownButton)stackedGroup2a[2];
+            var pulldownWorkset = (PulldownButton)stackedGroup2b[0];
+            var pulldownImport = (PulldownButton)stackedGroup2b[1];
+            var pulldownExport = (PulldownButton)stackedGroup2b[2];
+
+            #endregion
+
+            #region Pulldown - Audit
+
+            // Add pushbuttons to Audit
+            pulldownAudit.Ext_AddPushButton(
+                buttonName: "Delete imported patterns",
+                commandClass: "geeWiz.Cmds_Audit.Cmd_DeletePatterns",
+                availability: gAva.Document);
+            pulldownAudit.Ext_AddPushButton(
+                buttonName: "Purge unplaced rooms",
+                commandClass: "geeWiz.Cmds_Audit.Cmd_PurgeRooms",
                 availability: gAva.Project);
+            pulldownAudit.Ext_AddPushButton(
+                buttonName: "Purge unused view templates",
+                commandClass: "geeWiz.Cmds_Audit.Cmd_PurgeTemplates",
+                availability: gAva.Document);
+            pulldownAudit.Ext_AddPushButton(
+                buttonName: "Purge unused view filters",
+                commandClass: "geeWiz.Cmds_Audit.Cmd_PurgeFilters",
+                availability: gAva.Document);
 
-            // Panel 2 - Add Audit pulldown
-            // Panel 2 - Add Cmd_DeletePatterns to Audit pulldown
-            // Panel 2 - Add Cmd_PurgeRooms to Audit pulldown
-            // Panel 2 - Add Cmd_PurgeTemplates to Audit pulldown
-            // Panel 2 - Add Cmd_PurgeFilters to Audit pulldown
+            #endregion
 
-            // Panel 2 - Add Revision pulldown
-            // Panel 2 - Add Cmd_BulkRev to Revision pulldown
-            // Panel 2 - Add Cmd_RevSet to Revision pulldown
-            // Panel 2 - Add Cmd_DocTrans to Revision pulldown
+            #region Pulldown - Revision
+
+            // Add pushbuttons to Revision
+            pulldownRevision.Ext_AddPushButton(
+                buttonName: "Bulk revision",
+                commandClass: "geeWiz.Cmds_Revision.Cmd_BulkRev",
+                availability: gAva.Document);
+            pulldownRevision.Ext_AddPushButton(
+                buttonName: "Sheet set by revision",
+                commandClass: "geeWiz.Cmds_Revision.Cmd_RevSet",
+                availability: gAva.Document);
+            pulldownRevision.Ext_AddPushButton(
+                buttonName: "Create Excel transmittal",
+                commandClass: "geeWiz.Cmds_Revision.Cmd_DocTrans",
+                availability: gAva.Document);
+
+            #endregion
+
+            // Panel 2 - Add Select pulldown
+            // Panel 2 - Add Cmd_PickRooms to Select pulldown
+            // Panel 2 - Add Cmd_PickWalls to Select pulldown
+            // Panel 2 - Add Cmd_GetHidden to Select pulldown
+            // Panel 2 - Add Cmd_GetTtbs to Select pulldown
+            // Panel 2 - Add Cmd_RemoveGrouped to Select pulldown
+
+            #region Pulldown - Workset
+
+            // Add pushbuttons to Workset
+            pulldownRevision.Ext_AddPushButton(
+                buttonName: "Create worksets",
+                commandClass: "geeWiz.Cmds_Workset.Cmd_Create",
+                availability: gAva.Workshared);
+
+            #endregion
 
             // Panel 2 - Add Import pulldown
             // Panel 2 - Add Cmd_ExcelTemplate to Import pulldown
@@ -138,16 +215,6 @@ namespace geeWiz
             // Panel 2 - Add Cmd_ExportSchedule to Export pulldown
             // Panel 2 - Add Cmd_ExportPdf to Export pulldown
             // Panel 2 - Add Cmd_ExportDwg to Export pulldown
-
-            // Panel 2 - Add Select pulldown
-            // Panel 2 - Add Cmd_PickRooms to Select pulldown
-            // Panel 2 - Add Cmd_PickWalls to Select pulldown
-            // Panel 2 - Add Cmd_GetHidden to Select pulldown
-            // Panel 2 - Add Cmd_GetTtbs to Select pulldown
-            // Panel 2 - Add Cmd_RemoveGrouped to Select pulldown
-
-            // Panel 2 - Add Worksets pulldown
-            // Panel 2 - Add Cmd_CreateWorksets to Select pulldown
 
             #endregion
 

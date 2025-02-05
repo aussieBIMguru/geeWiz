@@ -73,7 +73,7 @@ namespace geeWiz.Resources.Files {
         ///   Looks up a localized string similar to Deletes all Fill and Line Patterns found in the current document that begin with the word &apos;Import&apos;.
         ///
         ///Condition(s) to run:
-        ///- User is in a project or family document
+        ///- The current document is a project or family
         ///
         ///Warning:
         ///This tool will not provide a list to choose from - it will go straight to deletion..
@@ -85,22 +85,10 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.
-        ///
-        ///Condition(s) to run:
-        ///- Current document is a project.
-        /// </summary>
-        internal static string Audit_DeleteRooms {
-            get {
-                return ResourceManager.GetString("Audit_DeleteRooms", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Provides a list of all unused View Filters in the current document, from which you can choose which ones to delete from the model.
         ///
         ///Condition(s) to run:
-        ///- Current document is a project
+        ///- The current document is a project
         ///
         ///Note:
         ///This tool will check all Views and View Templates for used filters..
@@ -112,10 +100,22 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project.
+        /// </summary>
+        internal static string Audit_PurgeRooms {
+            get {
+                return ResourceManager.GetString("Audit_PurgeRooms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Provides a list of all unused View Templates in the current document, from which you can choose which ones to delete from the model.
         ///
         ///Condition(s) to run:
-        ///- Current document is a project
+        ///- The current document is a project
         ///
         ///Note:
         ///This tool will check all Views and View Family Types for assigned and default templates..
@@ -127,11 +127,104 @@ namespace geeWiz.Resources.Files {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tools relating to  exporting data from Revit..
+        /// </summary>
+        internal static string Export {
+            get {
+                return ResourceManager.GetString("Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exports the contents of the active schedule view to Excel.
+        ///
+        ///Condition(s) to run:
+        ///- Current view is a schedule.
+        /// </summary>
+        internal static string Export_Schedule {
+            get {
+                return ResourceManager.GetString("Export_Schedule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exports selected sheets from Revit to DWG, using internal coordinates.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project
+        ///
+        ///Notes:
+        ///The tool will apply a generic naming rule to exported documents.
+        ///
+        ///Shift + click:
+        ///Uses shared coordinates instead..
+        /// </summary>
+        internal static string Export_SheetsDwg {
+            get {
+                return ResourceManager.GetString("Export_SheetsDwg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exports selected sheets from Revit to PDF.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project
+        ///
+        ///Notes:
+        ///The tool will apply a generic naming rule to exported documents. The built-in Pdf exporter is used for the exporting process, which automatically detects page sizes.
+        ///
+        ///Shift + click:
+        ///Shows crop boundaries (hidden by default)..
+        /// </summary>
+        internal static string Export_SheetsPdf {
+            get {
+                return ResourceManager.GetString("Export_SheetsPdf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Takes you to the project&apos;s github..
         /// </summary>
         internal static string General_About {
             get {
                 return ResourceManager.GetString("General_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools relating to importing information to Revit..
+        /// </summary>
+        internal static string Import {
+            get {
+                return ResourceManager.GetString("Import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using the templated Excel file, creates new sheets and updates the names of existing ones provided.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project.
+        /// </summary>
+        internal static string Import_CreateSheets {
+            get {
+                return ResourceManager.GetString("Import_CreateSheets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saves a template for entering sheet information that can be imported back into Revit.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project
+        ///
+        ///Shift + click:
+        ///Exports all sheet names and numbers to the template..
+        /// </summary>
+        internal static string Import_SheetsExcel {
+            get {
+                return ResourceManager.GetString("Import_SheetsExcel", resourceCulture);
             }
         }
         
@@ -183,6 +276,75 @@ namespace geeWiz.Resources.Files {
         internal static string Revision_RevSet {
             get {
                 return ResourceManager.GetString("Revision_RevSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools relating to selection tasks..
+        /// </summary>
+        internal static string Select {
+            get {
+                return ResourceManager.GetString("Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables reveal hidden elements mode, then selects any elements that are hidden in the active view.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project..
+        /// </summary>
+        internal static string Select_GetHidden {
+            get {
+                return ResourceManager.GetString("Select_GetHidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For all currently selected sheets, will in turn select any titleblock(s) on them.
+        ///
+        ///Condition(s) to run:
+        ///- Sheets are selected.
+        /// </summary>
+        internal static string Select_GetTtbs {
+            get {
+                return ResourceManager.GetString("Select_GetTtbs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Puts Revit into a mode where you can only select rooms.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project..
+        /// </summary>
+        internal static string Select_PickRooms {
+            get {
+                return ResourceManager.GetString("Select_PickRooms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Puts Revit into a mode where you can only select walls.
+        ///
+        ///Condition(s) to run:
+        ///- The current document is a project..
+        /// </summary>
+        internal static string Select_PickWalls {
+            get {
+                return ResourceManager.GetString("Select_PickWalls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removes any grouped elements (and groups) from the current selection.
+        ///
+        ///Condition(s) to run:
+        ///- Elements are selected.
+        /// </summary>
+        internal static string Select_RemoveGrouped {
+            get {
+                return ResourceManager.GetString("Select_RemoveGrouped", resourceCulture);
             }
         }
         

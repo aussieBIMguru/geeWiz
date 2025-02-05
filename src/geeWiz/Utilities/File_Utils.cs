@@ -264,6 +264,35 @@ namespace geeWiz.Utilities
 
         #endregion
 
+        #region Open directory
+
+        /// <summary>
+        /// Attempts to open a directory.
+        /// </summary>
+        /// <param name="directoryPath"">The directory path.</param>
+        /// <returns>A Result.</returns>
+        public static Result OpenDirectory(string directoryPath)
+        {
+            // Fail if it does not exist
+            if (!Directory.Exists(directoryPath))
+            {
+                return Result.Failed;
+            }
+
+            // Try to open the directory with Explorer.exe
+            try
+            {
+                System.Diagnostics.Process.Start("explorer.exe", directoryPath);
+                return Result.Succeeded;
+            }
+            catch
+            {
+                return Result.Failed;
+            }
+        }
+
+        #endregion
+
         #region Ribbon management
 
         /// <summary>

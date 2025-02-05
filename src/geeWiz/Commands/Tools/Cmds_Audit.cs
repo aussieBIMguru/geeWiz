@@ -26,10 +26,10 @@ namespace geeWiz.Cmds_Audit
 
             // Collect fill and line patterns
             var deletePatterns = doc.Ext_Collector()
-                .OfClass(typeof(FillPattern))
+                .OfClass(typeof(FillPatternElement))
                 .Concat(
                     doc.Ext_Collector()
-                    .OfClass(typeof(LinePattern))
+                    .OfClass(typeof(LinePatternElement))
                     )
                 .Cast<Element>()
                 .Where(e => e.Name.ToUpper().StartsWith("IMPORT"))

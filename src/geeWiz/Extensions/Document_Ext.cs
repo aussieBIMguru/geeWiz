@@ -1,13 +1,10 @@
 ﻿// Revit API
-using Room = Autodesk.Revit.DB.Architecture.Room;
 using View = Autodesk.Revit.DB.View;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
 using Autodesk.Revit.UI;
-using DocumentFormat.OpenXml.Spreadsheet;
-using geeWiz.Cmds_Audit;
 
 // The class belongs to the extensions namespace
 // Document doc.ExtensionMethod()
@@ -603,6 +600,71 @@ namespace geeWiz.Extensions
 
         #endregion
 
+        #region Titleblock type collector/selection
+
+        /// <summary>
+        /// Gets all titleblock types in the given document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="sorted">Sort the types by name.</param>
+        /// <returns>A list of Family types.</returns>
+        public static List<FamilySymbol> Ext_GetTitleblockTypes(this Document doc, bool sorted = false)
+        {
+            // Collect all titleblock types in document
+            List<FamilySymbol> titleblockTypes = doc.Ext_Collector()
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .OfClass(typeof(FamilySymbol))
+                .Cast<FamilySymbol>()
+                .ToList();
+
+            // Return the types sorted or unsorted
+            if (sorted)
+            {
+                return titleblockTypes
+                    .OrderBy(t => t.Ext_ToFamilySymbolKey())
+                    .ToList();
+            }
+            else
+            {
+                return titleblockTypes;
+            }
+        }
+
+        /// <summary>
+        /// Select titleblock type(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the types by name.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult Ext_SelectTitleblockTypes(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select Titleblock type(s):" : "Select a Titleblock type:";
+
+            // Get all Titleblock types in document
+            var titleblockTypes = doc.Ext_GetTitleblockTypes(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = titleblockTypes
+                .Select(t => t.Ext_ToFamilySymbolKey())
+                .ToList();
+
+            // Process into values (to display)
+            var values = titleblockTypes
+                .Cast<object>()
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.Custom.SelectFromList(keys: keys,
+                values: values,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        #endregion
+
         #region Revision collector/selection
 
         /// <summary>
@@ -714,17 +776,17 @@ namespace geeWiz.Extensions
         /// <param name="includeUnenclosed">Include unenclosed rooms.</param>
         /// <param name="includeUnplaced">Include unplaced rooms.</param>
         /// <returns>A list of Rooms.</returns>
-        public static List<Room> Ext_GetRooms(this Document doc, View view = null, bool sorted = false,
+        public static List<SpatialElement> Ext_GetRooms(this Document doc, View view = null, bool sorted = false,
             bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Collect all rooms in document
-            List<Room> rooms = doc.Ext_Collector(view)
-                .OfClass(typeof(Room))
-                .Cast<Room>()
+            List<SpatialElement> rooms = doc.Ext_Collector(view)
+                .OfCategory(BuiltInCategory.OST_Rooms)
+                .Cast<SpatialElement>()
                 .ToList();
 
             // New list to construct by placement
-            var roomsFinal = new List<Room>();
+            var roomsFinal = new List<SpatialElement>();
 
             // Filter the rooms, then rebuild the list by placement types
             var roomMatrixByPlacement = gSpa.RoomsMatrixByPlacement(rooms, doc);
@@ -759,7 +821,7 @@ namespace geeWiz.Extensions
         /// <param name="includeUnenclosed">Include unenclosed rooms.</param>
         /// <param name="includeUnplaced">Include unplaced rooms.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectRooms(this Document doc, List<Room> rooms = null, string title = null, bool multiSelect = true,
+        public static gFrm.FormResult Ext_SelectRooms(this Document doc, List<SpatialElement> rooms = null, string title = null, bool multiSelect = true,
             bool sorted = false, bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Set the default form title if not provided

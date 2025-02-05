@@ -157,6 +157,9 @@ namespace geeWiz
                 buttonName: "Delete imported patterns",
                 commandClass: "geeWiz.Cmds_Audit.Cmd_DeletePatterns",
                 availability: gAva.Document);
+
+            pulldownAudit.AddSeparator();
+
             pulldownAudit.Ext_AddPushButton(
                 buttonName: "Purge unplaced rooms",
                 commandClass: "geeWiz.Cmds_Audit.Cmd_PurgeRooms",
@@ -190,31 +193,85 @@ namespace geeWiz
 
             #endregion
 
-            // Panel 2 - Add Select pulldown
-            // Panel 2 - Add Cmd_PickRooms to Select pulldown
-            // Panel 2 - Add Cmd_PickWalls to Select pulldown
-            // Panel 2 - Add Cmd_GetHidden to Select pulldown
-            // Panel 2 - Add Cmd_GetTtbs to Select pulldown
-            // Panel 2 - Add Cmd_RemoveGrouped to Select pulldown
+            #region Pulldown - Select
+
+            // Add pushbuttons to Select
+            pulldownSelect.Ext_AddPushButton(
+                buttonName: "Pick rooms",
+                commandClass: "geeWiz.Cmds_Select.Cmd_PickRooms",
+                availability: gAva.Document);
+            pulldownSelect.Ext_AddPushButton(
+                buttonName: "Pick walls",
+                commandClass: "geeWiz.Cmds_Select.Cmd_PickWalls",
+                availability: gAva.Document);
+
+            pulldownSelect.AddSeparator();
+
+            pulldownSelect.Ext_AddPushButton(
+                buttonName: "Get hidden elements",
+                commandClass: "geeWiz.Cmds_Select.Cmd_GetHidden",
+                availability: gAva.Document);
+            pulldownSelect.Ext_AddPushButton(
+                buttonName: "Get sheet titleblocks",
+                commandClass: "geeWiz.Cmds_Select.Cmd_GetTtbs",
+                availability: gAva.SelectionOnlySheets);
+
+            pulldownSelect.AddSeparator();
+
+            pulldownSelect.Ext_AddPushButton(
+                buttonName: "Remove grouped elements",
+                commandClass: "geeWiz.Cmds_Select.Cmd_RemoveGrouped",
+                availability: gAva.Selection);
+
+            #endregion
 
             #region Pulldown - Workset
 
             // Add pushbuttons to Workset
-            pulldownRevision.Ext_AddPushButton(
+            pulldownWorkset.Ext_AddPushButton(
                 buttonName: "Create worksets",
                 commandClass: "geeWiz.Cmds_Workset.Cmd_Create",
                 availability: gAva.Workshared);
 
             #endregion
 
-            // Panel 2 - Add Import pulldown
-            // Panel 2 - Add Cmd_ExcelTemplate to Import pulldown
-            // Panel 2 - Add Cmd_ImportSheets to Import pulldown
+            #region Pulldown - Import
 
-            // Panel 2 - Add Export pulldown
-            // Panel 2 - Add Cmd_ExportSchedule to Export pulldown
-            // Panel 2 - Add Cmd_ExportPdf to Export pulldown
-            // Panel 2 - Add Cmd_ExportDwg to Export pulldown
+            // Add pushbuttons to Import
+            pulldownImport.Ext_AddPushButton(
+                buttonName: "Sheets to Excel",
+                commandClass: "geeWiz.Cmds_Import.Cmd_SheetsExcel",
+                availability: gAva.Project);
+
+            pulldownImport.AddSeparator();
+
+            pulldownImport.Ext_AddPushButton(
+                buttonName: "Create/update sheets",
+                commandClass: "geeWiz.Cmds_Import.Cmd_CreateSheets",
+                availability: gAva.Project);
+
+            #endregion
+
+            #region Pulldown - Export
+
+            // Add pushbuttons to Export
+            pulldownExport.Ext_AddPushButton(
+                buttonName: "Schedule to Excel",
+                commandClass: "geeWiz.Cmds_Export.Cmd_Schedule",
+                availability: gAva.ActiveViewSchedule);
+
+            pulldownExport.AddSeparator();
+
+            pulldownExport.Ext_AddPushButton(
+                buttonName: "Sheets to Pdf",
+                commandClass: "geeWiz.Cmds_Export.Cmd_SheetsPdf",
+                availability: gAva.Project);
+            pulldownExport.Ext_AddPushButton(
+                buttonName: "Sheets to Dwg",
+                commandClass: "geeWiz.Cmds_Export.Cmd_SheetsDwg",
+                availability: gAva.Project);
+
+            #endregion
 
             #endregion
 

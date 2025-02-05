@@ -226,7 +226,7 @@ namespace geeWiz.Utilities
                     foreach (var cell in row.Cells())
                     {
                         // If we can still read, or if read all
-                        if (colsRead < readCols || colsRead == 0)
+                        if (colsRead < readCols || readCols == 0)
                         {
                             // Add the cell text to the list
                             dataList.Add(cell.GetString().Trim());
@@ -260,20 +260,20 @@ namespace geeWiz.Utilities
         {
             // Catch null worksheet
             if (worksheet is null) { return; }
-            
-            // For each row (r), offset by startRow
-            for (int r = startRow; r < matrix.Count + startRow; r++)
+
+            // For each row...
+            for (int r = 0; r < matrix.Count; r++)
             {
-                // For each column in that row (c), offset by startCol
-                for (int c = startCol; c < matrix[r].Count + startCol; c++)
+                // For each column...
+                for (int c = 0; c < matrix[r].Count; c++)
                 {
                     // Get the matrix value
-                    var cellValue = matrix[r - 1][c - 1];
+                    var cellValue = matrix[r][c];
 
                     // Write to the cell if its value is not null
                     if (cellValue is not null)
                     {
-                        worksheet.Cell(r, c).Value = cellValue;
+                        worksheet.Cell(r + startRow, c + startCol).Value = cellValue;
                     }
                 }
             }

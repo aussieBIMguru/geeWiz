@@ -1,7 +1,6 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
 using View = Autodesk.Revit.DB.View;
-using Room = Autodesk.Revit.DB.Architecture.Room;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using Autodesk.Revit.UI.Selection;
@@ -216,12 +215,12 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="uiDoc">The active UIDocument (extended).</param>
         /// <returns>A list of rooms.</returns>
-        public static List<Room> Ext_SelectedRooms(this UIDocument uiDoc)
+        public static List<SpatialElement> Ext_SelectedRooms(this UIDocument uiDoc)
         {
             // Get selected views
             return uiDoc.Ext_SelectedElements()
-                .Where(e => e is Room)
-                .Cast<Room>()
+                .Where(e => e is Autodesk.Revit.DB.Architecture.Room)
+                .Cast<SpatialElement>()
                 .ToList();
         }
 

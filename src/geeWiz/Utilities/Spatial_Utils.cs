@@ -1,7 +1,4 @@
-﻿// Autodesk
-using Room = Autodesk.Revit.DB.Architecture.Room;
-
-// The class belongs to the utility namespace
+﻿// The class belongs to the utility namespace
 // using gSpa = geeWiz.Utilities.Spatial_Utils
 
 namespace geeWiz.Utilities
@@ -24,13 +21,13 @@ namespace geeWiz.Utilities
         /// <param name="rooms">The Rooms to sort.</param>
         /// <param name="doc">The related document.</param>
         /// <returns>A matrix (list of lists) of Rooms.</returns>
-        public static List<List<Room>> RoomsMatrixByPlacement(List<Room> rooms, Document doc)
+        public static List<List<SpatialElement>> RoomsMatrixByPlacement(List<SpatialElement> rooms, Document doc)
         {
             // Rooms to return
-            var roomsValid = new List<Room>();
-            var roomsRedundant = new List<Room>();
-            var roomsUnenclosed = new List<Room>();
-            var roomsUnplaced = new List<Room>();
+            var roomsValid = new List<SpatialElement>();
+            var roomsRedundant = new List<SpatialElement>();
+            var roomsUnenclosed = new List<SpatialElement>();
+            var roomsUnplaced = new List<SpatialElement>();
 
             // Construct the boundary location object
             var boundaryLocation = AreaVolumeSettings
@@ -45,7 +42,7 @@ namespace geeWiz.Utilities
             foreach (var room in rooms)
             {
                 // Area greater than 0 = Placed
-                if (room.Area > 0)
+                if (room.Area != 0)
                 {
                     roomsValid.Add(room);
                 }
@@ -67,9 +64,9 @@ namespace geeWiz.Utilities
             }
 
             // Return the rooms in a matrix
-            return new List<List<Room>>()
+            return new List<List<SpatialElement>>()
             {
-                roomsValid, roomsRedundant, roomsUnplaced, roomsUnenclosed
+                roomsValid, roomsRedundant, roomsUnenclosed, roomsUnplaced
             };
         }
     }

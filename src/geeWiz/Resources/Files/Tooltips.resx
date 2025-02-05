@@ -124,37 +124,88 @@
     <value>Deletes all Fill and Line Patterns found in the current document that begin with the word 'Import'.
 
 Condition(s) to run:
-- User is in a project or family document
+- The current document is a project or family
 
 Warning:
 This tool will not provide a list to choose from - it will go straight to deletion.</value>
-  </data>
-  <data name="Audit_DeleteRooms" xml:space="preserve">
-    <value>Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.
-
-Condition(s) to run:
-- Current document is a project</value>
   </data>
   <data name="Audit_PurgeFilters" xml:space="preserve">
     <value>Provides a list of all unused View Filters in the current document, from which you can choose which ones to delete from the model.
 
 Condition(s) to run:
-- Current document is a project
+- The current document is a project
 
 Note:
 This tool will check all Views and View Templates for used filters.</value>
+  </data>
+  <data name="Audit_PurgeRooms" xml:space="preserve">
+    <value>Provides a list of all unplaced rooms in the current document, from which you can choose which ones to delete from the model.
+
+Condition(s) to run:
+- The current document is a project</value>
   </data>
   <data name="Audit_PurgeTemplates" xml:space="preserve">
     <value>Provides a list of all unused View Templates in the current document, from which you can choose which ones to delete from the model.
 
 Condition(s) to run:
-- Current document is a project
+- The current document is a project
 
 Note:
 This tool will check all Views and View Family Types for assigned and default templates.</value>
   </data>
+  <data name="Export" xml:space="preserve">
+    <value>Tools relating to  exporting data from Revit.</value>
+  </data>
+  <data name="Export_Schedule" xml:space="preserve">
+    <value>Exports the contents of the active schedule view to Excel.
+
+Condition(s) to run:
+- Current view is a schedule</value>
+  </data>
+  <data name="Export_SheetsDwg" xml:space="preserve">
+    <value>Exports selected sheets from Revit to DWG, using internal coordinates.
+
+Condition(s) to run:
+- The current document is a project
+
+Notes:
+The tool will apply a generic naming rule to exported documents.
+
+Shift + click:
+Uses shared coordinates instead.</value>
+  </data>
+  <data name="Export_SheetsPdf" xml:space="preserve">
+    <value>Exports selected sheets from Revit to PDF.
+
+Condition(s) to run:
+- The current document is a project
+
+Notes:
+The tool will apply a generic naming rule to exported documents. The built-in Pdf exporter is used for the exporting process, which automatically detects page sizes.
+
+Shift + click:
+Shows crop boundaries (hidden by default).</value>
+  </data>
   <data name="General_About" xml:space="preserve">
     <value>Takes you to the project's github.</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>Tools relating to importing information to Revit.</value>
+  </data>
+  <data name="Import_CreateSheets" xml:space="preserve">
+    <value>Using the templated Excel file, creates new sheets and updates the names of existing ones provided.
+
+Condition(s) to run:
+- The current document is a project</value>
+  </data>
+  <data name="Import_SheetsExcel" xml:space="preserve">
+    <value>Saves a template for entering sheet information that can be imported back into Revit.
+
+Condition(s) to run:
+- The current document is a project
+
+Shift + click:
+Exports all sheet names and numbers to the template.</value>
   </data>
   <data name="Revision" xml:space="preserve">
     <value>Tools relating to revision management.</value>
@@ -182,6 +233,39 @@ Condition(s) to run:
 
 Note:
 If the sheet set already exists, it will be deleted and re-created.</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Tools relating to selection tasks.</value>
+  </data>
+  <data name="Select_GetHidden" xml:space="preserve">
+    <value>Enables reveal hidden elements mode, then selects any elements that are hidden in the active view.
+
+Condition(s) to run:
+- The current document is a project.</value>
+  </data>
+  <data name="Select_GetTtbs" xml:space="preserve">
+    <value>For all currently selected sheets, will in turn select any titleblock(s) on them.
+
+Condition(s) to run:
+- Sheets are selected</value>
+  </data>
+  <data name="Select_PickRooms" xml:space="preserve">
+    <value>Puts Revit into a mode where you can only select rooms.
+
+Condition(s) to run:
+- The current document is a project.</value>
+  </data>
+  <data name="Select_PickWalls" xml:space="preserve">
+    <value>Puts Revit into a mode where you can only select walls.
+
+Condition(s) to run:
+- The current document is a project.</value>
+  </data>
+  <data name="Select_RemoveGrouped" xml:space="preserve">
+    <value>Removes any grouped elements (and groups) from the current selection.
+
+Condition(s) to run:
+- Elements are selected</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>This menu contains various tools to toggle geeWiz's features.</value>

@@ -44,7 +44,7 @@ namespace geeWiz.Cmds_Revision
             // Select sheets
             var formResultSheets = doc.Ext_SelectSheets(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
-            var sheets = formResultRevision.Objects.Cast<ViewSheet>().ToList();
+            var sheets = formResultSheets.Objects.Cast<ViewSheet>().ToList();
 
             //Filter out workshared sheets
             if (doc.IsWorkshared)
@@ -218,7 +218,7 @@ namespace geeWiz.Cmds_Revision
             // Select sheets
             var formResultSheets = doc.Ext_SelectSheets(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
-            var sheets = formResultRevision.Objects.Cast<ViewSheet>().ToList();
+            var sheets = formResultSheets.Objects.Cast<ViewSheet>().ToList();
 
             // Construct doctans, header row
             var matrix = new List<List<string>>();
@@ -230,6 +230,9 @@ namespace geeWiz.Cmds_Revision
                 header.Add(revision.Ext_ToRevisionKey());
                 revisionIds.Add(revision.Id);
             }
+
+            // Add header row to matrix
+            matrix.Add(header);
 
             // For each sheet
             foreach (var sheet in sheets)
@@ -259,11 +262,15 @@ namespace geeWiz.Cmds_Revision
                     revisionNumber ??= "";
                     row.Add(revisionNumber);
                 }
+
+                // Add row to matrix
+                matrix.Add(row);
             }
 
             // Select directory
-            var directoryPath = gFrm.Custom.SelectDirectoryPath("Select where to save the transmittal");
-            if (directoryPath is null) { return Result.Cancelled; }
+            var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to save the transmittal");
+            if (directoryResult.Cancelled) { return Result.Cancelled; }
+            var directoryPath = directoryResult.Object as string;
             var filePath = $"{directoryPath}\\Doctrans.xlsx";
 
             // Accessibility check if it exists
@@ -303,7 +310,7 @@ namespace geeWiz.Cmds_Revision
                 worksheet.Row(1).Height = 150;
 
                 // For each column...
-                for (int i = 0; i < worksheet.ColumnCount(); i++)
+                for (int i = 1; i <= revisionIds.Count + 3; i++)
                 {
                     // First 3 columns set to 30 wide
                     if (i < 3)

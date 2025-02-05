@@ -44,5 +44,60 @@ namespace geeWiz.Utilities
         };
 
         #endregion
+
+        #region Export options
+
+        /// <summary>
+        /// Return default PDF export options.
+        /// </summary>
+        /// <param name="hideCrop"">Hide crop boundaries.</param>
+        /// <returns>A PDFExportOptions object.</returns>
+        public static PDFExportOptions DefaultPdfExportOptions(bool hideCrop = true)
+        {
+            // New options
+            var options = new PDFExportOptions();
+
+            // Configure the settings
+            options.AlwaysUseRaster = false;
+            options.ColorDepth = ColorDepthType.Color;
+            options.ExportQuality = PDFExportQualityType.DPI300;
+            options.HideCropBoundaries = hideCrop;
+            options.HideReferencePlane = true;
+            options.HideScopeBoxes = true;
+            options.HideUnreferencedViewTags = true;
+            options.MaskCoincidentLines = true;
+            options.PaperFormat = ExportPaperFormat.Default;
+            options.PaperOrientation = PageOrientationType.Auto;
+            options.RasterQuality = RasterQualityType.High;
+            options.ReplaceHalftoneWithThinLines = true;
+            options.StopOnError = false;
+            options.ViewLinksInBlue = false;
+            options.ZoomPercentage = 100;
+            options.ZoomType = ZoomType.Zoom;
+
+            // Return the options
+            return options;
+        }
+
+        /// <summary>
+        /// Return default DWG export options.
+        /// </summary>
+        /// <param name="shared"">Export as shared coordinates.</param>
+        /// <returns>A DWGExportOptions object.</returns>
+        public static DWGExportOptions DefaultDwgExportOptions(bool shared = false)
+        {
+            // New options
+            var options = new DWGExportOptions();
+
+            // Configure the settings
+            options.SharedCoords = shared;
+            options.MergedViews = true;
+            options.FileVersion = ACADVersion.R2013;
+            
+            // Return the options
+            return options;
+        }
+
+        #endregion
     }
 }

@@ -22,9 +22,9 @@ namespace geeWiz.Utilities
             private ElementId _builtinCategoryId;
 
             // Default constructor, internalize the builtin category
-            public ISF_ByBuiltInCategory(ElementId builtinCategoryId)
+            public ISF_ByBuiltInCategory(BuiltInCategory builtInCategory)
             {
-                _builtinCategoryId  = builtinCategoryId;
+                _builtinCategoryId  = new ElementId(builtInCategory);
             }
             
             // Condition for allowing elements by category

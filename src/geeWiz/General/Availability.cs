@@ -26,9 +26,9 @@ namespace geeWiz
             public static string Family { get { return $"{PATH_AVAILABILITY}+Family"; } }
             public static string Workshared { get { return $"{PATH_AVAILABILITY}+Workshared"; } }
             public static string Selection { get { return $"{PATH_AVAILABILITY}+Selection"; } }
-            public static string ActiveViewPlan { get { return $"{PATH_AVAILABILITY}+ActiveViewPlan"; } }
+            public static string ActiveViewSchedule { get { return $"{PATH_AVAILABILITY}+ActiveViewSchedule"; } }
             public static string SelectionIncludesSheets { get { return $"{PATH_AVAILABILITY}+SelectionIncludesSheets"; } }
-            public static string SelectionOnlyRooms { get { return $"{PATH_AVAILABILITY}+SelectionOnlyRooms"; } }
+            public static string SelectionOnlySheets { get { return $"{PATH_AVAILABILITY}+SelectionOnlySheets"; } }
         }
 
         #endregion
@@ -126,14 +126,14 @@ namespace geeWiz
             }
         }
 
-        // Command can only be ran when active view is a plan
-        public class ActiveViewPlan : IExternalCommandAvailability
+        // Command can only be ran when active view is a schedule
+        public class ActiveViewSchedule : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
                 if (uiApp.ActiveUIDocument is UIDocument uiDoc)
                 {
-                    return uiDoc.ActiveGraphicalView is ViewPlan;
+                    return uiDoc.ActiveGraphicalView is ViewSchedule;
                 }
                 else
                 {
@@ -158,15 +158,15 @@ namespace geeWiz
             }
         }
 
-        // Command can only be ran when only rooms are in selection
-        public class SelectionOnlyRooms : IExternalCommandAvailability
+        // Command can only be ran when only sheets are in selection
+        public class SelectionOnlySheets : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
                 if (uiApp.ActiveUIDocument is UIDocument uiDoc)
                 {
-                    if (categories.Size > 0) { return false; } // More than one category not permitted
-                    return categories.Contains(Category.GetCategory(uiDoc.Document, BuiltInCategory.OST_Rooms));
+                    if (categories.Size > 1) { return false; } // More than one category not permitted
+                    return categories.Contains(Category.GetCategory(uiDoc.Document, BuiltInCategory.OST_Sheets));
                 }
                 else
                 {

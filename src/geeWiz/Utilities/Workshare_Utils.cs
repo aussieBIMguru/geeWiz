@@ -46,8 +46,14 @@ namespace geeWiz.Utilities
             // If no elements are editable
             if (editable.Count == 0)
             {
-                // We assume user will have to cancel
-                gFrm.Custom.Cancelled("No elements are editable.");
+                // Message to user if we lost all elements
+                if (elements.Count > 0)
+                {
+                    gFrm.Custom.Cancelled("Elements were found, but all of them are not editable\n\n" +
+                        "The task cannot proceed, and has been cancelled.");
+                }
+
+                // Results are deemed cancelled
                 worksharingResults.Cancelled = true;
             }
             // Catch if some are not editable

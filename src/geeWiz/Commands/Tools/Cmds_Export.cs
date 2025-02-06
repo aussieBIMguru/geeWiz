@@ -169,11 +169,10 @@ namespace geeWiz.Cmds_Export
 
             // Progress bar properties
             int pbTotal = sheets.Count;
-            int pbCount = 1;
             int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressView(title: "Exporting sheets...", total: pbTotal))
+            using (var pb = new gFrm.ProgressBar(taskName: "Exporting sheets", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Export sheets"))
@@ -185,15 +184,10 @@ namespace geeWiz.Cmds_Export
                     foreach (var sheet in sheets)
                     {
                         // Check for cancellation
-                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        if (pb.CancelCheck(t))
                         {
-                            t.RollBack();
                             return Result.Cancelled;
                         }
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pbCount++;
 
                         // Export the sheet to Pdf
                         sheet.Ext_ExportToPdf(
@@ -201,10 +195,14 @@ namespace geeWiz.Cmds_Export
                             directoryPath: directoryPath,
                             doc: doc,
                             options: options);
+
+                        // Increase progress
+                        Thread.Sleep(pbStep);
+                        pb.Increment();
                     }
 
                     // Commit the transaction
-                    t.Commit();
+                    pb.Commit(t);
                 }
             }
 
@@ -248,11 +246,10 @@ namespace geeWiz.Cmds_Export
 
             // Progress bar properties
             int pbTotal = sheets.Count;
-            int pbCount = 1;
             int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressView(title: "Exporting sheets...", total: pbTotal))
+            using (var pb = new gFrm.ProgressBar(taskName: "Exporting sheets...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Export sheets"))
@@ -264,15 +261,10 @@ namespace geeWiz.Cmds_Export
                     foreach (var sheet in sheets)
                     {
                         // Check for cancellation
-                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        if (pb.CancelCheck(t))
                         {
-                            t.RollBack();
                             return Result.Cancelled;
                         }
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pbCount++;
 
                         // Export the sheet to Dwg
                         sheet.Ext_ExportToDwg(
@@ -280,10 +272,14 @@ namespace geeWiz.Cmds_Export
                             directoryPath: directoryPath,
                             doc: doc,
                             options: options);
+
+                        // Increase progress
+                        Thread.Sleep(pbStep);
+                        pb.Increment();
                     }
 
                     // Commit the transaction
-                    t.Commit();
+                    pb.Commit(t);
                 }
             }
 

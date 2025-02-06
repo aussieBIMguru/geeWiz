@@ -99,11 +99,10 @@ namespace geeWiz.Cmds_Workset
 
             // Progress bar properties
             int pbTotal = chosenNames.Count;
-            int pbCount = 1;
             int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressView("Creating worksets...", total: pbTotal))
+            using (var pb = new gFrm.ProgressBar(taskName: "Creating worksets...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Create worksets"))
@@ -115,9 +114,8 @@ namespace geeWiz.Cmds_Workset
                     foreach (var name in chosenNames)
                     {
                         // Check for cancellation
-                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        if (pb.CancelCheck(t))
                         {
-                            t.RollBack();
                             return Result.Cancelled;
                         }
 
@@ -126,11 +124,11 @@ namespace geeWiz.Cmds_Workset
 
                         // Increase progress
                         Thread.Sleep(pbStep);
-                        pbCount++;
+                        pb.Increment();
                     }
 
                     // Commit the transaction
-                    t.Commit();
+                    pb.Commit(t);
                 }
             }
 

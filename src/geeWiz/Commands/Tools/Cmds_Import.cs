@@ -170,7 +170,6 @@ namespace geeWiz.Cmds_Import
 
             // Progress bar properties
             int pbTotal = matrix.Count;
-            int pbCount = 1;
             int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
 
             // Tracker variables
@@ -178,7 +177,7 @@ namespace geeWiz.Cmds_Import
             int created = 0;
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressView(title: "Creating/updating sheets...", total: pbTotal))
+            using (var pb = new gFrm.ProgressBar(taskName: "Creating/updating sheets...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Import sheets"))
@@ -190,9 +189,8 @@ namespace geeWiz.Cmds_Import
                     foreach (var row in matrix)
                     {
                         // Check for cancellation
-                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        if (pb.CancelCheck(t))
                         {
-                            t.RollBack();
                             return Result.Cancelled;
                         }
 
@@ -229,11 +227,11 @@ namespace geeWiz.Cmds_Import
 
                         // Increase progress
                         Thread.Sleep(pbStep);
-                        pbCount++;
+                        pb.Increment();
                     }
 
                     // Commit the transaction
-                    t.Commit();
+                    pb.Commit(t);
                 }
             }
 

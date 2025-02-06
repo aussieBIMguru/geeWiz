@@ -55,14 +55,13 @@ namespace geeWiz.Cmds_Revision
 
             // Progress bar properties
             int pbTotal = sheets.Count;
-            int pbCount = 1;
             int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
             int updated = 0;
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressView(
-                title: altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...",
-                total: pbTotal))
+            using (var pb = new gFrm.ProgressBar(
+                taskName: altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...",
+                pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: BulkRev"))
@@ -74,9 +73,8 @@ namespace geeWiz.Cmds_Revision
                     foreach (var sheet in sheets)
                     {
                         // Check for cancellation
-                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        if (pb.CancelCheck(t))
                         {
-                            t.RollBack();
                             return Result.Cancelled;
                         }
 
@@ -85,11 +83,11 @@ namespace geeWiz.Cmds_Revision
 
                         // Increase progress
                         Thread.Sleep(pbStep);
-                        pbCount++;
+                        pb.Increment();
                     }
 
                     // Commit the transaction
-                    t.Commit();
+                    pb.Commit(t);
                 }
             }
 

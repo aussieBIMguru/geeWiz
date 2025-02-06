@@ -14,6 +14,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class Element_Ext
     {
+        #region Element name keys
+
         /// <summary>
         /// Constructs a name key, checking for common inheritances.
         /// </summary>
@@ -84,6 +86,10 @@ namespace geeWiz.Extensions
             }
         }
 
+        #endregion
+
+        #region Editability check
+
         /// <summary>
         /// Returns if an element is editable.
         /// </summary>
@@ -111,6 +117,10 @@ namespace geeWiz.Extensions
             // Finally, ensure element is current with central
             else { return updatesStatus == ModelUpdatesStatus.CurrentWithCentral; }
         }
+
+        #endregion
+
+        #region Element parameters
 
         /// <summary>
         /// Retrieve a parameter from an element via a builtin parameter.
@@ -191,5 +201,7 @@ namespace geeWiz.Extensions
             // Return failed if we did not succeed
             return Result.Failed;
         }
+
+        #endregion
     }
 }

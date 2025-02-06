@@ -155,12 +155,11 @@ namespace geeWiz.Extensions
 
             // Progress bar properties
             int pbTotal = elements.Count;
-            int pbCount = 1;
             int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
             int deleteCount = 0;
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressView($"Deleting {typeName}(s)...", total: pbTotal))
+            using (var pb = new gFrm.ProgressBar($"Deleting {typeName}(s)...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, $"geeWiz: Delete {typeName}(s)"))
@@ -172,9 +171,8 @@ namespace geeWiz.Extensions
                     foreach (var element in elements)
                     {
                         // Check for cancellation
-                        if (pb.UpdateProgress(pbCount, pbTotal))
+                        if (pb.CancelCheck(t))
                         {
-                            t.RollBack();
                             return Result.Cancelled;
                         }
 
@@ -186,11 +184,11 @@ namespace geeWiz.Extensions
 
                         // Increase progress
                         Thread.Sleep(pbStep);
-                        pbCount++;
+                        pb.Increment();
                     }
 
                     // Commit the transaction
-                    t.Commit();
+                    pb.Commit(t);
                 }
             }
 

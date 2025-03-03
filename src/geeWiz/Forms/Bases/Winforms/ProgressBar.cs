@@ -81,6 +81,13 @@ namespace geeWiz.Forms
             this.pbCount++;
             this.progressBarObj.Value = this.pbCount;
 
+            // Decrement to fix the slow progress graphic
+            if (this.pbCount > 0)
+            {
+                this.progressBarObj.Value = this.pbCount - 1;
+                this.progressBarObj.Value = this.pbCount;
+            }
+
             // If not cancelled and we want to show progress
             if (this.showProgress && !this.isCancelled)
             {

@@ -15,6 +15,98 @@ namespace geeWiz.Utilities
 
         #endregion
 
+        #region String => Double
+
+        /// <summary>
+        /// Convert a string to a nullable double.
+        /// </summary>
+        /// <param name="text">The string to convert.</param>
+        /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
+        /// <returns>A nullable double.</returns>
+        public static Nullable<double> StringToDouble(string text, Nullable<double> valueOnFailure = null)
+        {
+            // Default double value
+            double value = 0.0;
+
+            // If we can convert to a double, return it
+            if (double.TryParse(text, out value))
+            {
+                return value;
+            }
+
+            // If we can't, return the value on failure
+            return valueOnFailure;
+        }
+
+        /// <summary>
+        /// Convert a string to a double, with a backup value if it fails.
+        /// </summary>
+        /// <param name="text">The string to convert.</param>
+        /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
+        /// <returns>A double.</returns>
+        public static double StringToDouble(string text, double valueOnFailure)
+        {
+            // Default double value
+            double value = 0.0;
+
+            // If we can convert to a double, return it
+            if (double.TryParse(text, out value))
+            {
+                return value;
+            }
+
+            // If we can't, return the value on failure
+            return valueOnFailure;
+        }
+
+        #endregion
+
+        #region String => Integer
+
+        /// <summary>
+        /// Convert a string to a nullable integer.
+        /// </summary>
+        /// <param name="text">The string to convert.</param>
+        /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
+        /// <returns>A nullable integer.</returns>
+        public static Nullable<int> StringToInt(string text, Nullable<int> valueOnFailure = null)
+        {
+            // Default int value
+            int value = 0;
+
+            // If we can convert to a int, return it
+            if (int.TryParse(text, out value))
+            {
+                return value;
+            }
+
+            // If we can't, return the value on failure
+            return valueOnFailure;
+        }
+
+        /// <summary>
+        /// Convert a string to an integer, with a backup value if it fails.
+        /// </summary>
+        /// <param name="text">The string to convert.</param>
+        /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
+        /// <returns>An integer.</returns>
+        public static int StringToInt(string text, int valueOnFailure)
+        {
+            // Default int value
+            int value = 0;
+
+            // If we can convert to a int, return it
+            if (int.TryParse(text, out value))
+            {
+                return value;
+            }
+
+            // If we can't, return the value on failure
+            return valueOnFailure;
+        }
+
+#endregion
+
         #region Degrees <=> Radians
 
         /// <summary>

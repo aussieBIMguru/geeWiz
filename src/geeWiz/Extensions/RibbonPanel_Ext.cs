@@ -50,7 +50,7 @@ namespace geeWiz.Extensions
                 }
 
                 // Set tooltip and icons
-                pushButton.ToolTip = gFil.GetTooltip(baseName);
+                pushButton.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
                 pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
                 pushButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 
@@ -89,7 +89,7 @@ namespace geeWiz.Extensions
             if (ribbonPanel.AddItem(pulldownButtonData) is PulldownButton pulldownButton)
             {
                 // Set tooltip and icons
-                pulldownButton.ToolTip = gFil.GetTooltip(baseName);
+                pulldownButton.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
                 pulldownButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
                 pulldownButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 

@@ -1,6 +1,6 @@
 ﻿// System
-using System.Runtime.InteropServices;
 using Clipboard = System.Windows.Forms.Clipboard;
+using System.Windows.Input;
 // Revit API
 using Autodesk.Revit.UI;
 // geeWiz utilities
@@ -80,7 +80,7 @@ namespace geeWiz.Utilities
         /// <returns>A boolean.</returns>
         public static bool KeyHeldShift()
         {
-            return Keyboard.KeyIsPressedShift();
+            return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace geeWiz.Utilities
         /// <returns>A boolean.</returns>
         public static bool KeyHeldControl()
         {
-            return Keyboard.KeyIsPressedControl();
+            return Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace geeWiz.Utilities
         /// <returns>A boolean.</returns>
         public static bool KeyHeldAlt()
         {
-            return Keyboard.KeyIsPressedAlt();
+            return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
         }
 
         #endregion
@@ -135,62 +135,6 @@ namespace geeWiz.Utilities
             }
         }
 
-        /// <summary>
-        /// Returns a tooltip from the tooltips resource.
-        /// </summary>
-        /// <param name="key">The key to search for.</param>
-        /// <returns>The related tooltip, if found.</returns>
-        public static string GetTooltip(string key)
-        {
-            if (Globals.Tooltips.TryGetValue(key, out string value))
-            {
-                return value;
-            }
-            return "Tooltip not found.";
-        }
-
         #endregion
     }
-
-    #region Keyboard Class
-
-    /// <summary>
-    /// This class deals with the state of the keyboard.
-    /// </summary>
-    internal class Keyboard
-    {
-        [DllImport("user32.dll")]
-        
-        // Variables to handle virtual key codes
-        private static extern short GetKeyState(int nVirtKey);
-        private const int VK_SHIFT = 0x10;
-        private const int VK_CONTROL = 0x11;
-        private const int VK_ALT = 0x12;
-
-        /// <summary>
-        /// Returns if the shift key is held.
-        /// </summary>
-        public static bool KeyIsPressedShift()
-        {
-            return (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-        }
-
-        /// <summary>
-        /// Returns if the control key is held.
-        /// </summary>
-        public static bool KeyIsPressedControl()
-        {
-            return (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-        }
-
-        /// <summary>
-        /// Returns if the alt key is held.
-        /// </summary>
-        public static bool KeyIsPressedAlt()
-        {
-            return (GetKeyState(VK_ALT) & 0x8000) != 0;
-        }
-    }
-
-    #endregion
 }

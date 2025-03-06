@@ -327,17 +327,19 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Retrieve a tooltip value by key.
+        /// Returns a value based on a key from a dictionary.
         /// </summary>
-        /// <param name="key">The key value for the tooltip resource.</param>
-        /// <returns>A string.</returns>
-        public static string GetTooltip(string key)
+        /// <param name="dictionary">The dictionary of keys/values to search.</param>
+        /// <param name="key">The key to search for.</param>
+        /// <param name="defaultValue">The value to return if no key is found.</param>
+        /// <returns>The related tooltip, if found.</returns>
+        public static string GetDictValue(Dictionary<string, string> dictionary, string key, string defaultValue = "Value not found.")
         {
-            if (Globals.Tooltips.TryGetValue(key, out string value))
+            if (dictionary.TryGetValue(key, out string value))
             {
                 return value;
             }
-            return "Tooltip missing!";
+            return defaultValue;
         }
 
         #endregion

@@ -50,7 +50,7 @@ namespace geeWiz.Extensions
                 }
 
                 // Set tooltip and icons
-                pushButton.ToolTip = gFil.GetTooltip(baseName);
+                pushButton.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
                 pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
                 pushButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 

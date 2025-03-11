@@ -16,6 +16,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class RibbonPanel_Ext
     {
+        #region Add PushButton to panel
+
         /// <summary>
         /// Adds a Pushbutton to the panel.
         /// </summary>
@@ -65,6 +67,10 @@ namespace geeWiz.Extensions
             }
         }
 
+        #endregion
+
+        #region Add Pulldown to panel
+
         /// <summary>
         /// Creates a pulldownbutton on a panel.
         /// </summary>
@@ -104,6 +110,10 @@ namespace geeWiz.Extensions
             }
         }
 
+        #endregion
+
+        #region Get PushButton
+
         /// <summary>
         /// Returns a PushButton from a RibbonPanel.
         /// </summary>
@@ -119,28 +129,6 @@ namespace geeWiz.Extensions
                 if (ribbonItem.Name == buttonName && ribbonItem is PushButton pushButton)
                 {
                     return pushButton;
-                }
-            }
-
-            // If not found, we finally return null
-            return null;
-        }
-
-        /// <summary>
-        /// Returns a PuslldownButton from a RibbonPanel.
-        /// </summary>
-        /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
-        /// <param name="buttonName">The name of the button to find.</param>
-        /// <returns>A PushButton.</returns>
-        public static PulldownButton Ext_GetPulldownButtonByName(this RibbonPanel ribbonPanel, string buttonName)
-        {
-            // For each panel in the tab
-            foreach (RibbonItem ribbonItem in ribbonPanel.GetItems())
-            {
-                // If the name matches, return it
-                if (ribbonItem.Name == buttonName && ribbonItem is PulldownButton pulldownButton)
-                {
-                    return pulldownButton;
                 }
             }
 
@@ -169,5 +157,33 @@ namespace geeWiz.Extensions
             // If not found, we finally return null
             return null;
         }
+
+        #endregion
+
+        #region Get Pulldown
+
+        /// <summary>
+        /// Returns a PuslldownButton from a RibbonPanel.
+        /// </summary>
+        /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
+        /// <param name="buttonName">The name of the button to find.</param>
+        /// <returns>A PushButton.</returns>
+        public static PulldownButton Ext_GetPulldownButtonByName(this RibbonPanel ribbonPanel, string buttonName)
+        {
+            // For each panel in the tab
+            foreach (RibbonItem ribbonItem in ribbonPanel.GetItems())
+            {
+                // If the name matches, return it
+                if (ribbonItem.Name == buttonName && ribbonItem is PulldownButton pulldownButton)
+                {
+                    return pulldownButton;
+                }
+            }
+
+            // If not found, we finally return null
+            return null;
+        }
+
+        #endregion
     }
 }

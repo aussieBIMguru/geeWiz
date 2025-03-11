@@ -12,6 +12,8 @@ namespace geeWiz.Utilities
     /// </summary>
     public static class Parameter_Utils
     {
+        #region Set parameter by name
+
         /// <summary>
         /// Try to set a parameter using a ParameterHelper object.
         /// </summary>
@@ -46,6 +48,8 @@ namespace geeWiz.Utilities
             // Otherwise return failed result
             return Result.Failed;
         }
+
+        #endregion
     }
 
     #region ParameterHelper class

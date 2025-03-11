@@ -7,6 +7,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class ViewFamilyType_Ext
     {
+        #region Namekey
+
         /// <summary>
         /// Constructs a name key based on a Revit ViewFamilyType.
         /// </summary>
@@ -29,5 +31,7 @@ namespace geeWiz.Extensions
                 return $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name}";
             }
         }
+
+        #endregion
     }
 }

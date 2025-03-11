@@ -8,6 +8,8 @@ namespace geeWiz.Utilities
     /// </summary>
     public static class Spatial_Utils
     {
+        #region Matrix of rooms by placement
+
         /// <summary>
         /// Constructs a list of list of rooms, where each list is by a placement status.
         /// 
@@ -69,5 +71,7 @@ namespace geeWiz.Utilities
                 roomsValid, roomsRedundant, roomsUnenclosed, roomsUnplaced
             };
         }
+
+        #endregion
     }
 }

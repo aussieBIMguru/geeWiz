@@ -10,6 +10,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class SpatialElement_Ext
     {
+        #region Get actual room name
+
         /// <summary>
         /// Returns the Room's name.
         /// </summary>
@@ -26,6 +28,10 @@ namespace geeWiz.Extensions
             // Return the name
             return parameter.AsString();
         }
+
+        #endregion
+
+        #region Namekey
 
         /// <summary>
         /// Constructs a name key based on a Revit Room.
@@ -49,5 +55,7 @@ namespace geeWiz.Extensions
                 return $"{room.Number}: {room.Ext_GetRoomName()}";
             }
         }
+
+        #endregion
     }
 }

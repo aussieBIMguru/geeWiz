@@ -2,6 +2,8 @@
 // Revision revision.ExtensionMethod()
 namespace geeWiz.Extensions
 {
+    #region Namekey
+
     /// <summary>
     /// Methods of this class generally relate to Revisions.
     /// </summary>
@@ -30,4 +32,6 @@ namespace geeWiz.Extensions
             }
         }
     }
+
+    #endregion
 }

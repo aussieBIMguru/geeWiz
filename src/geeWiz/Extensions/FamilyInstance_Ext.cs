@@ -7,6 +7,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class FamilyInstance_Ext
     {
+        #region Namekey
+
         /// <summary>
         /// Constructs a name key based on a Revit FamilySymbol (type).
         /// </summary>
@@ -18,5 +20,7 @@ namespace geeWiz.Extensions
             // Return its key using the FamilySymbol key
             return familyInstance.Symbol.Ext_ToFamilySymbolKey(includeId, instanceId: familyInstance.Id);
         }
+
+        #endregion
     }
 }

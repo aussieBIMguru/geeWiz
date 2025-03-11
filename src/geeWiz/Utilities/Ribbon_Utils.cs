@@ -48,7 +48,7 @@ namespace geeWiz.Utilities
             PushButtonData pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
 
             // Set tooltip and icons
-            pushButtonData.ToolTip = gFil.GetTooltip(baseName);
+            pushButtonData.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
             pushButtonData.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
             pushButtonData.Image = gFil.GetImageSource(baseName, resolution: 16);
 
@@ -71,7 +71,7 @@ namespace geeWiz.Utilities
             PulldownButtonData pulldownButtonData = new PulldownButtonData(baseName, buttonName);
 
             // Set tooltip and icons
-            pulldownButtonData.ToolTip = gFil.GetTooltip(baseName);
+            pulldownButtonData.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
             pulldownButtonData.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
             pulldownButtonData.Image = gFil.GetImageSource(baseName, resolution: 16);
 

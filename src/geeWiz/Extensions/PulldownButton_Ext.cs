@@ -16,6 +16,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class PulldownButton_Ext
     {
+        #region Add PushButton to pulldown
+
         /// <summary>
         /// Adds a Pushbutton to the pulldown.
         /// </summary>
@@ -65,6 +67,10 @@ namespace geeWiz.Extensions
             }
         }
 
+        #endregion
+
+        #region Get PushButton on pulldown
+
         /// <summary>
         /// Returns a PushButton from a PulldownButton.
         /// </summary>
@@ -108,5 +114,7 @@ namespace geeWiz.Extensions
             // If not found, we finally return null
             return null;
         }
+
+        #endregion
     }
 }

@@ -10,6 +10,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class ViewType_Ext
     {
+        #region ViewFamily to ViewType
+
         /// <summary>
         /// Gets equivalent ViewFamily of a given ViewType.
         /// </summary>
@@ -24,5 +26,7 @@ namespace geeWiz.Extensions
             }
             return ViewType.Undefined;
         }
+
+        #endregion
     }
 }

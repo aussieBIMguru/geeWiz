@@ -12,6 +12,8 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class View_Ext
     {
+        #region Namekey
+
         /// <summary>
         /// Constructs a name key based on a Revit View.
         /// </summary>
@@ -44,6 +46,10 @@ namespace geeWiz.Extensions
             }
         }
 
+        #endregion
+
+        #region Editable check
+
         /// <summary>
         /// Returns if an view is editable, with an optional message.
         /// </summary>
@@ -65,5 +71,7 @@ namespace geeWiz.Extensions
             // Return the result
             return isEdtiable;
         }
+
+        #endregion
     }
 }

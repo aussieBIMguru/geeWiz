@@ -20,7 +20,6 @@ namespace geeWiz
         private static UIControlledApplication _uiCtlApp;
 
         // Ribbon construction constants
-        public const string TAB_NAME = "geeWiz";
         public const string PANEL1_NAME = "General";
         public const string PANEL2_NAME = "Tools";
 
@@ -53,7 +52,7 @@ namespace geeWiz
 
             // Store all other global variables and tooltips
             Globals.RegisterVariables(uiCtlApp);
-            Globals.RegisterTooltips("geeWiz.Resources.Files.Tooltips");
+            Globals.RegisterTooltips($"{Globals.AddinName}.Resources.Files.Tooltips");
 
             // Register the warden commands
             Warden.Register(uiCtlApp);
@@ -67,10 +66,10 @@ namespace geeWiz
             /// </summary>
 
             // Create the tab
-            uiCtlApp.Ext_AddRibbonTab(TAB_NAME);
+            uiCtlApp.Ext_AddRibbonTab(Globals.AddinName);
 
             // Add Panel1 to the tab
-            var ribbonPanel1 = uiCtlApp.Ext_AddRibbonPanelToTab(TAB_NAME, PANEL1_NAME);
+            var ribbonPanel1 = uiCtlApp.Ext_AddRibbonPanelToTab(Globals.AddinName, PANEL1_NAME);
 
             // Panel 1 - Add Cmd_About button
             ribbonPanel1.Ext_AddPushButton(buttonName: "About",
@@ -108,7 +107,7 @@ namespace geeWiz
             #region Construct Panel 2
 
             // Add Panel2 to the tab
-            var ribbonPanel2 = uiCtlApp.Ext_AddRibbonPanelToTab(TAB_NAME, PANEL2_NAME);
+            var ribbonPanel2 = uiCtlApp.Ext_AddRibbonPanelToTab(Globals.AddinName, PANEL2_NAME);
 
             #region Construct PulldownButton data
 

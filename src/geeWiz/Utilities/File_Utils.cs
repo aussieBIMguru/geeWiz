@@ -305,7 +305,7 @@ namespace geeWiz.Utilities
         public static System.Windows.Media.ImageSource GetImageSource(string iconName, int resolution = 32, string suffix = "")
         {
             // Construct the resource path
-            var resourcePath = $"geeWiz.Resources.Icons{resolution}.{iconName}{resolution}{suffix}.png";
+            var resourcePath = $"{Globals.AddinName}.Resources.Icons{resolution}.{iconName}{resolution}{suffix}.png";
 
             // Read the resource from its full path
             using (Stream stream = Globals.Assembly.GetManifestResourceStream(resourcePath))

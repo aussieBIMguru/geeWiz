@@ -26,7 +26,7 @@ namespace geeWiz.Utilities
             // Example: geeWiz.Cmds_Settings.Cmd_UiToggle
             // Step 1: Settings.Cmd_UiToggle
             // Step 2: Settings_UiToggle
-            return commandClass.Replace("geeWiz.Cmds_", "").Replace(".Cmd", "");
+            return commandClass.Replace($"{Globals.AddinName}.Cmds_", "").Replace(".Cmd", "");
         }
 
         #endregion

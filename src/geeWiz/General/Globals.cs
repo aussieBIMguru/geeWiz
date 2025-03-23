@@ -49,6 +49,7 @@ namespace geeWiz
         public static string VersionNumber { get; set; }
         public static string VersionName { get; set; }
         public static string AddinGuid { get; set; }
+        public static string AddinName { get; set; }
 
         // Tooltips resource
         public static Dictionary<string, string> Tooltips { get; set; } = new Dictionary<string, string>();
@@ -93,7 +94,8 @@ namespace geeWiz
             // Store versions and Ids
             VersionNumber = "25.01.02";
             VersionName = "WIP (January 2025)";
-            AddinGuid = "{8FFC127F-9CD7-46E2-8506-C5F36D057B4B}";
+            AddinGuid = "8FFC127F-9CD7-46E2-8506-C5F36D057B4B";
+            AddinName = "geeWiz";
         }
 
         #endregion
@@ -108,15 +110,14 @@ namespace geeWiz
         public static void RegisterTooltips(string resourcePath)
         {
             // Construct the assembly, resource and sub-assembly paths
-            var resourceManager = new ResourceManager(resourcePath, typeof(Application).Assembly);
+            var resourceManager = new ResourceManager(resourcePath, Globals.Assembly);
             var resourceSet = resourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
 
             // Get all tooltip entries, store globally
             foreach (DictionaryEntry entry in resourceSet)
             {
                 string key = entry.Key.ToString();
-                string value = entry.Value.ToString().Replace("\\n", Environment.NewLine);
-                Tooltips[key] = value;
+                Tooltips[key] = entry.Value.ToString();
             }
         }
 

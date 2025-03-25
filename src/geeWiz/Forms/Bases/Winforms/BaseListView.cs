@@ -50,7 +50,6 @@ namespace geeWiz.Forms
 
             // Create the key and value pairs
             this.ItemsOriginal = Utilities.CombineAsFormPairs(keys, values);
-            this.ItemsShown = this.ItemsOriginal;
             this.FilterString = "";
 
             // Establish multi selection behavior
@@ -78,6 +77,14 @@ namespace geeWiz.Forms
         /// <returns>Void (nothing).</returns>
         private void LoadShownItems()
         {
+            // Collect filter value, force to lower case
+            this.FilterString = textFilter.Text.ToLower();
+
+            // Set shown items to those that pass the filter
+            this.ItemsShown = this.ItemsOriginal
+                .Where(i => PassesTextFilter(i.ItemKey))
+                .ToList();
+
             // Reset the ListView
             listView.Clear();
             listView.Columns.Add("Key", 380);
@@ -103,23 +110,7 @@ namespace geeWiz.Forms
         /// <returns>Void (nothing).</returns>
         private void txtFilter_TextChanged(object sender, EventArgs e)
         {
-            // Collect filter value, force to lower case
-            this.FilterString = textFilter.Text.ToLower();
-
-            // Reset the shown items to a new list
-            this.ItemsShown = new List<FormPair>();
-
-            // For each item...
-            foreach (var item in this.ItemsOriginal)
-            {
-                // It is shown if it passes the filter
-                if (PassesTextFilter(item.ItemKey))
-                {
-                    this.ItemsShown.Add(item);
-                }
-            }
-
-            // Call load objects function
+            // Call the load items method
             LoadShownItems();
         }
 

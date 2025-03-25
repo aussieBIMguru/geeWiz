@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 // geeWiz libraries
 using gFrm = geeWiz.Forms;
+using gCnv = geeWiz.Utilities.Convert_Utils;
 
 // The class belongs to the forms namespace
 // using gFrm = geeWiz.Forms (+ .Custom)
@@ -79,10 +80,7 @@ namespace geeWiz.Forms
             bool yesNo = false, bool noCancel = false, bool warning = false)
         {
             // Establish the form result to return
-            FormResult formResult = new FormResult();
-            formResult.Cancelled = false;
-            formResult.Affirmative = false;
-            formResult.Object = null;
+            var formResult = new FormResult(valid: false);
 
             // Variables to set later for buttons/icon
             MessageBoxButtons buttons;
@@ -108,18 +106,12 @@ namespace geeWiz.Forms
             }
 
             // Create a messagebox, process its dialog result
-            DialogResult dialogResult = MessageBox.Show(message, title, buttons, icon);
+            var dialogResult = MessageBox.Show(message, title, buttons, icon);
 
             // Process the outcomes
             if (dialogResult == DialogResult.Yes || dialogResult == DialogResult.OK)
             {
-                formResult.Affirmative = true;
-                formResult.Object = true;
-            }
-            else if (dialogResult == DialogResult.None || dialogResult == DialogResult.Cancel && !noCancel)
-            {
-                formResult.Object = false;
-                formResult.Cancelled = true;
+                formResult.Validate();
             }
             
             // Return the outcome
@@ -181,10 +173,7 @@ namespace geeWiz.Forms
         public static FormResult SelectFilePaths(string title = "", string filter = "", bool multiSelect = true)
         {
             // Establish the form result to return
-            FormResult formResult = new FormResult();
-            formResult.Cancelled = false;
-            formResult.Valid = false;
-            formResult.Object = null;
+            var formResult = new FormResult(valid: false);
 
             // Using a dialog object
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -201,18 +190,14 @@ namespace geeWiz.Forms
                 // Process the results
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    List<object> filePaths = openFileDialog
+                    var filePaths = openFileDialog
                         .FileNames
                         .Cast<object>()
                         .ToList();
 
                     if (multiSelect) { formResult.Objects = filePaths; }
                     else { formResult.Object = filePaths.First(); }
-                    formResult.Valid = true;
-                }
-                else
-                {
-                    formResult.Cancelled = true;
+                    formResult.Validate();
                 }
             }
 
@@ -228,27 +213,19 @@ namespace geeWiz.Forms
         public static FormResult SelectDirectoryPath(string title = "")
         {
             // Establish the form result to return
-            FormResult formResult = new FormResult();
-            formResult.Cancelled = false;
-            formResult.Valid = false;
-            formResult.Object = null;
+            var formResult = new FormResult(valid: false);
+
+            // Default title
+            if (title == "") { title = "Select folder"; }
 
             // Using a dialog object
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog() { Description = title })
             {
-                // Default title and filter
-                if (title == "") { title = "Select folder"; }
-                folderBrowserDialog.Description = title;
-
                 // Process the result
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
                     formResult.Object = folderBrowserDialog.SelectedPath as object;
-                    formResult.Valid = true;
-                }
-                else
-                {
-                    formResult.Cancelled = true;
+                    formResult.Validate();
                 }
             }
 
@@ -273,10 +250,7 @@ namespace geeWiz.Forms
             string defaultValue = "", bool numberOnly = false, bool allowEmptyString = false)
         {
             // Establish the form result to return
-            FormResult formResult = new FormResult();
-            formResult.Cancelled = false;
-            formResult.Affirmative = false;
-            formResult.Valid = false;
+            var formResult = new FormResult(valid: false);
 
             // Returned value and number
             string inputValue = "";
@@ -301,34 +275,36 @@ namespace geeWiz.Forms
                 // Process the outcomes
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Affirmative = true;
                     inputValue = form.Tag as string;
+                    formResult.Validate();
                 }
                 else
                 {
-                    formResult.Cancelled = true;
+                    // Early return
                     return formResult;
                 }
             }
 
-            // Process input as number or text
+            // Process input as number
             if (numberOnly)
             {
-                try
+                // Try to parse as double
+                var tryDouble = gCnv.StringToDouble(inputValue);
+
+                // Process the outcome
+                if (tryDouble.HasValue)
                 {
-                    resultDouble = double.Parse(inputValue);
-                    formResult.Valid = true;
+                    resultDouble = tryDouble.Value;
                 }
-                catch
+                else
                 {
-                    resultDouble = 0.0;
                     formResult.Valid = false;
                 }
-                finally
-                {
-                    formResult.Object = resultDouble as object;
-                }
+
+                // Set form object anyway
+                formResult.Object = resultDouble as object;
             }
+            // Otherwise, process as text
             else
             {
                 formResult.Object = inputValue;
@@ -355,12 +331,7 @@ namespace geeWiz.Forms
             string title = "", bool multiSelect = true)
         {
             // Establish the form result to return
-            FormResult formResult = new FormResult();
-            formResult.Cancelled = false;
-            formResult.Affirmative = false;
-            formResult.Valid = false;
-            List<object> selectedValues = null;
-            object selectedValue = null;
+            var formResult = new FormResult(valid: false);
 
             // Default title
             if (title == "")
@@ -375,20 +346,13 @@ namespace geeWiz.Forms
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Affirmative = true;
-                    formResult.Valid = true;
-                    if (multiSelect) { selectedValues = form.Tag as List<object>; }
-                    else { selectedValue = form.Tag as object; }
-                }
-                else
-                {
-                    formResult.Cancelled = true;
+                    if (multiSelect) { formResult.Objects = form.Tag as List<object>; }
+                    else { formResult.Object = form.Tag as object; }
+                    formResult.Validate();
                 }
             }
 
-            // Set the object values, return the result
-            formResult.Objects = selectedValues;
-            formResult.Object = selectedValue;
+            // Return the result
             return formResult;
         }
 
@@ -409,11 +373,7 @@ namespace geeWiz.Forms
             string title = "", string message = "", int defaultIndex = -1)
         {
             // Establish the form result to return
-            FormResult formResult = new FormResult();
-            formResult.Cancelled = false;
-            formResult.Affirmative = false;
-            formResult.Valid = false;
-            formResult.Object = null;
+            var formResult = new FormResult(valid: false);
 
             // Default title and message
             if (title == "") { title = "Select object from dropdown"; }
@@ -425,13 +385,8 @@ namespace geeWiz.Forms
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Affirmative = true;
-                    formResult.Valid = true;
                     formResult.Object = form.Tag as object;
-                }
-                else
-                {
-                    formResult.Cancelled = true;
+                    formResult.Validate();
                 }
             }
 
@@ -487,6 +442,34 @@ namespace geeWiz.Forms
         public bool Cancelled { get; set; }
         public bool Valid { get; set; }
         public bool Affirmative { get; set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public FormResult() { }
+
+        /// <summary>
+        /// Constructor to begin a FormResult.
+        /// </summary>
+        /// <param name="valid">Should the result begin as valid.</param>
+        public FormResult(bool valid)
+        {
+            Objects = new List<object>();
+            Object = null;
+            Cancelled = !valid;
+            Valid = valid;
+            Affirmative = valid;
+        }
+
+        /// <summary>
+        /// Sets all dialog related results to valid.
+        /// </summary>
+        public void Validate()
+        {
+            Cancelled = false;
+            Valid = true;
+            Affirmative = true;
+        }
     }
 
     #endregion

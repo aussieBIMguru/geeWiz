@@ -18,10 +18,10 @@ namespace geeWiz.Forms
         #region Class properties
 
         // Properties belonging to the form
-        private List<string> keys;
-        private List<object> values;
-        private bool multiSelect;
-        private List<int> filteredIndices;
+        private bool MultiSelect;
+        private List<FormPair> ItemsOriginal;
+        private List<FormPair> ItemsShown;
+        private string FilterString;
 
         #endregion
 
@@ -41,20 +41,6 @@ namespace geeWiz.Forms
             InitializeComponent();
             geeWiz.Utilities.File_Utils.SetFormIcon(this);
 
-            // Set the key and value properties
-            this.keys = keys;
-            this.values = values;
-
-            // Establish multi selection behavior
-            this.multiSelect = multiSelect;
-            this.listView.MultiSelect = multiSelect;
-            this.listView.CheckBoxes = multiSelect;
-            this.btnCheckAll.Enabled = multiSelect;
-            this.btnUncheckAll.Enabled = multiSelect;
-
-            // Filtered indices to process with the text filter
-            filteredIndices = new List<int>();
-            
             // Set default title
             if (title == "")
             {
@@ -62,48 +48,52 @@ namespace geeWiz.Forms
             }
             this.Text = title;
 
+            // Create the key and value pairs
+            this.ItemsOriginal = Utilities.CombineAsFormPairs(keys, values);
+            this.ItemsShown = this.ItemsOriginal;
+            this.FilterString = "";
+
+            // Establish multi selection behavior
+            this.MultiSelect = multiSelect;
+            this.listView.MultiSelect = multiSelect;
+            this.listView.CheckBoxes = multiSelect;
+            this.btnCheckAll.Enabled = multiSelect;
+            this.btnUncheckAll.Enabled = multiSelect;
+
             // By default, we assume cancellation occurs
             this.Tag = null;
             this.DialogResult = DialogResult.Cancel;
 
-            // Call initial load objects function
-            ResetKeys();
+            // Call load objects function
+            LoadShownItems();
         }
 
         #endregion
 
-        #region Reset list view
+        #region Load all shown items
 
         /// <summary>
-        /// Load all keys into the listview.
+        /// Load all items to be shown.
         /// </summary>
         /// <returns>Void (nothing).</returns>
-        private void ResetKeys()
+        private void LoadShownItems()
         {
-            // Clear all items and filtered indices
+            // Reset the ListView
             listView.Clear();
-            filteredIndices.Clear();
-
-            // Re-establish the list view
             listView.Columns.Add("Key", 380);
 
-            // For each relevant key
-            for (int i = 0; i < keys.Count; i++)
+            // For each item in shown items
+            foreach (var item in this.ItemsShown)
             {
-                // Make an unchecked listviewitem object
-                var item = new ListViewItem(keys[i]);
-                item.Checked = false;
-                item.SubItems.Add(values[i]?.ToString() ?? "");
-
-                // Add the item and indice
-                listView.Items.Add(item);
-                filteredIndices.Add(i);
+                var listViewItem = new ListViewItem(item.ItemKey);
+                listViewItem.Checked = false;
+                this.listView.Items.Add(listViewItem);
             }
         }
 
         #endregion
 
-        #region Text filter changed
+        #region Text filtering
 
         /// <summary>
         /// Event handler when text filter changes.
@@ -114,34 +104,40 @@ namespace geeWiz.Forms
         private void txtFilter_TextChanged(object sender, EventArgs e)
         {
             // Collect filter value, force to lower case
-            string filter = textFilter.Text.ToLower();
+            this.FilterString = textFilter.Text.ToLower();
 
-            // If the filter is blank, reset to all keys (do not continue further)
-            if (string.IsNullOrEmpty(filter)) { ResetKeys(); return; }
+            // Reset the shown items to a new list
+            this.ItemsShown = new List<FormPair>();
 
-            // Clear all items and filtered indices
-            listView.Clear();
-            filteredIndices.Clear();
-
-            // Re-establish the list view
-            listView.Columns.Add("Key", 380);
-
-            // For each relevant key
-            for (int i = 0; i < keys.Count; i++)
+            // For each item...
+            foreach (var item in this.ItemsOriginal)
             {
-                // If that key contains the filter string
-                if (keys[i].ToLower().Contains(filter))
+                // It is shown if it passes the filter
+                if (PassesTextFilter(item.ItemKey))
                 {
-                    // Make an unchecked listviewitem object
-                    var item = new ListViewItem(keys[i]);
-                    item.Checked = false;
-                    item.SubItems.Add(values[i]?.ToString() ?? "");
-
-                    // Add the item and indice
-                    listView.Items.Add(item);
-                    filteredIndices.Add(i);
+                    this.ItemsShown.Add(item);
                 }
             }
+
+            // Call load objects function
+            LoadShownItems();
+        }
+
+        /// <summary>
+        /// Checks if a value passes the current text filter.
+        /// </summary>
+        /// <param name="text">The value to check.</param>
+        /// <returns>A boolean.</returns>
+        private bool PassesTextFilter(string text)
+        {
+            // True if filter is empty
+            if (this.FilterString.IsNullOrEmpty())
+            {
+                return true;
+            }
+
+            // Otherwise return if it contains the string
+            return text.ToLower().Contains(this.FilterString);
         }
 
         #endregion
@@ -195,42 +191,38 @@ namespace geeWiz.Forms
         private void btnSelect_Click(object sender, EventArgs e)
         {
             // Multi-select (+ selection)
-            if (multiSelect)
+            if (this.MultiSelect)
             {
-                // Null list by default
-                List<object> checkedValues = null;
-
-                // Get checked items (if any, taking filtering into consideration)
+                // If more than 0 items checked
                 if (listView.CheckedItems.Count > 0)
                 {
-                    checkedValues = listView.CheckedItems.Cast<ListViewItem>()
-                        .Select(item => values[filteredIndices[listView.Items.IndexOf(item)]])
+                    // Get the values related to the checked items
+                    this.Tag = listView.CheckedItems
+                        .Cast<ListViewItem>()
+                        .Select(i => this.ItemsShown[i.Index].ItemValue)
                         .ToList();
+
+                    // Dialog result is OK
                     this.DialogResult = DialogResult.OK;
                 }
-                
-                // Apply objects to tag, close form
-                this.Tag = checkedValues;
-                this.Close();
             }
             // Single selection (+ selection)
             else
             {
-                // Null object by default
-                object selectedValue = null;
-
-                // Get selected item (if any, taking filtering into consideration)
+                // If an item is selected
                 if (listView.SelectedItems.Count > 0)
                 {
-                    var selectedItem = listView.SelectedItems[0];
-                    selectedValue = values[filteredIndices[listView.Items.IndexOf(selectedItem)]];
+                    // Get the value related to the selected item
+                    int ind = listView.SelectedItems[0].Index;
+                    this.Tag = this.ItemsShown[ind].ItemValue;
+
+                    // Dialog result is OK
                     this.DialogResult = DialogResult.OK;
                 }
-
-                // Apply object to tag, close form
-                this.Tag = selectedValue;
-                this.Close();
             }
+
+            // Close the form
+            this.Close();
         }
 
         #endregion
@@ -245,7 +237,6 @@ namespace geeWiz.Forms
         /// <returns>Void (nothing).</returns>
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            this.Tag = null;
             this.Close();
         }
 

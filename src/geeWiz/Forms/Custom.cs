@@ -42,7 +42,7 @@ namespace geeWiz.Forms
                 else if (linkPath != null) { title = "Link path"; }
                 else { title = "Default title"; }
             }
-            
+
             // Process the default message conditions
             if (message == "")
             {
@@ -113,7 +113,7 @@ namespace geeWiz.Forms
             {
                 formResult.Validate();
             }
-            
+
             // Return the outcome
             return formResult;
         }
@@ -134,7 +134,7 @@ namespace geeWiz.Forms
                 title: "Task cancelled",
                 noCancel: true,
                 warning: true);
-            
+
             // Return a cancelled result
             return Result.Cancelled;
         }
@@ -255,7 +255,7 @@ namespace geeWiz.Forms
             // Returned value and number
             string inputValue = "";
             double resultDouble = 0.0;
-            
+
             // Default values
             if (numberOnly)
             {
@@ -310,7 +310,7 @@ namespace geeWiz.Forms
                 formResult.Object = inputValue;
                 formResult.Valid = inputValue != "" || allowEmptyString;
             }
-            
+
             // Return the form result
             return formResult;
         }
@@ -369,7 +369,7 @@ namespace geeWiz.Forms
         /// <param name="message">An optional message to display.</param>
         /// <param name="defaultIndex">An optional index to initialize at.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectFromDropdown(List<string> keys, List <object> values,
+        public static FormResult SelectFromDropdown(List<string> keys, List<object> values,
             string title = "", string message = "", int defaultIndex = -1)
         {
             // Establish the form result to return
@@ -409,7 +409,7 @@ namespace geeWiz.Forms
         {
             // Catch one step or less
             if (steps < 2) { return duration; }
-            
+
             // Calculate the step
             int step = duration / steps;
 
@@ -419,9 +419,49 @@ namespace geeWiz.Forms
                 if (step < 1) { step = 1; }
                 else if (step > 200) { step = 200; }
             }
-            
+
             // Return the step
             return step;
+        }
+
+        #endregion
+    }
+
+    // These classes provide form utility
+    public static class Utilities
+    {
+        #region Construct FormPairs from keys/values
+
+        /// <summary>
+        /// Combines keys and values into FormPairs.
+        /// </summary>
+        /// <param name="values">Objects to add to the FormPair.</param>
+        /// <param name="keys">The keys to connect to the FormPair.</param>
+        /// <returns>A list of FormPairs.</returns>
+        public static List<FormPair> CombineAsFormPairs(List<string> keys, List<object> values)
+        {
+            // Get the shortest count
+            var pairCount = keys.Count > values.Count ? values.Count : keys.Count;
+
+            // Empty list of form pairs
+            var formPairs = new List<FormPair>();
+
+            // Return the list if one list was empty
+            if (pairCount == 0) { return formPairs; }
+
+            // Construct the form pairs with indices
+            for (int i = 0; i < pairCount; i++)
+            {
+                formPairs.Add(new FormPair()
+                {
+                    ItemValue = values[i],
+                    ItemKey = keys[i],
+                    ItemIndex = i
+                });
+            }
+
+            // Return the formpairs
+            return formPairs;
         }
 
         #endregion
@@ -437,7 +477,7 @@ namespace geeWiz.Forms
         // These properties hold the resulting object or objects from the form
         public List<object> Objects { get; set; }
         public object Object { get; set; }
-        
+
         // These properties allow us to verify the outcome of the form
         public bool Cancelled { get; set; }
         public bool Valid { get; set; }
@@ -469,6 +509,103 @@ namespace geeWiz.Forms
             Cancelled = false;
             Valid = true;
             Affirmative = true;
+        }
+    }
+
+    #endregion
+
+    #region FormItem class
+
+    /// <summary>
+    /// A class for holding form items, with various data in parallel.
+    /// </summary>
+    public class FormItem
+    {
+        // These properties hold an item and group object
+        public object ItemValue { get; set; }
+        public object GroupValue { get; set; }
+
+        // These properties hold the key values for the objects
+        public string ItemKey { get; set; }
+        public string GroupKey { get; set; }
+
+        // These properties allow for the carriage of indices in parallel
+        public int ItemIndex { get; set; }
+        public int GroupIndex { get; set; }
+        
+        // This is intended as a unique index string
+        public string IndexKey { get; set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public FormItem() { }
+
+        /// <summary>
+        /// Construct using required data.
+        /// </summary>
+        /// <param name="itemValue"></param>
+        /// <param name="itemKey"></param>
+        /// <param name="groupValue"></param>
+        /// <param name="groupKey"></param>
+        public FormItem(object itemValue, string itemKey, int itemIndex, object groupValue, string groupKey, int groupIndex)
+        {
+            // Pass the properties
+            ItemValue = itemValue;
+            ItemKey = itemKey;
+            ItemIndex = itemIndex;
+            GroupValue = groupValue;
+            GroupKey = groupKey;
+            GroupIndex = groupIndex;
+
+            // Set the index key
+            IndexKey = $"{groupIndex}\t{itemIndex}";
+        }
+    }
+
+    #endregion
+
+    #region FormPair class
+
+    /// <summary>
+    /// A class for holding a key value pair.
+    /// </summary>
+    public class FormPair
+    {
+        // These properties relate to the item
+        public object ItemValue { get; set; }
+        public string ItemKey { get; set; }
+        public int ItemIndex { get; set; }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public FormPair() { }
+
+        /// <summary>
+        /// Construct using required data.
+        /// </summary>
+        /// <param name="itemValue">The object to store.</param>
+        /// <param name="itemKey">The key for the item.</param>
+        public FormPair(object itemValue, string itemKey)
+        {
+            // Pass the properties
+            ItemValue = itemValue;
+            ItemKey = itemKey;
+        }
+
+        /// <summary>
+        /// Construct using required data.
+        /// </summary>
+        /// <param name="itemValue">The object to store.</param>
+        /// <param name="itemKey">The key for the item.</param>
+        /// <param name="itemIndex">The index to store the item at.</param>
+        public FormPair(object itemValue, string itemKey, int itemIndex)
+        {
+            // Pass the properties
+            ItemValue = itemValue;
+            ItemKey = itemKey;
+            ItemIndex = itemIndex;
         }
     }
 

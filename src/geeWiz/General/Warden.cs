@@ -101,8 +101,7 @@ namespace geeWiz
                 // Ask the user if we want to permit the command
                 var formResult = gFrm.Custom.Message(title: "Warden",
                     message: "Are you sure you want to run this command?\n\nIt is generally not good practice.",
-                    yesNo: true,
-                    warning: true);
+                    yesNo: true);
 
                 // If the user answered no or cancelled, permit becomes false
                 permit = formResult.Affirmative;

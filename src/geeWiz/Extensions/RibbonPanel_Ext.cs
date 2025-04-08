@@ -4,7 +4,6 @@ using System.Diagnostics;
 using Autodesk.Revit.UI;
 using PushButton = Autodesk.Revit.UI.PushButton;
 // geeWiz
-using gFil = geeWiz.Utilities.File_Utils;
 using gRib = geeWiz.Utilities.Ribbon_Utils;
 
 // The class belongs to the extensions namespace
@@ -36,11 +35,8 @@ namespace geeWiz.Extensions
                 return null;
             }
 
-            // Deconstruct the commmandclass into its basic name, to align to tooltips and icons
-            string baseName = gRib.CommandClassToBaseName(commandClass);
-
             // Make pushbuttondata
-            PushButtonData pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
+            var pushButtonData = gRib.NewPushButtonData(buttonName, commandClass);
 
             // Make pushbutton, add to panel
             if (ribbonPanel.AddItem(pushButtonData) is PushButton pushButton)
@@ -50,11 +46,6 @@ namespace geeWiz.Extensions
                 {
                     pushButton.AvailabilityClassName = availability;
                 }
-
-                // Set tooltip and icons
-                pushButton.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
-                pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
-                pushButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 
                 // Return the PushButton
                 return pushButton;
@@ -75,37 +66,32 @@ namespace geeWiz.Extensions
         /// Creates a pulldownbutton on a panel.
         /// </summary>
         /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
-        /// <param name="baseName">The base name of the pulldown.</param>
         /// <param name="buttonName">The displayed name of the pulldown.</param>
+        /// <param name="commandClass">The command the button will run.</param>
         /// <param name="suffix">The icon suffix (none by default).</param>
         /// <returns>A pulldownButton object.</returns>
-        public static PulldownButton Ext_AddPulldownButton(this RibbonPanel ribbonPanel, string baseName, string buttonName, string suffix = "")
+        public static PulldownButton Ext_AddPulldownButton(this RibbonPanel ribbonPanel, string buttonName, string commandClass, string suffix = "")
         {
             // Return an error message if panel is null
             if (ribbonPanel == null)
             {
-                Debug.WriteLine($"ERROR: {baseName} not created, ribbonPanel was null.");
+                Debug.WriteLine($"ERROR: {buttonName} not created, ribbonPanel was null.");
                 return null;
             }
 
             // Make pulldownButtonData
-            PulldownButtonData pulldownButtonData = new PulldownButtonData(baseName, buttonName);
+            var pulldownButtonData = gRib.NewPulldownButtonData(buttonName, commandClass);
 
             // Make pulldown, add to panel
             if (ribbonPanel.AddItem(pulldownButtonData) is PulldownButton pulldownButton)
             {
-                // Set tooltip and icons
-                pulldownButton.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
-                pulldownButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
-                pulldownButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
-
                 // Return the pulldown
                 return pulldownButton;
             }
             // Return an error message if it could not be made
             else
             {
-                Debug.WriteLine($"ERROR: Pulldown could not be created ({baseName})");
+                Debug.WriteLine($"ERROR: Pulldown could not be created ({buttonName})");
                 return null;
             }
         }

@@ -32,11 +32,11 @@ namespace geeWiz.Forms
         /// <param name="linkPath">An optional link path to open when the form is clicked.</param>
         /// <param name="success">Return a successful result.</param>
         /// <returns>A Result (based on success arg).</returns>
-        public static Result BubbleMessage(string title = "", string message = "",
+        public static Result BubbleMessage(string title = null, string message = null,
             string filePath = null, string linkPath = null, bool success = true)
         {
             // Process the default title conditions
-            if (title == "")
+            if (title is null)
             {
                 if (filePath != null) { title = "File path"; }
                 else if (linkPath != null) { title = "Link path"; }
@@ -44,7 +44,7 @@ namespace geeWiz.Forms
             }
 
             // Process the default message conditions
-            if (message == "")
+            if (message is null)
             {
                 if (filePath != null) { message = "Click here to open file"; }
                 else if (linkPath != null) { message = "Click here to open link"; }
@@ -74,27 +74,24 @@ namespace geeWiz.Forms
         /// <param name="message">An optional message to display.</param>
         /// <param name="yesNo">Show Yes and No options instead of OK and Cancel.</param>
         /// <param name="noCancel">Does not offer a cancel button.</param>
-        /// <param name="warning">Display a warning icon.</param>
+        /// <param name="icon">The icon type to display.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult Message(string title = "", string message = "",
-            bool yesNo = false, bool noCancel = false, bool warning = false)
+        public static FormResult Message(string title = null, string message = null,
+            bool yesNo = false, bool noCancel = false, MessageBoxIcon icon = MessageBoxIcon.None)
         {
             // Establish the form result to return
             var formResult = new FormResult(valid: false);
 
-            // Variables to set later for buttons/icon
-            MessageBoxButtons buttons;
-            MessageBoxIcon icon;
-
             // Default values if not provided
-            if (title == "") { title = "Message"; }
-            if (message == "") { message = "No description provided."; }
+            title ??= "Message";
+            message ??= "No description provided.";
 
-            // Set the icon
-            if (warning) { icon = MessageBoxIcon.Warning; }
-            else { icon = MessageBoxIcon.None; }
+            // Set the question icon
+            if (yesNo) { icon = MessageBoxIcon.Question; }
 
             // Set the available buttons
+            MessageBoxButtons buttons;
+
             if (noCancel)
             {
                 buttons = MessageBoxButtons.OK;
@@ -118,37 +115,15 @@ namespace geeWiz.Forms
             return formResult;
         }
 
-
-        /// <summary>
-        /// Displays a generic cancelled message.
-        /// </summary>
-        /// <param name="message">An optional message to display.</param>
-        /// <returns>Result.Cancelled.</returns>
-        public static Result Cancelled(string message = "")
-        {
-            // Default message
-            if (message == "") { message = "Task cancelled."; }
-
-            // Show form to user
-            Message(message: message,
-                title: "Task cancelled",
-                noCancel: true,
-                warning: true);
-
-            // Return a cancelled result
-            return Result.Cancelled;
-        }
-
-
         /// <summary>
         /// Displays a generic completed message.
         /// </summary>
         /// <param name="message">An optional message to display.</param>
         /// <returns>Result.Succeeded.</returns>
-        public static Result Completed(string message = "")
+        public static Result Completed(string message = null)
         {
             // Default message
-            if (message == "") { message = "Task completed."; }
+            message ??= "Task completed.";
 
             // Show form to user
             Message(message: message,
@@ -157,6 +132,46 @@ namespace geeWiz.Forms
 
             // Return a succeeded result
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Displays a generic cancelled message.
+        /// </summary>
+        /// <param name="message">An optional message to display.</param>
+        /// <returns>Result.Cancelled.</returns>
+        public static Result Cancelled(string message = null)
+        {
+            // Default message
+            message ??= "Task cancelled.";
+
+            // Show form to user
+            Message(message: message,
+                title: "Task cancelled",
+                noCancel: true,
+                icon: MessageBoxIcon.Warning);
+
+            // Return a cancelled result
+            return Result.Cancelled;
+        }
+
+        /// <summary>
+        /// Displays a generic error message.
+        /// </summary>
+        /// <param name="message">An optional message to display.</param>
+        /// <returns>Result.Failed.</returns>
+        public static Result Error(string message = null)
+        {
+            // Default message
+            message ??= "Error encountered.";
+
+            // Show form to user
+            Message(message: message,
+                title: "Error",
+                noCancel: true,
+                icon: MessageBoxIcon.Error);
+
+            // Return a cancelled result
+            return Result.Failed;
         }
 
         #endregion
@@ -170,7 +185,7 @@ namespace geeWiz.Forms
         /// <param name="filter">An optional file type filter.</param>
         /// <param name="multiSelect">If we want to select more than one file path.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectFilePaths(string title = "", string filter = "", bool multiSelect = true)
+        public static FormResult SelectFilePaths(string title = null, string filter = null, bool multiSelect = true)
         {
             // Establish the form result to return
             var formResult = new FormResult(valid: false);
@@ -179,8 +194,8 @@ namespace geeWiz.Forms
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 // Default title and filter
-                if (title == "") { title = "Select file(s)"; }
-                if (filter != "") { openFileDialog.Filter = filter; }
+                title ??= multiSelect ? "Select file(s)" : "Select a file";
+                if (filter is not null) { openFileDialog.Filter = filter; }
 
                 // Set the typical settings
                 openFileDialog.RestoreDirectory = true;
@@ -195,9 +210,8 @@ namespace geeWiz.Forms
                         .Cast<object>()
                         .ToList();
 
-                    if (multiSelect) { formResult.Objects = filePaths; }
-                    else { formResult.Object = filePaths.First(); }
-                    formResult.Validate();
+                    if (multiSelect) { formResult.Validate(filePaths); }
+                    else { formResult.Validate(filePaths.First()); }
                 }
             }
 
@@ -210,13 +224,13 @@ namespace geeWiz.Forms
         /// </summary>
         /// <param name="title">An optional title to display.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectDirectoryPath(string title = "")
+        public static FormResult SelectDirectoryPath(string title = null)
         {
             // Establish the form result to return
             var formResult = new FormResult(valid: false);
 
             // Default title
-            if (title == "") { title = "Select folder"; }
+            title ??= "Select folder";
 
             // Using a dialog object
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog() { Description = title })
@@ -224,8 +238,7 @@ namespace geeWiz.Forms
                 // Process the result
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Object = folderBrowserDialog.SelectedPath as object;
-                    formResult.Validate();
+                    formResult.Validate(folderBrowserDialog.SelectedPath as object);
                 }
             }
 
@@ -246,7 +259,7 @@ namespace geeWiz.Forms
         /// <param name="numberOnly">Enforce a number input only.</param>
         /// <param name="allowEmptyString">An empty string counts as a valid result.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult EnterValue(string title = "", string message = "",
+        public static FormResult EnterValue(string title = null, string message = null,
             string defaultValue = "", bool numberOnly = false, bool allowEmptyString = false)
         {
             // Establish the form result to return
@@ -259,13 +272,13 @@ namespace geeWiz.Forms
             // Default values
             if (numberOnly)
             {
-                if (title == "") { title = "Enter number"; }
-                if (message == "") { title = "Enter a numerical input below:"; }
+                title ??= "Enter number";
+                title ??= "Enter a numerical input below:";
             }
             else
             {
-                if (title == "") { title = "Enter text"; }
-                if (message == "") { title = "Enter a text input below:"; }
+                title ??= "Enter text";
+                title ??= "Enter a text input below:";
             }
 
             // Using an enter value form
@@ -328,17 +341,13 @@ namespace geeWiz.Forms
         /// <param name="multiSelect">If we want to select more than one item.</param>
         /// <returns>A FormResult object.</returns>
         public static FormResult SelectFromList(List<string> keys, List<object> values,
-            string title = "", bool multiSelect = true)
+            string title = null, bool multiSelect = true)
         {
             // Establish the form result to return
             var formResult = new FormResult(valid: false);
 
             // Default title
-            if (title == "")
-            {
-                if (multiSelect) { title = "Select objects from list:"; }
-                else { title = "Select object from list:"; }
-            }
+            title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
 
             // Using a select items form
             using (var form = new gFrm.BaseListView(keys, values, title: title, multiSelect: multiSelect))
@@ -346,9 +355,8 @@ namespace geeWiz.Forms
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    if (multiSelect) { formResult.Objects = form.Tag as List<object>; }
-                    else { formResult.Object = form.Tag as object; }
-                    formResult.Validate();
+                    if (multiSelect) { formResult.Validate(form.Tag as List<object>); ; }
+                    else { formResult.Validate(form.Tag as object); } 
                 }
             }
 
@@ -370,14 +378,14 @@ namespace geeWiz.Forms
         /// <param name="defaultIndex">An optional index to initialize at.</param>
         /// <returns>A FormResult object.</returns>
         public static FormResult SelectFromDropdown(List<string> keys, List<object> values,
-            string title = "", string message = "", int defaultIndex = -1)
+            string title = null, string message = null, int defaultIndex = -1)
         {
             // Establish the form result to return
             var formResult = new FormResult(valid: false);
 
             // Default title and message
-            if (title == "") { title = "Select object from dropdown"; }
-            if (message == "") { message = "Select an object from the dropdown:"; }
+            title ??= "Select object from dropdown";
+            message ??= "Select an object from the dropdown:";
 
             // Using a dropdown form
             using (var form = new gFrm.BaseDropdown(keys, values, title: title, message: message, defaultIndex: defaultIndex))
@@ -385,8 +393,7 @@ namespace geeWiz.Forms
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Object = form.Tag as object;
-                    formResult.Validate();
+                    formResult.Validate(form.Tag as object);
                 }
             }
 
@@ -509,6 +516,26 @@ namespace geeWiz.Forms
             Cancelled = false;
             Valid = true;
             Affirmative = true;
+        }
+
+        /// <summary>
+        /// Sets the dialog result to valid, passing an object.
+        /// </summary>
+        /// <param name="obj">Object to pass to result.</param>
+        public void Validate(object obj)
+        {
+            this.Validate();
+            this.Object = obj;
+        }
+
+        /// <summary>
+        /// Sets the dialog result to valid, passing a list of objects.
+        /// </summary>
+        /// <param name="objs">Objects to pass to result.</param>
+        public void Validate(List<object> objs)
+        {
+            this.Validate();
+            this.Objects = objs;
         }
     }
 

@@ -32,20 +32,16 @@ namespace geeWiz.Forms
         /// </summary>
         /// <param name="keys">Keys to display in the listview.</param>
         /// <param name="values">Values associated to the keys.</param>
-        /// <param name="title">An optional title to display.</param>
+        /// <param name="title">A title to display.</param>
         /// <param name="multiSelect">Allow selection of multiple keys.</param>
         /// <returns>A BaseListView form.</returns>
-        public BaseListView(List<string> keys, List<object> values, string title = "", bool multiSelect = true)
+        public BaseListView(List<string> keys, List<object> values, string title, bool multiSelect = true)
         {
             // Initialize the form, set the icon
             InitializeComponent();
             geeWiz.Utilities.File_Utils.SetFormIcon(this);
 
-            // Set default title
-            if (title == "")
-            {
-                title = multiSelect ? "Select objects from list" : "Select object from list";
-            }
+            // Set title
             this.Text = title;
 
             // Create the key and value pairs

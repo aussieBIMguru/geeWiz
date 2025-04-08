@@ -81,8 +81,8 @@ namespace geeWiz
 
             // Panel 1 - Add Settings pulldown
             var pullDownSettings = ribbonPanel1.Ext_AddPulldownButton(
-                baseName: "Settings",
-                buttonName: "Settings");
+                buttonName: "Settings",
+                commandClass: "geeWiz.Cmds_Settings");
 
             // Panel 1 - Add Cmd_Warden button to Settings pulldown
             pullDownSettings.Ext_AddPushButton(

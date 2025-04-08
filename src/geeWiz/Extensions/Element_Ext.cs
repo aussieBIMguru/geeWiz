@@ -135,42 +135,67 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
+        /// Gets the value of parameter by name, given a specified storage type.
+        /// </summary>
+        /// <typeparam name="T">The parameter storage type.</typeparam>
+        /// <param name="element">The element to get the value from.</param>
+        /// <param name="parameterName">The parameter name to get the value of.</param>
+        /// <returns>The value of the parameter.</returns>
+        public static T Ext_GetParameterValue<T>(this Element element, string parameterName)
+        {
+            // Default value for type if no element
+            if (element is null) { return default; }
+
+            // Get parameter, default value for type if no parameter
+            var parameter = element.LookupParameter(parameterName);
+            if (parameter is null) { return default; }
+
+            // Return the value based on storage type
+            return parameter.StorageType switch
+            {
+                StorageType.String => (T)(object)parameter.AsString(),
+                StorageType.Integer => (T)(object)parameter.AsInteger(),
+                StorageType.Double => (T)(object)parameter.AsDouble(),
+                StorageType.ElementId => (T)(object)parameter.AsElementId(),
+                _ => default
+            };
+        }
+
+        /// <summary>
         /// Constructs a parameter helper object to get parameter values.
         /// </summary>
         /// <param name="element">A Revit Element (extended).</param>
         /// <param name="parameterName">The parameter name to get.</param>
         /// <returns>A ParameterHelper object.</returns>
-        public static ParameterHelper Ext_GetParameterValueByName(this Element element, string parameterName)
+        public static ParameterHelper Ext_GetParameterHelper(this Element element, string parameterName)
         {
             return new ParameterHelper(element, parameterName);
         }
 
         /// <summary>
-        /// Gets the value of a text based parameter, if able.
+        /// Gets the value of a parameter as text (even if not a text parameter).
         /// </summary>
         /// <param name="element">A Revit Element (extended).</param>
         /// <param name="parameterName">The parameter name to get.</param>
         /// <returns>A string.</returns>
-        public static string Ext_GetParameterTextByName(this Element element, string parameterName)
+        public static string Ext_GetParameterText(this Element element, string parameterName)
         {
             // Early exit on null
             if (element is null) { return null; }
 
             // Try to get parameter
-            Parameter parameter = element.LookupParameter(parameterName);
-
-            // Check if parameter is valid
+            var parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return null; }
 
-            // Return string value if parameter is string type
-            if (parameter.StorageType == StorageType.String)
+            // Return the value based on storage type
+            return parameter.StorageType switch
             {
-                return parameter.AsString();
-            }
-            else
-            {
-                return null;
-            }
+                StorageType.String => parameter.AsString(),
+                StorageType.Integer => parameter.AsValueString(),
+                StorageType.Double => parameter.AsValueString(),
+                StorageType.ElementId => parameter.AsElementId().ToString(),
+                _ => null
+            };
         }
 
         /// <summary>
@@ -180,26 +205,107 @@ namespace geeWiz.Extensions
         /// <param name="parameterName">The parameter name to set.</param>
         /// <param name="value">The string value to set.</param>
         /// <returns>A Result.</returns>
-        public static Result Ext_SetParameterTextByName(this Element element, string parameterName, string value)
+        public static Result Ext_SetParameterValue(this Element element, string parameterName, string value)
         {
-            // Early exit on nulls
+            // Early exit on no element or value
             if (element is null || value is null) { return Result.Failed; }
             
-            // Try to get parameter
-            Parameter parameter = element.LookupParameter(parameterName);
-
-            // Check if parameter is valid
+            // Try to get parameter, cancel if we can not set it
+            var parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return Result.Failed; }
+            if (parameter.StorageType != StorageType.String) { return Result.Failed; }
 
-            // Set string value if parameter is string type
-            if (parameter.StorageType == StorageType.String)
-            {
-                parameter.Set(value);
-                return Result.Succeeded;
-            }
+            // Set parameter value
+            parameter.Set(value);
+            return Result.Succeeded;
+        }
 
-            // Return failed if we did not succeed
-            return Result.Failed;
+        /// <summary>
+        /// Sets the value of an integer based parameter, if able.
+        /// </summary>
+        /// <param name="element">A Revit Element (extended).</param>
+        /// <param name="parameterName">The parameter name to set.</param>
+        /// <param name="value">The integer value to set.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_SetParameterValue(this Element element, string parameterName, int value)
+        {
+            // Early exit on no element or value
+            if (element is null) { return Result.Failed; }
+
+            // Try to get parameter, cancel if we can not set it
+            var parameter = element.LookupParameter(parameterName);
+            if (parameter is null) { return Result.Failed; }
+            if (parameter.StorageType != StorageType.Integer) { return Result.Failed; }
+
+            // Set parameter value
+            parameter.Set(value);
+            return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Sets the value of a double based parameter, if able.
+        /// </summary>
+        /// <param name="element">A Revit Element (extended).</param>
+        /// <param name="parameterName">The parameter name to set.</param>
+        /// <param name="value">The double value to set.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_SetParameterValue(this Element element, string parameterName, double value)
+        {
+            // Early exit on no element or value
+            if (element is null) { return Result.Failed; }
+
+            // Try to get parameter, cancel if we can not set it
+            var parameter = element.LookupParameter(parameterName);
+            if (parameter is null) { return Result.Failed; }
+            if (parameter.StorageType != StorageType.Double) { return Result.Failed; }
+
+            // Set parameter value
+            parameter.Set(value);
+            return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Sets the value of an ElementId based parameter, if able.
+        /// </summary>
+        /// <param name="element">A Revit Element (extended).</param>
+        /// <param name="parameterName">The parameter name to set.</param>
+        /// <param name="value">The ElementId value to set.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_SetParameterValue(this Element element, string parameterName, ElementId value)
+        {
+            // Early exit on no element or value
+            if (element is null || value is null) { return Result.Failed; }
+
+            // Try to get parameter, cancel if we can not set it
+            var parameter = element.LookupParameter(parameterName);
+            if (parameter is null) { return Result.Failed; }
+            if (parameter.StorageType != StorageType.ElementId) { return Result.Failed; }
+
+            // Set parameter value
+            parameter.Set(value);
+            return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Sets the value of an ElementId based parameter, if able.
+        /// </summary>
+        /// <param name="element">A Revit Element (extended).</param>
+        /// <param name="parameterName">The parameter name to set.</param>
+        /// <param name="value">The Element for the Id value to set.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_SetParameterValue(this Element element, string parameterName, Element value)
+        {
+            // Early exit on no element or value
+            if (element is null || value is null) { return Result.Failed; }
+
+            // Try to get parameter, cancel if we can not set it
+            var parameter = element.LookupParameter(parameterName);
+            if (parameter is null) { return Result.Failed; }
+            if (parameter.StorageType != StorageType.ElementId) { return Result.Failed; }
+
+            // Set parameter value
+            parameter.Set(value.Id);
+            return Result.Succeeded;
         }
 
         #endregion

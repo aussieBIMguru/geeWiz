@@ -92,10 +92,7 @@ namespace geeWiz.Extensions
         public static Result Ext_SelectElements(this UIDocument uiDoc, List<Element> elements)
         {
             // Ensure both are valid
-            if (uiDoc is null)
-            {
-                return Result.Failed;
-            }
+            if (uiDoc is null) { return Result.Failed; }
 
             // Get element Ids as ICollection
             List<ElementId> idsToSelect = elements

@@ -24,11 +24,11 @@ namespace geeWiz.Forms
         /// </summary>
         /// <param name="keys">Keys to display in the listview.</param>
         /// <param name="values">Values associated to the keys.</param>
-        /// <param name="title">An optional title to display.</param>
-        /// <param name="message">An optional message to display.</param>
+        /// <param name="title">A title to display.</param>
+        /// <param name="message">A message to display.</param>
         /// <param name="defaultIndex">An optional index to initialize at.</param>
         /// <returns>A BaseDropDown form.</returns>
-        public BaseDropdown(List<string> keys, List<object> values, string title = "", string message = "", int defaultIndex = -1)
+        public BaseDropdown(List<string> keys, List<object> values, string title, string message, int defaultIndex = -1)
         {
             // Initialize form, set the icon
             InitializeComponent();
@@ -40,8 +40,6 @@ namespace geeWiz.Forms
             this.defaultIndex = defaultIndex;
 
             // Default values if not given, then set title/tooltip
-            if (title == "") { title = "Select object from dropdown"; }
-            if (message == "") { message = "Select an object from the dropdown:"; }
             this.Text = title;
             labelTooltip.Text = message;
 

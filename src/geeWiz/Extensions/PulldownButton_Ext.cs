@@ -4,7 +4,6 @@ using System.Diagnostics;
 using Autodesk.Revit.UI;
 using PushButton = Autodesk.Revit.UI.PushButton;
 // geeWiz
-using gFil = geeWiz.Utilities.File_Utils;
 using gRib = geeWiz.Utilities.Ribbon_Utils;
 
 // The class belongs to the extensions namespace
@@ -36,11 +35,8 @@ namespace geeWiz.Extensions
                 return null;
             }
 
-            // Deconstruct the commmandclass into its basic name, to align to tooltips and icons
-            string baseName = gRib.CommandClassToBaseName(commandClass);
-
             // Make pushbuttondata
-            PushButtonData pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
+            var pushButtonData = gRib.NewPushButtonData(buttonName, commandClass);
 
             // Make pushbutton, add to panel
             if (pulldownButton.AddPushButton(pushButtonData) is PushButton pushButton)
@@ -50,11 +46,6 @@ namespace geeWiz.Extensions
                 {
                     pushButton.AvailabilityClassName = availability;
                 }
-
-                // Set tooltip and icons
-                pushButton.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
-                pushButton.LargeImage = gFil.GetImageSource(baseName, resolution: 32, suffix: suffix);
-                pushButton.Image = gFil.GetImageSource(baseName, resolution: 16, suffix: suffix);
 
                 // Return the PushButton
                 return pushButton;

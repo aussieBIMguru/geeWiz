@@ -1,10 +1,10 @@
 ﻿// Revit API
 using View = Autodesk.Revit.DB.View;
+using Autodesk.Revit.UI;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
-using Autodesk.Revit.UI;
 
 // The class belongs to the extensions namespace
 // Document doc.ExtensionMethod()
@@ -207,21 +207,24 @@ namespace geeWiz.Extensions
         #region Generic collectors
 
         /// <summary>
-        /// Creates a new collector object, with an optional view input.
+        /// Creates a new collector object.
         /// </summary>
         /// <param name="doc">A Revit document (extended).</param>
-        /// <param name="view">An optional view.</param>
         /// <returns>A FilteredElementCollector object.</returns>
-        public static FilteredElementCollector Ext_Collector(this Document doc, View view = null)
+        public static FilteredElementCollector Ext_Collector(this Document doc)
         {
-            if (view != null)
-            {
-                return new FilteredElementCollector(doc, view.Id);
-            }
-            else
-            {
-                return new FilteredElementCollector(doc);
-            }
+            return new FilteredElementCollector(doc);
+        }
+
+        /// <summary>
+        /// Creates a new collector object, in the given view.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="view">An Revit view.</param>
+        /// <returns>A FilteredElementCollector object.</returns>
+        public static FilteredElementCollector Ext_Collector(this Document doc, View view)
+        {
+            return new FilteredElementCollector(doc, view.Id);
         }
 
         /// <summary>
@@ -239,6 +242,21 @@ namespace geeWiz.Extensions
                 .ToList();
         }
 
+        /// <summary>
+        /// Collects all elements types of the provided category.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="builtInCategory">A Revit BuiltInCategory.</param>
+        /// <param name="view">An optional view.</param>
+        /// <returns>A list of Element types.</returns>
+        public static List<Element> Ext_GetTypesOfCategory(this Document doc, BuiltInCategory builtInCategory, View view = null)
+        {
+            return doc.Ext_Collector(view)
+                .OfCategory(builtInCategory)
+                .WhereElementIsElementType()
+                .ToList();
+        }
+
         #endregion
 
         #region Sheet collector/selection
@@ -253,7 +271,7 @@ namespace geeWiz.Extensions
         public static List<ViewSheet> Ext_GetSheets(this Document doc, bool sorted = false, bool includePlaceholders = false)
         {
             // Collect all viewsheets in document
-            List<ViewSheet> sheets = doc.Ext_Collector()
+            var sheets = doc.Ext_Collector()
                 .OfClass(typeof(ViewSheet))
                 .ToElements()
                 .Cast<ViewSheet>()
@@ -295,18 +313,7 @@ namespace geeWiz.Extensions
             bool multiSelect = true, bool sorted = false, bool includePlaceholders = false, bool includeId = false)
         {
             // Set the default form title if not provided
-            if (title is null)
-            {
-                // Process based on multiSelect
-                if (multiSelect)
-                {
-                    title = "Select Sheets(s):";
-                }
-                else
-                {
-                    title = "Select a Sheet:";
-                }
-            }
+            title ??= multiSelect ? "Select Sheet(s):" : "Select a sheet";
 
             // Get all Sheets in document if none provided
             sheets ??= doc.Ext_GetSheets(sorted: sorted);
@@ -345,7 +352,7 @@ namespace geeWiz.Extensions
             viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
             
             // Collect all views in document
-            List<View> views = doc.Ext_Collector()
+            var views = doc.Ext_Collector()
                 .OfClass(typeof(View))
                 .WhereElementIsNotElementType()
                 .Cast<View>()
@@ -416,10 +423,10 @@ namespace geeWiz.Extensions
         public static List<View> Ext_GetViewTemplates(this Document doc, List<ViewType> viewTypes = null, bool sorted = false)
         {
             // Set default types if not provided
-            if (viewTypes == null) { viewTypes = gView.VIEWTYPES_GRAPHICAL; }
+            viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
 
             // Collect all view templates in document
-            List<View> viewTemplates = doc.Ext_Collector()
+            var viewTemplates = doc.Ext_Collector()
                 .OfClass(typeof(View))
                 .WhereElementIsNotElementType()
                 .Cast<View>()
@@ -453,6 +460,9 @@ namespace geeWiz.Extensions
         public static gFrm.FormResult Ext_SelectViewTemplates(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
             string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
         {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select View template(s):" : "Select a view template";
+
             // Filter to just view templates
             views = views.Where(v => v.IsTemplate).ToList();
             
@@ -474,10 +484,10 @@ namespace geeWiz.Extensions
         public static List<ViewFamilyType> Ext_GetViewFamilyTypes(this Document doc, List<ViewFamily> viewFamilies = null, bool sorted = false)
         {
             // Set default types if not provided
-            if (viewFamilies == null) { viewFamilies = gView.VIEWFAMILIES_GRAPHICAL; }
+            viewFamilies ??= gView.VIEWFAMILIES_GRAPHICAL;
 
             // Collect all viewsfamilytypes in document
-            List<ViewFamilyType> viewFamilyTypes = doc.Ext_Collector()
+            var viewFamilyTypes = doc.Ext_Collector()
                 .OfClass(typeof(ViewFamilyType))
                 .Cast<ViewFamilyType>()
                 .Where(vft => viewFamilies.Contains(vft.ViewFamily))
@@ -545,7 +555,7 @@ namespace geeWiz.Extensions
         public static List<Level> Ext_GetLevels(this Document doc, bool sorted = false)
         {
             // Collect all levels in document
-            List<Level> levels = doc.Ext_Collector()
+            var levels = doc.Ext_Collector()
                 .OfClass(typeof(Level))
                 .Cast<Level>()
                 .ToList();
@@ -609,7 +619,7 @@ namespace geeWiz.Extensions
         public static List<FamilySymbol> Ext_GetTitleblockTypes(this Document doc, bool sorted = false)
         {
             // Collect all titleblock types in document
-            List<FamilySymbol> titleblockTypes = doc.Ext_Collector()
+            var titleblockTypes = doc.Ext_Collector()
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
@@ -674,7 +684,7 @@ namespace geeWiz.Extensions
         public static List<Revision> Ext_GetRevisions(this Document doc, bool sorted = false)
         {
             // Collect all revisions in document
-            List<Revision> revisions = doc.Ext_Collector()
+            var revisions = doc.Ext_Collector()
                 .OfClass(typeof(Revision))
                 .Cast<Revision>()
                 .ToList();
@@ -778,7 +788,7 @@ namespace geeWiz.Extensions
             bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Collect all rooms in document
-            List<SpatialElement> rooms = doc.Ext_Collector(view)
+            var rooms = doc.Ext_Collector(view)
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .Cast<SpatialElement>()
                 .ToList();
@@ -826,14 +836,13 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Room(s):" : "Select a Room:";
 
             // Get all rooms in document if not provided
-            if (rooms is null)
-            {
-                rooms = doc.Ext_GetRooms(sorted: sorted,
+            rooms ??= doc.Ext_GetRooms(
+                sorted: sorted,
                 includePlaced: includePlaced,
                 includeRedundant: includeRedundant,
                 includeUnenclosed: includeUnenclosed,
-                includeUnplaced: includeUnplaced);
-            }
+                includeUnplaced: includeUnplaced
+                );
 
             // Process into keys (to return)
             var keys = rooms
@@ -868,7 +877,7 @@ namespace geeWiz.Extensions
             if (!doc.IsWorkshared) { return new List<Workset>(); }
 
             // Collect all Worksets in the document
-            List<Workset> worksets = new FilteredWorksetCollector(doc)
+            var worksets = new FilteredWorksetCollector(doc)
                 .OfKind(WorksetKind.UserWorkset)
                 .ToWorksets()
                 .ToList();

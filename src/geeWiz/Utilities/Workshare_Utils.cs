@@ -62,7 +62,7 @@ namespace geeWiz.Utilities
                 // Present form to user
                 gFrm.FormResult formResult = gFrm.Custom.Message(title: "Please choose an option",
                     message: "Not all elements are editable.\n\nProceed with only editable elements?",
-                    yesNo: true, warning: true);
+                    yesNo: true);
 
                 // Catch and capture cancellation
                 if (formResult.Cancelled)

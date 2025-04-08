@@ -29,12 +29,12 @@ namespace geeWiz.Forms
         /// <summary>
         /// Constructs an enter value form.
         /// </summary>
-        /// <param name="title">An optional title to display.</param>
-        /// <param name="message">An optional message to display.</param>
+        /// <param name="title">A title to display.</param>
+        /// <param name="message">A message to display.</param>
         /// <param name="defaultValue">An optinoal default value.</param>
         /// <param name="numberOnly">Enforce a number input only.</param>
         /// <returns>A BaseEnterValue form.</returns>
-        public BaseEnterValue(string title = "", string message = "", string defaultValue = "", bool numberOnly = false)
+        public BaseEnterValue(string title, string message, string defaultValue = "", bool numberOnly = false)
         {
             // Initialize the form, set the icon
             InitializeComponent();
@@ -46,8 +46,6 @@ namespace geeWiz.Forms
             this.numberOnly = numberOnly;
 
             // Default title and message, then set in the form
-            if (title == "") { title = "Enter a value"; }
-            if (message == "") { message = "Enter a value below:"; }
             this.Text = title;
             labelTooltip.Text = message;
         }

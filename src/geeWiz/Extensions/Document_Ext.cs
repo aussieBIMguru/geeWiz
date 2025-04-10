@@ -155,11 +155,11 @@ namespace geeWiz.Extensions
 
             // Progress bar properties
             int pbTotal = elements.Count;
-            int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
+            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
             int deleteCount = 0;
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressBar($"Deleting {typeName}(s)...", pbTotal: pbTotal))
+            using (var pb = new gFrm.Bases.ProgressBar($"Deleting {typeName}(s)...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, $"geeWiz: Delete {typeName}(s)"))

@@ -170,14 +170,14 @@ namespace geeWiz.Cmds_Import
 
             // Progress bar properties
             int pbTotal = matrix.Count;
-            int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
+            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
 
             // Tracker variables
             int updated = 0;
             int created = 0;
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressBar(taskName: "Creating/updating sheets...", pbTotal: pbTotal))
+            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Creating/updating sheets...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Import sheets"))

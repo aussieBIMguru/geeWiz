@@ -169,10 +169,10 @@ namespace geeWiz.Cmds_Export
 
             // Progress bar properties
             int pbTotal = sheets.Count;
-            int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
+            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressBar(taskName: "Exporting sheets", pbTotal: pbTotal))
+            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Exporting sheets", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Export sheets"))
@@ -246,10 +246,10 @@ namespace geeWiz.Cmds_Export
 
             // Progress bar properties
             int pbTotal = sheets.Count;
-            int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
+            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressBar(taskName: "Exporting sheets...", pbTotal: pbTotal))
+            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Exporting sheets...", pbTotal: pbTotal))
             {
                 // Using a transaction
                 using (var t = new Transaction(doc, "geeWiz: Export sheets"))

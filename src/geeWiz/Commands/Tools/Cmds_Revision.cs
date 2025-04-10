@@ -55,11 +55,11 @@ namespace geeWiz.Cmds_Revision
 
             // Progress bar properties
             int pbTotal = sheets.Count;
-            int pbStep = gFrm.Custom.ProgressDelay(pbTotal);
+            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
             int updated = 0;
 
             // Using a progress bar
-            using (var pb = new gFrm.ProgressBar(
+            using (var pb = new gFrm.Bases.ProgressBar(
                 taskName: altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...",
                 pbTotal: pbTotal))
             {

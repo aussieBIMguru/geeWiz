@@ -1,5 +1,5 @@
 ﻿// The base form will belong to the forms namespace
-namespace geeWiz.Forms
+namespace geeWiz.Forms.Bases
 {
     /// <summary>
     /// Standard class for showing a form for selecting from a dropdown (combobox).

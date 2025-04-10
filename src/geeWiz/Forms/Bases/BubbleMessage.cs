@@ -4,7 +4,7 @@ using ResultClickEventArgs = Autodesk.Internal.InfoCenter.ResultClickEventArgs;
 using gFil = geeWiz.Utilities.File_Utils;
 
 // The base form will belong to the forms namespace (we decorate in the custom class)
-namespace geeWiz.Forms
+namespace geeWiz.Forms.Bases
 {
     #region Class summary
 

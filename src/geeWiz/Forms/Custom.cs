@@ -52,7 +52,7 @@ namespace geeWiz.Forms
             }
 
             // Create and show the bubble message
-            var bubbleMessage = new gFrm.BubbleMessage(title: title,
+            var bubbleMessage = new gFrm.Bases.BubbleMessage(title: title,
                 message: message,
                 linkPath: linkPath,
                 filePath: filePath);
@@ -128,7 +128,8 @@ namespace geeWiz.Forms
             // Show form to user
             Message(message: message,
                 title: "Task completed",
-                noCancel: true);
+                noCancel: true,
+                icon: MessageBoxIcon.Information);
 
             // Return a succeeded result
             return Result.Succeeded;
@@ -282,7 +283,7 @@ namespace geeWiz.Forms
             }
 
             // Using an enter value form
-            using (var form = new gFrm.BaseEnterValue(title: title, message: message,
+            using (var form = new gFrm.Bases.BaseEnterValue(title: title, message: message,
                 defaultValue: defaultValue, numberOnly: numberOnly))
             {
                 // Process the outcomes
@@ -350,7 +351,7 @@ namespace geeWiz.Forms
             title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
 
             // Using a select items form
-            using (var form = new gFrm.BaseListView(keys, values, title: title, multiSelect: multiSelect))
+            using (var form = new gFrm.Bases.BaseListView(keys, values, title: title, multiSelect: multiSelect))
             {
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
@@ -388,7 +389,7 @@ namespace geeWiz.Forms
             message ??= "Select an object from the dropdown:";
 
             // Using a dropdown form
-            using (var form = new gFrm.BaseDropdown(keys, values, title: title, message: message, defaultIndex: defaultIndex))
+            using (var form = new gFrm.Bases.BaseDropdown(keys, values, title: title, message: message, defaultIndex: defaultIndex))
             {
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
@@ -402,7 +403,11 @@ namespace geeWiz.Forms
         }
 
         #endregion
+    }
 
+    // These classes provide form utility
+    public static class Utilities
+    {
         #region Progress bar delay
 
         /// <summary>
@@ -432,11 +437,7 @@ namespace geeWiz.Forms
         }
 
         #endregion
-    }
 
-    // These classes provide form utility
-    public static class Utilities
-    {
         #region Construct FormPairs from keys/values
 
         /// <summary>

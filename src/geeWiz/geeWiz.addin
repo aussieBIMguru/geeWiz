@@ -1,4 +1,8 @@
 ﻿<RevitAddIns>
+	<ManifestSettings>
+	    <UseRevitContext>False</UseRevitContext>
+	    <ContextName>RevitAddIn</ContextName>
+	</ManifestSettings>
     <AddIn Type="Application">
         <Name>geeWiz</Name>
         <Assembly>geeWiz/geeWiz.dll</Assembly>

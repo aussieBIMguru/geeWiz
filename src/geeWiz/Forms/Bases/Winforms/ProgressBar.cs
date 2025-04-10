@@ -3,7 +3,7 @@ using Form = System.Windows.Forms.Form;
 using FormsApplication = System.Windows.Forms.Application;
 
 // The base form will belong to the forms namespace
-namespace geeWiz.Forms
+namespace geeWiz.Forms.Bases
 {
     #region Class summary
     /// <summary>

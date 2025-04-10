@@ -224,6 +224,7 @@ namespace geeWiz.Extensions
         /// <returns>A FilteredElementCollector object.</returns>
         public static FilteredElementCollector Ext_Collector(this Document doc, View view)
         {
+            if (view is null) { return doc.Ext_Collector(); }
             return new FilteredElementCollector(doc, view.Id);
         }
 

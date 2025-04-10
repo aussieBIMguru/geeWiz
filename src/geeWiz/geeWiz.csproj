@@ -49,20 +49,13 @@
     <ItemGroup>
         <PackageReference Include="ClosedXML" Version="0.104.2" />
 		<PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
+		<PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
         <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="UIFramework">
-        <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\UIFramework.dll</HintPath>
-      </Reference>
-      <Reference Include="Xceed.Wpf.AvalonDock">
-        <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\Xceed.Wpf.AvalonDock.dll</HintPath>
-      </Reference>
+        <PackageReference Include="Xceed.Wpf.AvalonDock" Version="4.7.25103.5738" />
     </ItemGroup>
 
     <ItemGroup>

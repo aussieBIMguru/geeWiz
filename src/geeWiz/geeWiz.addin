@@ -1,7 +1,7 @@
 ﻿<RevitAddIns>
 	<ManifestSettings>
 	    <UseRevitContext>False</UseRevitContext>
-	    <ContextName>RevitAddIn</ContextName>
+	    <ContextName>geeWiz</ContextName>
 	</ManifestSettings>
     <AddIn Type="Application">
         <Name>geeWiz</Name>

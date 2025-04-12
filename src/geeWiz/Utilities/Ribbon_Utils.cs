@@ -45,7 +45,7 @@ namespace geeWiz.Utilities
             string baseName = CommandClassToBaseName(commandClass);
 
             // Make pushbuttondata
-            PushButtonData pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
+            var pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
 
             // Set tooltip and icons
             pushButtonData.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
@@ -68,7 +68,7 @@ namespace geeWiz.Utilities
             string baseName = CommandClassToBaseName(commandClass);
 
             // Make pushbuttondata
-            PulldownButtonData pulldownButtonData = new PulldownButtonData(baseName, buttonName);
+            var pulldownButtonData = new PulldownButtonData(baseName, buttonName);
 
             // Set tooltip and icons
             pulldownButtonData.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);

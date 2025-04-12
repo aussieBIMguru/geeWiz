@@ -60,7 +60,7 @@ namespace geeWiz.Extensions
         public static bool Ext_ViewIsEditable(this View view, Document doc = null, bool showMessage = false)
         {
             // Get editability
-            bool isEdtiable = (view as Element).Ext_IsEditable(doc);
+            var isEdtiable = (view as Element).Ext_IsEditable(doc);
 
             // Message if not editable
             if (showMessage && !isEdtiable)

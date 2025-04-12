@@ -146,7 +146,7 @@ namespace geeWiz.Utilities
             if (unitType == null) { unitType = SpecTypeId.Length; }
             
             // Get the unit type Id
-            ForgeTypeId unitTypeId = doc.GetUnits().GetFormatOptions(unitType).GetUnitTypeId();
+            var unitTypeId = doc.GetUnits().GetFormatOptions(unitType).GetUnitTypeId();
 
             // Convert the unit to project
             return UnitUtils.ConvertFromInternalUnits(value, unitTypeId);
@@ -165,7 +165,7 @@ namespace geeWiz.Utilities
             if (unitType == null) { unitType = SpecTypeId.Length; }
 
             // Get the unit type Id
-            ForgeTypeId unitTypeId = doc.GetUnits().GetFormatOptions(unitType).GetUnitTypeId();
+            var unitTypeId = doc.GetUnits().GetFormatOptions(unitType).GetUnitTypeId();
 
             // Convert the unit to internal
             return UnitUtils.ConvertToInternalUnits(value, unitTypeId);

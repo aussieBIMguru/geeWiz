@@ -105,8 +105,8 @@ namespace geeWiz.Extensions
             if (!doc.IsWorkshared) { return true; }
 
             // Get the checkout and model updates status
-            CheckoutStatus checkoutStatus = WorksharingUtils.GetCheckoutStatus(doc, element.Id);
-            ModelUpdatesStatus updatesStatus = WorksharingUtils.GetModelUpdatesStatus(doc, element.Id);
+            var checkoutStatus = WorksharingUtils.GetCheckoutStatus(doc, element.Id);
+            var updatesStatus = WorksharingUtils.GetModelUpdatesStatus(doc, element.Id);
 
             // Check if owned by another user
             if (checkoutStatus == CheckoutStatus.OwnedByOtherUser) { return false; }
@@ -130,7 +130,7 @@ namespace geeWiz.Extensions
         /// <returns>A Parameter object.</returns>
         public static Parameter Ext_GetBuiltInParameter(this Element element, BuiltInParameter builtInParameter)
         {
-            ForgeTypeId forgeTypeId = ParameterUtils.GetParameterTypeId(builtInParameter);
+            var forgeTypeId = ParameterUtils.GetParameterTypeId(builtInParameter);
             return element.GetParameter(forgeTypeId);
         }
 

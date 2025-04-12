@@ -55,7 +55,7 @@ namespace geeWiz.Utilities
             // Receive text from the clipboard
             try
             {
-                string clipboardText = Clipboard.GetText();
+                var clipboardText = Clipboard.GetText();
                 return clipboardText;
             }
             // Catch if it could not be received
@@ -125,7 +125,7 @@ namespace geeWiz.Utilities
         {
             try
             {
-                RevitCommandId commandId = RevitCommandId.LookupCommandId(commandName);
+                var commandId = RevitCommandId.LookupCommandId(commandName);
                 uiApp.PostCommand(commandId);
                 return Result.Succeeded;
             }

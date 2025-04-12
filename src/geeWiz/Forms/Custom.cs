@@ -334,7 +334,7 @@ namespace geeWiz.Forms
         #region SelectFromList
 
         /// <summary>
-        /// Processes a generic form for showing objects in a list.
+        /// Processes a generic form for showing objects in a list with a text filter.
         /// </summary>
         /// <param name="keys">A list of keys to display.</param>
         /// <param name="values">A list of values to pass by key.</param>
@@ -358,6 +358,38 @@ namespace geeWiz.Forms
                 {
                     if (multiSelect) { formResult.Validate(form.Tag as List<object>); ; }
                     else { formResult.Validate(form.Tag as object); } 
+                }
+            }
+
+            // Return the result
+            return formResult;
+        }
+
+        /// <summary>
+        /// Processes a generic form for showing objects in a simple list.
+        /// </summary>
+        /// <param name="keys">A list of keys to display.</param>
+        /// <param name="values">A list of values to pass by key.</param>
+        /// <param name="title">An optional title to display.</param>
+        /// <param name="multiSelect">If we want to select more than one item.</param>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult SelectFromSimpleList(List<string> keys, List<object> values,
+            string title = null, bool multiSelect = true)
+        {
+            // Establish the form result to return
+            var formResult = new FormResult(valid: false);
+
+            // Default title
+            title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
+
+            // Using a select items form
+            using (var form = new gFrm.Bases.BaseSimpleListView(keys, values, title: title, multiSelect: multiSelect))
+            {
+                // Process the outcome
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    if (multiSelect) { formResult.Validate(form.Tag as List<object>); ; }
+                    else { formResult.Validate(form.Tag as object); }
                 }
             }
 
@@ -460,12 +492,7 @@ namespace geeWiz.Forms
             // Construct the form pairs with indices
             for (int i = 0; i < pairCount; i++)
             {
-                formPairs.Add(new FormPair()
-                {
-                    ItemValue = values[i],
-                    ItemKey = keys[i],
-                    ItemIndex = i
-                });
+                formPairs.Add(new FormPair(values[i], keys[i], i));
             }
 
             // Return the formpairs
@@ -604,11 +631,20 @@ namespace geeWiz.Forms
         public object ItemValue { get; set; }
         public string ItemKey { get; set; }
         public int ItemIndex { get; set; }
+        public bool Checked { get; set; }
+        public bool Visible { get; set; }
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public FormPair() { }
+        public FormPair()
+        {
+            ItemValue = null;
+            ItemKey = null;
+            ItemIndex = -1;
+            Visible = true;
+            Checked = false;
+        }
 
         /// <summary>
         /// Construct using required data.
@@ -617,9 +653,11 @@ namespace geeWiz.Forms
         /// <param name="itemKey">The key for the item.</param>
         public FormPair(object itemValue, string itemKey)
         {
-            // Pass the properties
             ItemValue = itemValue;
             ItemKey = itemKey;
+            ItemIndex = -1;
+            Visible = true;
+            Checked = false;
         }
 
         /// <summary>
@@ -630,10 +668,11 @@ namespace geeWiz.Forms
         /// <param name="itemIndex">The index to store the item at.</param>
         public FormPair(object itemValue, string itemKey, int itemIndex)
         {
-            // Pass the properties
             ItemValue = itemValue;
             ItemKey = itemKey;
             ItemIndex = itemIndex;
+            Visible = true;
+            Checked = false;
         }
     }
 

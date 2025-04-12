@@ -26,7 +26,7 @@ namespace geeWiz.Utilities
         public static string MakeStringValid(string checkString, char replaceChar = '*')
         {
             // New stringbuilder
-            StringBuilder newStringBuilder = new StringBuilder();
+            var newStringBuilder = new StringBuilder();
 
             // For each character
             foreach (char c in checkString)

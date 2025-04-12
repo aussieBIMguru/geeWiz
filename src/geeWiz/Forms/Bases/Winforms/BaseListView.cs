@@ -19,9 +19,9 @@ namespace geeWiz.Forms.Bases
 
         // Properties belonging to the form
         private bool MultiSelect;
-        private List<FormPair> ItemsOriginal;
-        private List<FormPair> ItemsShown;
+        private List<FormPair> FormPairs;
         private string FilterString;
+        private List<int> VisibleIndices;
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace geeWiz.Forms.Bases
             this.Text = title;
 
             // Create the key and value pairs
-            this.ItemsOriginal = Utilities.CombineAsFormPairs(keys, values);
+            this.FormPairs = Utilities.CombineAsFormPairs(keys, values);
             this.FilterString = "";
 
             // Establish multi selection behavior
@@ -59,13 +59,20 @@ namespace geeWiz.Forms.Bases
             this.Tag = null;
             this.DialogResult = DialogResult.Cancel;
 
+            // Set initial indices
+            this.VisibleIndices = new List<int>();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                VisibleIndices.Add(i);
+            }
+
             // Call load objects function
             LoadShownItems();
         }
 
         #endregion
 
-        #region Load all shown items
+        #region Load / reload items
 
         /// <summary>
         /// Load all items to be shown.
@@ -73,30 +80,27 @@ namespace geeWiz.Forms.Bases
         /// <returns>Void (nothing).</returns>
         private void LoadShownItems()
         {
-            // Collect filter value, force to lower case
-            this.FilterString = textFilter.Text.ToLower();
-
-            // Set shown items to those that pass the filter
-            this.ItemsShown = this.ItemsOriginal
-                .Where(i => PassesTextFilter(i.ItemKey))
-                .ToList();
-
             // Reset the ListView
             listView.Clear();
             listView.Columns.Add("Key", 380);
 
-            // For each item in shown items
-            foreach (var item in this.ItemsShown)
+            // For each form pair...
+            foreach (var pair in this.FormPairs)
             {
-                var listViewItem = new ListViewItem(item.ItemKey);
-                listViewItem.Checked = false;
-                this.listView.Items.Add(listViewItem);
+                // If visible...
+                if (pair.Visible)
+                {
+                    // Add the key to the list view
+                    var listViewItem = new ListViewItem(pair.ItemKey);
+                    listViewItem.Checked = pair.Checked;
+                    this.listView.Items.Add(listViewItem);
+                }
             }
         }
 
         #endregion
 
-        #region Text filtering
+        #region Visibility management
 
         /// <summary>
         /// Event handler when text filter changes.
@@ -106,6 +110,26 @@ namespace geeWiz.Forms.Bases
         /// <returns>Void (nothing).</returns>
         private void txtFilter_TextChanged(object sender, EventArgs e)
         {
+            // Store the checked status
+            UpdateCheckedValues();
+
+            // Pass the filter value
+            this.FilterString = textFilter.Text.ToLower();
+
+            // Clear visible indices
+            this.VisibleIndices = new List<int>();
+
+            // For each formpair...
+            foreach (var pair in this.FormPairs)
+            {
+                // Check if it passes the filter, set visibility
+                var passesFilter = PassesTextFilter(pair.ItemKey);
+                pair.Visible = passesFilter;
+
+                // Add its index if it passes the filter
+                if (passesFilter) { this.VisibleIndices.Add(pair.ItemIndex); }
+            }
+            
             // Call the load items method
             LoadShownItems();
         }
@@ -125,6 +149,23 @@ namespace geeWiz.Forms.Bases
 
             // Otherwise return if it contains the string
             return text.ToLower().Contains(this.FilterString);
+        }
+
+        /// <summary>
+        /// Update the checked status of visible items.
+        /// </summary>
+        private void UpdateCheckedValues()
+        {
+            // For each visible indice...
+            for (int i = 0; i < this.listView.Items.Count; i++)
+            {
+                // Get the pair index and listviewitem
+                var pairIndex = this.VisibleIndices[i];
+                var listViewItem = this.listView.Items[i];
+
+                // Set the corresponding formpair check
+                this.FormPairs[pairIndex].Checked = listViewItem.Checked;
+            }
         }
 
         #endregion
@@ -177,35 +218,35 @@ namespace geeWiz.Forms.Bases
         /// <returns>Void (nothing).</returns>
         private void btnSelect_Click(object sender, EventArgs e)
         {
+            // Store the checked status
+            UpdateCheckedValues();
+
             // Multi-select (+ selection)
             if (this.MultiSelect)
             {
-                // If more than 0 items checked
-                if (listView.CheckedItems.Count > 0)
-                {
-                    // Get the values related to the checked items
-                    this.Tag = listView.CheckedItems
-                        .Cast<ListViewItem>()
-                        .Select(i => this.ItemsShown[i.Index].ItemValue)
-                        .ToList();
+                // Store the checked items
+                var checkedValues = FormPairs
+                    .Where(f => f.Checked)
+                    .Select(f => f.ItemValue)
+                    .ToList();
 
-                    // Dialog result is OK
+                // If we have values, OK and tag
+                if (checkedValues.Count > 0)
+                {
+                    this.Tag = checkedValues;
                     this.DialogResult = DialogResult.OK;
                 }
             }
             // Single selection (+ selection)
-            else
+            else if (listView.SelectedItems.Count > 0)
             {
-                // If an item is selected
-                if (listView.SelectedItems.Count > 0)
-                {
-                    // Get the value related to the selected item
-                    int ind = listView.SelectedItems[0].Index;
-                    this.Tag = this.ItemsShown[ind].ItemValue;
+                // Get the selected index, then the value index
+                int selectedIndex = listView.SelectedItems[0].Index;
+                int valueIndex = this.VisibleIndices[selectedIndex];
 
-                    // Dialog result is OK
-                    this.DialogResult = DialogResult.OK;
-                }
+                // OK and tag
+                this.Tag = this.FormPairs[valueIndex].ItemValue;
+                this.DialogResult = DialogResult.OK;
             }
 
             // Close the form

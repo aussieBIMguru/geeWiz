@@ -95,7 +95,7 @@ namespace geeWiz.Extensions
             if (uiDoc is null) { return Result.Failed; }
 
             // Get element Ids as ICollection
-            List<ElementId> idsToSelect = elements
+            var idsToSelect = elements
                 .Select(e => e.Id)
                 .Where(i => i is not null)
                 .Distinct()

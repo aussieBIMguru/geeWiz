@@ -81,7 +81,7 @@ namespace geeWiz.Utilities
             this.Element = element;
 
             // Store the parameter
-            Parameter parameter = element.LookupParameter(parameterName);
+            var parameter = element.LookupParameter(parameterName);
             this.Parameter = parameter;
 
             // Default values to return (assume nothing found)
@@ -145,7 +145,7 @@ namespace geeWiz.Utilities
             this.Element = element;
 
             // Store the parameter
-            Parameter parameter = element.LookupParameter(parameterName);
+            var parameter = element.LookupParameter(parameterName);
             this.Parameter = parameter;
 
             // Store the type and value
@@ -178,7 +178,7 @@ namespace geeWiz.Utilities
             this.Element = element;
 
             // Store the parameter
-            Parameter parameter = element.LookupParameter(parameterName);
+            var parameter = element.LookupParameter(parameterName);
             this.Parameter = parameter;
 
             // Store the type and value
@@ -211,7 +211,7 @@ namespace geeWiz.Utilities
             this.Element = element;
 
             // Store the parameter
-            Parameter parameter = element.LookupParameter(parameterName);
+            var parameter = element.LookupParameter(parameterName);
             this.Parameter = parameter;
 
             // Store the type and value
@@ -244,7 +244,7 @@ namespace geeWiz.Utilities
             this.Element = element;
 
             // Store the parameter
-            Parameter parameter = element.LookupParameter(parameterName);
+            var parameter = element.LookupParameter(parameterName);
             this.Parameter = parameter;
 
             // Store the type and value

@@ -251,7 +251,7 @@ namespace geeWiz.Utilities
         /// <returns>Void (nothing).</returns>
         public static void SetFormIcon(Form form)
         {
-            string iconPath = "geeWiz.Resources.Icons16.IconList16.ico";
+            var iconPath = "geeWiz.Resources.Icons16.IconList16.ico";
 
             using (Stream stream = Globals.Assembly.GetManifestResourceStream(iconPath))
             {

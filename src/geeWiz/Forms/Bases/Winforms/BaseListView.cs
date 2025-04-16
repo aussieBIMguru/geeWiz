@@ -1,4 +1,7 @@
-﻿// The base form will belong to the forms namespace
+﻿// geeWiz
+using gDat = geeWiz.Utilities.Data_Utils;
+
+// The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
     #region Class summary
@@ -19,7 +22,7 @@ namespace geeWiz.Forms.Bases
 
         // Properties belonging to the form
         private bool MultiSelect;
-        private List<FormPair> FormPairs;
+        private List<gDat.KeyedValue> FormPairs;
         private string FilterString;
         private List<int> VisibleIndices;
 

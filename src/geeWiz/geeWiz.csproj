@@ -32,8 +32,8 @@
         <StartAction>Program</StartAction>
         <StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
         <StartArguments>/language ENG</StartArguments>
-        <AssemblyVersion>25.04.01.00</AssemblyVersion>
-        <FileVersion>25.04.01.00</FileVersion>
+        <AssemblyVersion>25.XX.XX.00</AssemblyVersion>
+        <FileVersion>25.XX.XX.00</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

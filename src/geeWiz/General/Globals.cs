@@ -92,8 +92,8 @@ namespace geeWiz
             // (UsernameRevit stored by idling event)
 
             // Store versions and Ids
-            VersionNumber = "25.01.02";
-            VersionName = "WIP (January 2025)";
+            VersionNumber = "25.04.01.00";
+            VersionName = "Version 1";
             AddinGuid = "8FFC127F-9CD7-46E2-8506-C5F36D057B4B";
             AddinName = "geeWiz";
         }

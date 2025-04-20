@@ -54,6 +54,9 @@ namespace geeWiz
         // Tooltips resource
         public static Dictionary<string, string> Tooltips { get; set; } = new Dictionary<string, string>();
 
+        // Namespaces
+        public static string Availability {get;set; }
+
         #endregion
 
         #region Register variables
@@ -90,6 +93,9 @@ namespace geeWiz
             // Store user names
             UsernameWindows = Environment.UserName;
             // (UsernameRevit stored by idling event)
+
+            // Other
+            Availability = "geeWiz.Availability";
 
             // Store versions and Ids
             VersionNumber = "25.XX.XX.00";

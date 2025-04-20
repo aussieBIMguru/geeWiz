@@ -1,5 +1,8 @@
 ﻿// The class belongs to the extensions namespace
 // ViewFamilyType viewFamilyType.ExtensionMethod()
+using Autodesk.Revit.UI;
+using View = Autodesk.Revit.DB.View;
+
 namespace geeWiz.Extensions
 {
     /// <summary>
@@ -29,6 +32,96 @@ namespace geeWiz.Extensions
             else
             {
                 return $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name}";
+            }
+        }
+
+        #endregion
+
+        #region View templates
+
+        /// <summary>
+        /// Assigns a view template to a ViewFamilyType.
+        /// </summary>
+        /// <param name="viewFamilyType">The ViewFamilyType (extended).</param>
+        /// <param name="viewTemplate">The view template to assign.</param>
+        /// <returns>A Result</returns>
+        public static Result Ext_ApplyViewTemplate(this ViewFamilyType viewFamilyType, View viewTemplate)
+        {
+            // Null check
+            if (viewFamilyType is null || viewTemplate is null) { return Result.Failed; }
+
+            // If the view template is a template
+            if (viewTemplate.IsTemplate)
+            {
+                // Assign it
+                viewFamilyType.DefaultTemplateId = viewTemplate.Id;
+                return Result.Succeeded;
+            }
+            else
+            {
+                // Otherwise, we failed
+                return Result.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Removes the view template from a ViewFamilyType.
+        /// </summary>
+        /// <param name="viewFamilyType">The ViewFamilyType (extended).</param>
+        /// <returns>A Result</returns>
+        public static Result Ext_RemoveViewTemplate(this ViewFamilyType viewFamilyType)
+        {
+            // Null check
+            if (viewFamilyType is null) { return Result.Failed; }
+
+            // If the view template Id is not invalid
+            if (viewFamilyType.DefaultTemplateId != ElementId.InvalidElementId)
+            {
+                // Remove it
+                viewFamilyType.DefaultTemplateId = ElementId.InvalidElementId;
+                return Result.Succeeded;
+            }
+            else
+            {
+                // Otherwise, we failed
+                return Result.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Returns if a ViewFamilyType has a template.
+        /// </summary>
+        /// <param name="viewFamilyType">The ViewFamilyType (extended).</param>
+        /// <returns>A Boolean</returns>
+        public static bool Ext_HasViewTemplate(this ViewFamilyType viewFamilyType)
+        {
+            // Null check
+            if (viewFamilyType is null) { return false; }
+
+            // Return if it has a template
+            return viewFamilyType.DefaultTemplateId != ElementId.InvalidElementId;
+        }
+
+        /// <summary>
+        /// Gets the view template from a ViewFamilyType.
+        /// </summary>
+        /// <param name="viewFamilyType">The ViewFamilyType (extended).</param>
+        /// <returns>A Result</returns>
+        public static View Ext_GetViewTemplate(this ViewFamilyType viewFamilyType)
+        {
+            // Null check
+            if (viewFamilyType is null) { return null; }
+
+            // If the view has a template
+            if (viewFamilyType.DefaultTemplateId != ElementId.InvalidElementId)
+            {
+                // Return it
+                return viewFamilyType.DefaultTemplateId.Ext_GetElement<View>(viewFamilyType.Document);
+            }
+            else
+            {
+                // Otherwise, return null
+                return null;
             }
         }
 

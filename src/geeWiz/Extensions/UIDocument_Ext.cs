@@ -72,7 +72,7 @@ namespace geeWiz.Extensions
 
             // Return opened UIViews as Views
             return uiDoc.GetOpenUIViews()
-                .Select(u => doc.GetElement(u.ViewId))
+                .Select(u => u.ViewId.Ext_GetElement<View>(doc))
                 .Cast<View>()
                 .ToList();
         }
@@ -242,7 +242,7 @@ namespace geeWiz.Extensions
                 // Return the selected elements if it worked
                 return uiDoc.Selection.PickObjects(ObjectType.Element, selectionFilter, selectionPrompt)
                     .Select(i => uiDoc.Document.GetElement(i))
-                    .Where (e => e is Element)
+                    .Where (e => e is not null)
                     .Cast<Element>()
                     .ToList();
             }

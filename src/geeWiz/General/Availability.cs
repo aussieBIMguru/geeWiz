@@ -36,7 +36,7 @@ namespace geeWiz
         #region Availability classes
 
         // Command is disabled
-        public class Disabled : IExternalCommandAvailability
+        private class Disabled : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -45,7 +45,7 @@ namespace geeWiz
         }
 
         // Command can only be ran even if a document is not opened
-        public class ZeroDoc : IExternalCommandAvailability
+        private class ZeroDoc : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -54,7 +54,7 @@ namespace geeWiz
         }
 
         // Command can only be ran in a document
-        public class Document : IExternalCommandAvailability
+        private class Document : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -63,7 +63,7 @@ namespace geeWiz
         }
 
         // Command can only be ran in a project (non-family) document
-        public class Project : IExternalCommandAvailability
+        private class Project : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -79,7 +79,7 @@ namespace geeWiz
         }
 
         // Command can only be ran in a family document
-        public class Family : IExternalCommandAvailability
+        private class Family : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -95,7 +95,7 @@ namespace geeWiz
         }
 
         // Command can only be ran in a workshared document
-        public class Workshared : IExternalCommandAvailability
+        private class Workshared : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -111,7 +111,7 @@ namespace geeWiz
         }
 
         // Command can only be ran when elements are selected (even if in family document)
-        public class Selection : IExternalCommandAvailability
+        private class Selection : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -127,7 +127,7 @@ namespace geeWiz
         }
 
         // Command can only be ran when active view is a schedule
-        public class ActiveViewSchedule : IExternalCommandAvailability
+        private class ActiveViewSchedule : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -143,7 +143,7 @@ namespace geeWiz
         }
 
         // Command can only be ran when sheets are in selection
-        public class SelectionIncludesSheets : IExternalCommandAvailability
+        private class SelectionIncludesSheets : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
@@ -159,7 +159,7 @@ namespace geeWiz
         }
 
         // Command can only be ran when only sheets are in selection
-        public class SelectionOnlySheets : IExternalCommandAvailability
+        private class SelectionOnlySheets : IExternalCommandAvailability
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {

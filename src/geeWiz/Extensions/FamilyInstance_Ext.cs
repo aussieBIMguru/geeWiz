@@ -22,5 +22,31 @@ namespace geeWiz.Extensions
         }
 
         #endregion
+
+        #region Family / inplace
+
+        /// <summary>
+        /// Returns the family of a family instance.
+        /// </summary>
+        /// <param name="familyInstance">The familyinstance (extended).</param>
+        /// <returns>A Family.</returns>
+        public static Family Ext_GetFamily(this FamilyInstance familyInstance)
+        {
+            if (familyInstance is null) { return null; }
+            return familyInstance.Symbol.Family;
+        }
+
+        /// <summary>
+        /// Returns if a family instance is modelled in place.
+        /// </summary>
+        /// <param name="familyInstance">The familyinstance (extended).</param>
+        /// <returns>A Boolean.</returns>
+        public static bool Ext_IsInPlace(this FamilyInstance familyInstance)
+        {
+            if (familyInstance is null) { return false; }
+            return familyInstance.Symbol.Family.IsInPlace;
+        }
+
+        #endregion
     }
 }

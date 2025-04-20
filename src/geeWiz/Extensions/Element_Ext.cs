@@ -31,6 +31,7 @@ namespace geeWiz.Extensions
             if (element is ViewSheet sheet) { return sheet.Ext_ToSheetKey(includeId); }
             if (element is ViewFamilyType viewFamilyType) { return viewFamilyType.Ext_ToViewFamilyTypeKey(includeId); }
             if (element is View view) { return view.Ext_ToViewKey(includeId); }
+            if (element is Family family) { return family.Ext_ToFamilyKey(includeId); }
             if (element is FamilySymbol familySymbol) { return familySymbol.Ext_ToFamilySymbolKey(includeId); }
             if (element is FamilyInstance familyInstance) { return familyInstance.Ext_ToFamilyInstanceKey(includeId); }
 
@@ -98,6 +99,9 @@ namespace geeWiz.Extensions
         /// <returns>A boolean.</returns>
         public static bool Ext_IsEditable(this Element element, Document doc = null)
         {
+            // Catch null element
+            if (element is null) { return false; }
+            
             // Get document if not provided
             doc ??= element.Document;
 
@@ -120,6 +124,51 @@ namespace geeWiz.Extensions
 
         #endregion
 
+        #region Element's type
+
+        /// <summary>
+        /// Returns the type of an element.
+        /// </summary>
+        /// <param name="element">An Element (extended).</param>
+        /// <returns>An Element.</returns>
+        public static Element Ext_GetElementType(this Element element)
+        {
+            // Null check
+            if (element is null) { return null; }
+
+            // Return the element's type
+            return element.Document.GetElement(element.GetTypeId());
+        }
+
+        /// <summary>
+        /// Returns the type of an element.
+        /// </summary>
+        /// <typeparam name="T">The type to get the element type as.</typeparam>
+        /// <param name="element">An Element (extended).</param>
+        /// <returns>An Element as T.</returns>
+        public static T Ext_GetElementType<T>(this Element element)
+        {
+            // Null check
+            if (element is null) { return default(T); }
+
+            // Get the element's type
+            var elementType = element.Document.GetElement(element.GetTypeId());
+
+            // If the element is of the type...
+            if (elementType is T elementAsType)
+            {
+                // Return it
+                return elementAsType;
+            }
+            else
+            {
+                // Otherwise, return default of T
+                return default(T);
+            }
+        }
+
+        #endregion
+
         #region Element parameters
 
         /// <summary>
@@ -130,6 +179,10 @@ namespace geeWiz.Extensions
         /// <returns>A Parameter object.</returns>
         public static Parameter Ext_GetBuiltInParameter(this Element element, BuiltInParameter builtInParameter)
         {
+            // Null check
+            if (element is null) { return null; }
+            
+            // Get the parameter by its forgetypeid
             var forgeTypeId = ParameterUtils.GetParameterTypeId(builtInParameter);
             return element.GetParameter(forgeTypeId);
         }
@@ -159,6 +212,50 @@ namespace geeWiz.Extensions
                 StorageType.ElementId => (T)(object)parameter.AsElementId(),
                 _ => default
             };
+        }
+
+        /// <summary>
+        /// Gets the value of type parameter by name, given a specified storage type.
+        /// </summary>
+        /// <typeparam name="T">The parameter storage type.</typeparam>
+        /// <param name="element">The element to get the value from.</param>
+        /// <param name="parameterName">The parameter name to get the value of.</param>
+        /// <returns>The value of the parameter.</returns>
+        public static T Ext_GetTypeParameterValue<T>(this Element element, string parameterName)
+        {
+            // Default value for type if no element
+            if (element is null) { return default; }
+
+            // Get element type
+            var elementType = element.Document.GetElement(element.GetTypeId());
+
+            // Return type parameter value
+            return elementType.Ext_GetParameterValue<T>(parameterName);
+        }
+
+        /// <summary>
+        /// Gets the value of a type or instance parameter by name, given a specified storage type.
+        /// </summary>
+        /// <typeparam name="T">The parameter storage type.</typeparam>
+        /// <param name="element">The element to get the value from.</param>
+        /// <param name="parameterName">The parameter name to get the value of.</param>
+        /// <returns>The value of the parameter.</returns>
+        public static T Ext_GetTypeOrInstanceParameterValue<T>(this Element element, string parameterName)
+        {
+            // Default value for type if no element
+            if (element is null) { return default; }
+
+            // If instance has the parameter...
+            if (element.LookupParameter(parameterName) is Parameter)
+            {
+                // Return it for the element
+                return element.Ext_GetParameterValue<T>(parameterName);
+            }
+            else
+            {
+                // Otherwise, return it for the type
+                return element.Ext_GetTypeParameterValue<T>(parameterName);
+            }
         }
 
         /// <summary>

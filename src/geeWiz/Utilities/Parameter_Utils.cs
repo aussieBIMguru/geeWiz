@@ -1,7 +1,6 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
-// geeWiz
-using gCnv = geeWiz.Utilities.Convert_Utils;
+using geeWiz.Extensions;
 
 // The class belongs to the utilities namespace
 // gPar = geeWiz.Utilities.Parameter_Utils
@@ -126,7 +125,7 @@ namespace geeWiz.Utilities
                 if (parameter.AsElementId() is ElementId value)
                 {
                     this.AsElementId = value;
-                    this.AsInteger = gCnv.ElementIdToInt(value);
+                    this.AsInteger = value.Ext_AsInteger();
                     this.AsString = value.ToString();
                     this.AsDouble = (double)AsInteger;
 

@@ -41,5 +41,27 @@ namespace geeWiz.Extensions
         }
 
         #endregion
+
+        #region Get all instances
+
+        /// <summary>
+        /// Returns all instances of the provided family type.
+        /// </summary>
+        /// <param name="familySymbol">The FamilySymbol (extended).</param>
+        /// <returns>A list of FamilyInstances.</returns>
+        public static List<FamilyInstance> Ext_GetAllInstances(this FamilySymbol familySymbol)
+        {
+            // Get family symbol Id
+            var familySymbolId = familySymbol.Id;
+            
+            // Get all instances of same symbool
+            return familySymbol.Document.Ext_Collector()
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(f => f.Symbol.Id == familySymbolId)
+                .ToList();
+        }
+
+        #endregion
     }
 }

@@ -30,7 +30,7 @@ namespace geeWiz.Extensions
             // Return the starting view if there is one
             if (startingViewSettings.ViewId is ElementId elementId)
             {
-                return doc.GetElement(elementId) as View;
+                return elementId.Ext_GetElement<View>(doc);
             }
             else
             {

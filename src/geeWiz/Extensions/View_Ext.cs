@@ -164,5 +164,50 @@ namespace geeWiz.Extensions
         }
 
         #endregion
+
+        #region Other
+
+        /// <summary>
+        /// Returns the Scope box of a view, if any.
+        /// </summary>
+        /// <param name="view">The view (extended).</param>
+        /// <returns>A Scope Box Element.</returns>
+        public static Element Ext_GetScopeBox(this View view)
+        {
+            // Null check
+            if (view is null) { return null; }
+
+            // Get parameter
+            var parameter = (view as Element).Ext_GetBuiltInParameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP);
+
+            // Return null if it has no value or is invalid
+            if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
+
+            // Return the element
+            return view.Document.GetElement(parameter.AsElementId());
+        }
+
+        /// <summary>
+        /// Returns the ViewFamilyType of a View.
+        /// </summary>
+        /// <param name="view">The view (extended).</param>
+        /// <returns>A ViewFamilyType.</returns>
+        public static ViewFamilyType Ext_GetViewFamilyType(this View view)
+        {
+            // Null check
+            if (view is null) { return null; }
+
+            // Return view family type
+            if ((view as Element).Ext_GetElementType() is ViewFamilyType viewFamilyType)
+            {
+                return viewFamilyType;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        #endregion
     }
 }

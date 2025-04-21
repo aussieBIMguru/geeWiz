@@ -126,5 +126,33 @@ namespace geeWiz.Extensions
         }
 
         #endregion
+
+        #region Collect views
+
+        /// <summary>
+        /// Gets all views of the given ViewFamilyType.
+        /// </summary>
+        /// <param name="viewFamilyType">The ViewFamilyType (extended).</param>
+        /// <param name="doc">The document.</param>
+        /// <param name="sorted">Sort views by name.</param>
+        /// <returns>A list of views.</returns>
+        public static List<View> Ext_AllViewsOfType(this ViewFamilyType viewFamilyType, Document doc = null, bool sorted = true)
+        {
+            // Null check
+            if (viewFamilyType is null) { return new List<View>(); }
+            
+            // Get current document
+            doc ??= Globals.UiApp.ActiveUIDocument.Document;
+
+            // View family type Id
+            var viewFamilyTypeId = viewFamilyType.Id;
+
+            // Get all views of given view type
+            return doc.Ext_GetViews(sorted: sorted)
+                .Where(v => v.GetTypeId() == viewFamilyTypeId)
+                .ToList();
+        }
+
+        #endregion
     }
 }

@@ -10,6 +10,24 @@ namespace geeWiz.Extensions
         #region Get Element
 
         /// <summary>
+        /// Gets an element from an ElementId and a Document.
+        /// </summary>
+        /// <param name="elementId">The ElementId (extended).</param>
+        /// <param name="doc">The document to get the element from.</param>
+        /// <returns>An Element.</returns>
+        public static Element Ext_GetElement(this ElementId elementId, Document doc)
+        {
+            // Catch invalid elementId or null
+            if (elementId is null || elementId == ElementId.InvalidElementId || doc is null)
+            {
+                return null;
+            }
+
+            // Get element
+            return doc.GetElement(elementId);
+        }
+
+        /// <summary>
         /// Gets an element and returns it as the given type if possible.
         /// </summary>
         /// <typeparam name="T">The type to return as.</typeparam>
@@ -19,7 +37,7 @@ namespace geeWiz.Extensions
         public static T Ext_GetElement<T>(this ElementId elementId, Document doc)
         {
             // Catch invalid elementId or null
-            if (elementId is null || elementId == ElementId.InvalidElementId)
+            if (elementId is null || elementId == ElementId.InvalidElementId || doc is null)
             {
                 return default(T);
             }

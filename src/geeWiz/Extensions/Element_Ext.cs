@@ -124,7 +124,7 @@ namespace geeWiz.Extensions
 
         #endregion
 
-        #region Element's type
+        #region Element type
 
         /// <summary>
         /// Returns the type of an element.
@@ -165,6 +165,40 @@ namespace geeWiz.Extensions
                 // Otherwise, return default of T
                 return default(T);
             }
+        }
+
+        /// <summary>
+        /// Returns the type of an element.
+        /// </summary>
+        /// <param name="element">An Element (extended).</param>
+        /// <returns>An Element.</returns>
+        public static bool Ext_IsElementType(this Element element)
+        {
+            // Null check
+            if (element is null) { return false; }
+
+            // Return if it is an Element type
+            return element is ElementType;
+        }
+
+        /// <summary>
+        /// Returns all elements of type.
+        /// </summary>
+        /// <param name="element">An Element (extended).</param>
+        /// <returns>A list of Elements.</returns>
+        public static List<Element> Ext_AllElementsOfType(this Element element)
+        {
+            // Null check
+            if (element is null) { return new List<Element>(); }
+
+            // Get element type Id
+            var elementTypeId = element.Id;
+
+            // Return all elements of type
+            return element.Document.Ext_Collector()
+                .WhereElementIsNotElementType()
+                .Where(e => e.GetTypeId() == elementTypeId)
+                .ToList();
         }
 
         #endregion

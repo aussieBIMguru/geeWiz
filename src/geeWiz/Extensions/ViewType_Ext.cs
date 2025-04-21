@@ -1,4 +1,6 @@
-﻿// geeWiz
+﻿// Autodesk
+using View = Autodesk.Revit.DB.View;
+// geeWiz
 using gView = geeWiz.Utilities.View_Utils;
 
 // The class belongs to the extensions namespace
@@ -25,6 +27,26 @@ namespace geeWiz.Extensions
                     [gView.VIEWFAMILIES_GRAPHICAL.IndexOf(viewFamily)];
             }
             return ViewType.Undefined;
+        }
+
+        #endregion
+
+        #region Collect views
+
+        /// <summary>
+        /// Gets all views of the given ViewType.
+        /// </summary>
+        /// <param name="viewType">The ViewType (extended).</param>
+        /// <param name="doc">The document.</param>
+        /// <param name="sorted">Sort views by name.</param>
+        /// <returns>A list of views.</returns>
+        public static List<View> Ext_AllViewsOfType(this ViewType viewType, Document doc = null, bool sorted = true)
+        {
+            // Get current document
+            doc ??= Globals.UiApp.ActiveUIDocument.Document;
+            
+            // Get all views of given view type
+            return doc.Ext_GetViews(new List<ViewType>() { viewType }, sorted: sorted);
         }
 
         #endregion

@@ -26,9 +26,9 @@ namespace geeWiz.Cmds_Revision
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Detect alt fire
             var altFired = gScr.KeyHeldShift();
@@ -78,8 +78,15 @@ namespace geeWiz.Cmds_Revision
                             return Result.Cancelled;
                         }
 
-                        // Revise sheet, add to result
-                        updated += sheet.Ext_RevSheet(selectedRevision, upRev: !altFired);
+                        // Add or remove result if altfired
+                        if (altFired)
+                        {
+                            updated += sheet.Ext_RemoveRevision(selectedRevision).Ext_ToInteger();
+                        }
+                        else
+                        {
+                            updated += sheet.Ext_AddRevision(selectedRevision).Ext_ToInteger();
+                        }
 
                         // Increase progress
                         Thread.Sleep(pbStep);
@@ -111,9 +118,9 @@ namespace geeWiz.Cmds_Revision
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Select a revision
             var formResultRevision = doc.Ext_SelectRevisions(multiSelect: false, sorted: true);
@@ -204,9 +211,9 @@ namespace geeWiz.Cmds_Revision
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Select a revision
             var formResultRevision = doc.Ext_SelectRevisions(sorted: true);

@@ -24,9 +24,9 @@ namespace geeWiz.Cmds_Import
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Check for alt firing
             var altFired = gScr.KeyHeldShift();
@@ -35,7 +35,7 @@ namespace geeWiz.Cmds_Import
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Choose where to save template");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
             var directoryPath = directoryResult.Object as string;
-            var filePath = $"{directoryPath}\\Import sheets.xlsx";
+            var filePath = Path.Combine(directoryPath, "Import sheets.xlsx");
 
             // Accessibility check if it exists
             if (File.Exists(filePath))
@@ -123,9 +123,9 @@ namespace geeWiz.Cmds_Import
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Select file path
             var formResult = gFrm.Custom.SelectFilePaths(

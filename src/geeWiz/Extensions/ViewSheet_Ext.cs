@@ -70,13 +70,12 @@ namespace geeWiz.Extensions
         #region Add/remove revision
 
         /// <summary>
-        /// Adds or removes a revision from a sheet.
+        /// Adds a revision to a sheet.
         /// </summary>
-        /// <param name="sheet">A Revit Sheet (extended).</param>
-        /// <param name="revision">The Revision to add/remove.</param>
-        /// <param name="upRev">Add or remove the revision.</param>
-        /// <returns>1 if actioned, 0 if passed.</returns>
-        public static int Ext_RevSheet(this ViewSheet sheet, Revision revision, bool upRev = true)
+        /// <param name="sheet">A Sheet (extended).</param>
+        /// <param name="revision">The Revision to add.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_AddRevision(this ViewSheet sheet, Revision revision)
         {
             // Get revisions on sheet
             var revisionIds = sheet.GetAdditionalRevisionIds();
@@ -84,27 +83,42 @@ namespace geeWiz.Extensions
             // If the revision is in the list
             if (revisionIds.Contains(revision.Id))
             {
-                // Down revision routine
-                if (!upRev)
-                {
-                    revisionIds.Remove(revision.Id);
-                    sheet.SetAdditionalRevisionIds(revisionIds);
-                    return 1;
-                }
+                // Do not add it
+                return Result.Failed;
             }
             else
             {
-                // Uprevision routine
-                if (upRev)
-                {
-                    revisionIds.Add(revision.Id);
-                    sheet.SetAdditionalRevisionIds(revisionIds);
-                    return 1;
-                }
+                // Otherwise, add it
+                revisionIds.Add(revision.Id);
+                sheet.SetAdditionalRevisionIds(revisionIds);
+                return Result.Succeeded;
             }
+        }
 
-            // Do nothing
-            return 0;
+        /// <summary>
+        /// Removes a revision to a sheet.
+        /// </summary>
+        /// <param name="sheet">A Sheet (extended).</param>
+        /// <param name="revision">The Revision to remove.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_RemoveRevision(this ViewSheet sheet, Revision revision)
+        {
+            // Get revisions on sheet
+            var revisionIds = sheet.GetAdditionalRevisionIds();
+
+            // If the revision is in the list
+            if (revisionIds.Contains(revision.Id))
+            {
+                // Remove it
+                revisionIds.Remove(revision.Id);
+                sheet.SetAdditionalRevisionIds(revisionIds);
+                return Result.Succeeded;
+            }
+            else
+            {
+                // Otherwise, do not remove it
+                return Result.Failed;
+            }
         }
 
         #endregion

@@ -10,6 +10,26 @@ namespace geeWiz.Extensions
         #region Get Element
 
         /// <summary>
+        /// Returns if an ElementId is null or invalid.
+        /// </summary>
+        /// <param name="elementId">The ElementId (extended).</param>
+        /// <returns>A boolean.</returns>
+        public static bool Ext_IsNullOrInvalid(this ElementId elementId)
+        {
+            return elementId is null || elementId == ElementId.InvalidElementId;
+        }
+
+        /// <summary>
+        /// Returns if an ElementId is valid.
+        /// </summary>
+        /// <param name="elementId">The ElementId (extended).</param>
+        /// <returns>A boolean.</returns>
+        public static bool Ext_IsValid(this ElementId elementId)
+        {
+            return elementId is not null && elementId != ElementId.InvalidElementId;
+        }
+
+        /// <summary>
         /// Gets an element from an ElementId and a Document.
         /// </summary>
         /// <param name="elementId">The ElementId (extended).</param>
@@ -18,7 +38,7 @@ namespace geeWiz.Extensions
         public static Element Ext_GetElement(this ElementId elementId, Document doc)
         {
             // Catch invalid elementId or null
-            if (elementId is null || elementId == ElementId.InvalidElementId || doc is null)
+            if (elementId.Ext_IsNullOrInvalid() || doc is null)
             {
                 return null;
             }
@@ -37,7 +57,7 @@ namespace geeWiz.Extensions
         public static T Ext_GetElement<T>(this ElementId elementId, Document doc)
         {
             // Catch invalid elementId or null
-            if (elementId is null || elementId == ElementId.InvalidElementId || doc is null)
+            if (elementId.Ext_IsNullOrInvalid() || doc is null)
             {
                 return default(T);
             }

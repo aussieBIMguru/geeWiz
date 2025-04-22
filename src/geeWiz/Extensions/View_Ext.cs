@@ -1,8 +1,8 @@
 ﻿// Autodesk
+using Autodesk.Revit.UI;
 using View = Autodesk.Revit.DB.View;
 // geeWiz
 using gFrm = geeWiz.Forms;
-using Autodesk.Revit.UI;
 
 // The class belongs to the extensions namespace
 // View view.ExtensionMethod()
@@ -165,7 +165,7 @@ namespace geeWiz.Extensions
 
         #endregion
 
-        #region Other
+        #region Get scope box, phase, type
 
         /// <summary>
         /// Returns the Scope box of a view, if any.
@@ -184,7 +184,27 @@ namespace geeWiz.Extensions
             if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
 
             // Return the element
-            return view.Document.GetElement(parameter.AsElementId());
+            return parameter.AsElementId().Ext_GetElement(view.Document);
+        }
+
+        /// <summary>
+        /// Returns the Phase of a view, if any.
+        /// </summary>
+        /// <param name="view">The view (extended).</param>
+        /// <returns>A Phase.</returns>
+        public static Phase Ext_GetViewPhase(this View view)
+        {
+            // Null check
+            if (view is null) { return null; }
+
+            // Get parameter
+            var parameter = (view as Element).Ext_GetBuiltInParameter(BuiltInParameter.VIEW_PHASE);
+
+            // Return null if it has no value or is invalid
+            if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
+
+            // Return the element
+            return parameter.AsElementId().Ext_GetElement<Phase>(view.Document);
         }
 
         /// <summary>

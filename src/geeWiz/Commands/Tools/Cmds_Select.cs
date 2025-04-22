@@ -1,7 +1,6 @@
 ﻿// Revit API
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using View = Autodesk.Revit.DB.View;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
@@ -21,9 +20,8 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
 
             // Make the category filter
             var selectionFilter = new gSel.ISF_ByBuiltInCategory(BuiltInCategory.OST_Rooms);
@@ -34,13 +32,7 @@ namespace geeWiz.Cmds_Select
                 selectionPrompt: "Select rooms, then press \'Finish\'");
 
             // If elements were selected, select them
-            if (selectedElements.Count > 0)
-            {
-                uiDoc.Ext_SelectElements(selectedElements);
-            }
-
-            // Either way, we are finished
-            return Result.Succeeded;
+            return uiDoc.Ext_SelectElements(selectedElements);
         }
     }
 
@@ -57,9 +49,8 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
 
             // Make the category filter
             var selectionFilter = new gSel.ISF_ByBuiltInCategory(BuiltInCategory.OST_Walls);
@@ -70,13 +61,7 @@ namespace geeWiz.Cmds_Select
                 selectionPrompt: "Select walls, then press \'Finish\'");
 
             // If elements were selected, select them
-            if (selectedElements.Count > 0)
-            {
-                uiDoc.Ext_SelectElements(selectedElements);
-            }
-
-            // Either way, we are finished
-            return Result.Succeeded;
+            return uiDoc.Ext_SelectElements(selectedElements);
         }
     }
 
@@ -93,10 +78,12 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
-            View activeView = uiDoc.ActiveGraphicalView;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
+
+            // Active view and hidden elements
+            var activeView = uiDoc.ActiveGraphicalView;
             var hiddenElements = new List<Element>();
 
             // Ensure active view is editable
@@ -142,9 +129,9 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Get selected sheet Ids
             var selectedSheetIds = uiDoc.Ext_SelectedSheets()
@@ -157,13 +144,7 @@ namespace geeWiz.Cmds_Select
                 .ToList();
 
             // If elements were found, select them
-            if (titleBlocks.Count > 0)
-            {
-                uiDoc.Ext_SelectElements(titleBlocks);
-            }
-
-            // Either way, we are finished
-            return Result.Succeeded;
+            return uiDoc.Ext_SelectElements(titleBlocks);
         }
     }
 
@@ -180,9 +161,9 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Get selected elements which are not grouped
             var ungroupedElements = uiDoc.Ext_SelectedElements()

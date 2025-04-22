@@ -4,7 +4,6 @@ using View = Autodesk.Revit.DB.View;
 // geeWiz
 using ParameterHelper = geeWiz.Utilities.ParameterHelper;
 
-
 // The class belongs to the extensions namespace
 // Element element.ExtensionMethod()
 namespace geeWiz.Extensions
@@ -131,13 +130,27 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="element">An Element (extended).</param>
         /// <returns>An Element.</returns>
-        public static Element Ext_GetElementType(this Element element)
+        public static bool Ext_HasElementType(this Element element)
         {
             // Null check
-            if (element is null) { return null; }
+            if (element is null) { return false; }
+
+            // Return if type id is valid
+            return element.GetTypeId().Ext_IsValid();
+        }
+
+        /// <summary>
+        /// Returns the type of an element.
+        /// </summary>
+        /// <param name="element">An Element (extended).</param>
+        /// <returns>An Element.</returns>
+        public static Element Ext_GetElementType(this Element element)
+        {
+            // No type check
+            if (!element.Ext_HasElementType()) { return null; }
 
             // Return the element's type
-            return element.Document.GetElement(element.GetTypeId());
+            return element.GetTypeId().Ext_GetElement(element.Document);
         }
 
         /// <summary>
@@ -149,10 +162,10 @@ namespace geeWiz.Extensions
         public static T Ext_GetElementType<T>(this Element element)
         {
             // Null check
-            if (element is null) { return default(T); }
+            if (!element.Ext_HasElementType()) { return default(T); }
 
             // Get the element's type
-            var elementType = element.Document.GetElement(element.GetTypeId());
+            var elementType = element.GetTypeId().Ext_GetElement(element.Document);
 
             // If the element is of the type...
             if (elementType is T elementAsType)
@@ -165,20 +178,6 @@ namespace geeWiz.Extensions
                 // Otherwise, return default of T
                 return default(T);
             }
-        }
-
-        /// <summary>
-        /// Returns the type of an element.
-        /// </summary>
-        /// <param name="element">An Element (extended).</param>
-        /// <returns>An Element.</returns>
-        public static bool Ext_IsElementType(this Element element)
-        {
-            // Null check
-            if (element is null) { return false; }
-
-            // Return if it is an Element type
-            return element is ElementType;
         }
 
         /// <summary>
@@ -437,6 +436,50 @@ namespace geeWiz.Extensions
             // Set parameter value
             parameter.Set(value.Id);
             return Result.Succeeded;
+        }
+
+        #endregion
+
+        #region Get phase created/demolished
+
+        /// <summary>
+        /// Returns the Phase created of an element, if any.
+        /// </summary>
+        /// <param name="element">The element(extended).</param>
+        /// <returns>A Phase.</returns>
+        public static Phase Ext_GetPhaseCreated(this Element element)
+        {
+            // Null check
+            if (element is null) { return null; }
+
+            // Get parameter
+            var parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.PHASE_CREATED);
+
+            // Return null if it has no value or is invalid
+            if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
+
+            // Return the element
+            return parameter.AsElementId().Ext_GetElement<Phase>(element.Document);
+        }
+
+        /// <summary>
+        /// Returns the Phase demolished of an element, if any.
+        /// </summary>
+        /// <param name="element">The element(extended).</param>
+        /// <returns>A Phase.</returns>
+        public static Phase Ext_GetPhaseDemolished(this Element element)
+        {
+            // Null check
+            if (element is null) { return null; }
+
+            // Get parameter
+            var parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.PHASE_DEMOLISHED);
+
+            // Return null if it has no value or is invalid
+            if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
+
+            // Return the element
+            return parameter.AsElementId().Ext_GetElement<Phase>(element.Document);
         }
 
         #endregion

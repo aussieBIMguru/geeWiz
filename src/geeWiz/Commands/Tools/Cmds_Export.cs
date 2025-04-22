@@ -26,10 +26,10 @@ namespace geeWiz.Cmds_Export
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
-            View activeView = uiDoc.ActiveView;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
+            var activeView = uiDoc.ActiveView;
 
             // Ensure we have a schedule
             if (activeView is not ViewSchedule)
@@ -42,12 +42,12 @@ namespace geeWiz.Cmds_Export
 
             // Get table data and section data
             var viewSchedule = activeView as ViewSchedule;
-            TableData tableData = viewSchedule.GetTableData();
-            TableSectionData tableSectionData = tableData.GetSectionData(SectionType.Body);
+            var tableData = viewSchedule.GetTableData();
+            var tableSectionData = tableData.GetSectionData(SectionType.Body);
 
             // Count rows and columns
-            int rowCount = tableSectionData.NumberOfRows;
-            int colCount = tableSectionData.NumberOfColumns;
+            var rowCount = tableSectionData.NumberOfRows;
+            var colCount = tableSectionData.NumberOfColumns;
 
             // For each row...
             for (int r = 0; r < rowCount; r++)
@@ -75,7 +75,7 @@ namespace geeWiz.Cmds_Export
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Choose where to save the file");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
             var directoryPath = directoryResult.Object as string;
-            var filePath = $"{directoryPath}\\Export schedule.xlsx";
+            var filePath = Path.Combine(directoryPath, "Export schedule.xlsx");
 
             // Accessibility check if it exists
             if (File.Exists(filePath))
@@ -147,9 +147,9 @@ namespace geeWiz.Cmds_Export
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Check for alt fire
             var altFire = gScr.KeyHeldShift();
@@ -224,9 +224,9 @@ namespace geeWiz.Cmds_Export
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Check for alt fire
             var altFire = gScr.KeyHeldShift();

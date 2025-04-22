@@ -91,7 +91,7 @@ namespace geeWiz.Forms.Bases
             // If not cancelled and we want to show progress
             if (this.showProgress && !this.isCancelled)
             {
-                this.progressLabel.Text = $"{this.taskName} ({this.pbCount} of {this.pbTotal})";
+                this.progressLabel.Text = $"{this.taskName} {this.pbCount} of {this.pbTotal}";
             }
 
             // Process messages in queue

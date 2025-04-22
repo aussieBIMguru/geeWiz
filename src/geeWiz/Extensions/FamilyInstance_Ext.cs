@@ -23,7 +23,7 @@ namespace geeWiz.Extensions
 
         #endregion
 
-        #region Family / inplace
+        #region Properties
 
         /// <summary>
         /// Returns the family of a family instance.
@@ -45,6 +45,41 @@ namespace geeWiz.Extensions
         {
             if (familyInstance is null) { return false; }
             return familyInstance.Symbol.Family.IsInPlace;
+        }
+
+        /// <summary>
+        /// Returns if a family instance is nested.
+        /// </summary>
+        /// <param name="familyInstance">The familyinstance (extended).</param>
+        /// <returns>A Boolean.</returns>
+        public static bool Ext_IsNested(this FamilyInstance familyInstance)
+        {
+            // Null check
+            if (familyInstance is null) { return false; }
+
+            // Return if it has a super component
+            return familyInstance.SuperComponent is not null;
+        }
+
+        /// <summary>
+        /// Returns the super componet of a family instance, if any.
+        /// </summary>
+        /// <param name="familyInstance">The familyinstance (extended).</param>
+        /// <returns>A FamilyInstance.</returns>
+        public static FamilyInstance Ext_GetSuperComponent(this FamilyInstance familyInstance)
+        {
+            // Null check
+            if (familyInstance is null) { return null; }
+
+            // If super component is a family instance, return it
+            if (familyInstance.SuperComponent is FamilyInstance superComponent)
+            {
+                return superComponent;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         #endregion

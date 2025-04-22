@@ -260,7 +260,7 @@ namespace geeWiz.Extensions
             if (element is null) { return default; }
 
             // Get element type
-            var elementType = element.Document.GetElement(element.GetTypeId());
+            var elementType = element.Ext_GetElementType();
 
             // Return type parameter value
             return elementType.Ext_GetParameterValue<T>(parameterName);

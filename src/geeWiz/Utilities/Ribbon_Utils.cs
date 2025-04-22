@@ -36,13 +36,14 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Creates PushButtonData (to stack, generally).
         /// </summary>
+        /// <typeparam name="CommandClass">The related Command class.</typeparam>
         /// <param name="buttonName">The name for the button.</param>
-        /// <param name="commandClass">The command class path.</param>
-        /// <returns>A PushButtonData object.</returns>
-        public static PushButtonData NewPushButtonData(string buttonName, string commandClass)
+        /// <returns>A PushButtonData object</returns>
+        public static PushButtonData NewPushButtonData<CommandClass>(string buttonName)
         {
             // Strip the command class name to basics
-            string baseName = CommandClassToBaseName(commandClass);
+            var commandClass = typeof(CommandClass).FullName;
+            var baseName = CommandClassToBaseName(commandClass);
 
             // Make pushbuttondata
             var pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
@@ -60,12 +61,12 @@ namespace geeWiz.Utilities
         /// Creates PulldownButtonData (to stack, generally).
         /// </summary>
         /// <param name="buttonName">The name for the button.</param>
-        /// <param name="commandClass">The command class path.</param>
+        /// <param name="nameSpace">The namespace the commands relate to.</param>
         /// <returns>A PulldownButtonData object.</returns>
-        public static PulldownButtonData NewPulldownButtonData(string buttonName, string commandClass)
+        public static PulldownButtonData NewPulldownButtonData(string buttonName, string nameSpace)
         {
             // Strip the command class name to basics
-            string baseName = CommandClassToBaseName(commandClass);
+            string baseName = CommandClassToBaseName(nameSpace);
 
             // Make pushbuttondata
             var pulldownButtonData = new PulldownButtonData(baseName, buttonName);
@@ -90,7 +91,7 @@ namespace geeWiz.Utilities
         /// <param name="commandClass">The command class path.</param>
         /// <param name="availability">The availability string.</param>
         /// <returns>Void (nothing).</returns>
-        public static void AddButton_UiToggle(PulldownButton pulldownButton, string commandClass, string availability)
+        public static void AddButton_UiToggle<T>(PulldownButton pulldownButton, string availability)
         {
             // Add Dark/Light mode if in 2024 or higher
             #if REVIT2024_OR_GREATER
@@ -99,9 +100,8 @@ namespace geeWiz.Utilities
             Globals.IsDarkMode = UIThemeManager.CurrentTheme == UITheme.Dark;
 
             // Add UiToggle button
-            pulldownButton.Ext_AddPushButton(
+            pulldownButton.Ext_AddPushButton<T>(
                 buttonName: Globals.IsDarkMode ? "Light mode" : "Dark mode",
-                commandClass: commandClass,
                 availability: availability,
                 suffix: Globals.IsDarkMode ? "" : "_Dark");
 

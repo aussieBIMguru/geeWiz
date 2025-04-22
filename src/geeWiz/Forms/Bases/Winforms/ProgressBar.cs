@@ -43,7 +43,7 @@ namespace geeWiz.Forms.Bases
             InitializeComponent();
 
             // Initialize variables
-            this.pbCount = 0;
+            this.pbCount = 1;
             this.pbTotal = pbTotal;
             this.progressBarObj.Minimum = 0;
             this.progressBarObj.Maximum = this.pbTotal;
@@ -78,7 +78,7 @@ namespace geeWiz.Forms.Bases
         public void Increment()
         {
             // Increase the progress value
-            this.pbCount++;
+            if (this.pbCount < this.pbTotal) { this.pbCount++; }
             this.progressBarObj.Value = this.pbCount;
 
             // Decrement to fix the slow progress graphic

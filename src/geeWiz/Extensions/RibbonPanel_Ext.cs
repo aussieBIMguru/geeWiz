@@ -20,13 +20,14 @@ namespace geeWiz.Extensions
         /// <summary>
         /// Adds a Pushbutton to the panel.
         /// </summary>
+        /// <typeparam name="CommandClass">The related Command class.</typeparam>
         /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
         /// <param name="buttonName">The name for the button.</param>
-        /// <param name="commandClass">The command the button will run.</param>
         /// <param name="availability">The availability name.</param>
         /// <param name="suffix">The icon suffix (none by default).</param>
         /// <returns>A Pushbutton object.</returns>
-        public static PushButton Ext_AddPushButton(this RibbonPanel ribbonPanel, string buttonName, string commandClass, string availability = "", string suffix = "")
+        public static PushButton Ext_AddPushButton<CommandClass>(this RibbonPanel ribbonPanel,
+            string buttonName, string availability = "", string suffix = "")
         {
             // Return an error message if panel is null
             if (ribbonPanel == null)
@@ -36,7 +37,7 @@ namespace geeWiz.Extensions
             }
 
             // Make pushbuttondata
-            var pushButtonData = gRib.NewPushButtonData(buttonName, commandClass);
+            var pushButtonData = gRib.NewPushButtonData<CommandClass>(buttonName);
 
             // Make pushbutton, add to panel
             if (ribbonPanel.AddItem(pushButtonData) is PushButton pushButton)
@@ -53,7 +54,7 @@ namespace geeWiz.Extensions
             // Return an error message if it could not be made
             else
             {
-                Debug.WriteLine($"ERROR: Button could not be created ({commandClass})");
+                Debug.WriteLine($"ERROR: Button could not be created ({buttonName})");
                 return null;
             }
         }
@@ -67,10 +68,10 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="ribbonPanel">The RibbonPanel (extended).</param>
         /// <param name="buttonName">The displayed name of the pulldown.</param>
-        /// <param name="commandClass">The command the button will run.</param>
+        /// <param name="nameSpace">The namespace the button relates to.</param>
         /// <param name="suffix">The icon suffix (none by default).</param>
         /// <returns>A pulldownButton object.</returns>
-        public static PulldownButton Ext_AddPulldownButton(this RibbonPanel ribbonPanel, string buttonName, string commandClass, string suffix = "")
+        public static PulldownButton Ext_AddPulldownButton(this RibbonPanel ribbonPanel, string buttonName, string nameSpace, string suffix = "")
         {
             // Return an error message if panel is null
             if (ribbonPanel == null)
@@ -80,7 +81,7 @@ namespace geeWiz.Extensions
             }
 
             // Make pulldownButtonData
-            var pulldownButtonData = gRib.NewPulldownButtonData(buttonName, commandClass);
+            var pulldownButtonData = gRib.NewPulldownButtonData(buttonName, nameSpace);
 
             // Make pulldown, add to panel
             if (ribbonPanel.AddItem(pulldownButtonData) is PulldownButton pulldownButton)

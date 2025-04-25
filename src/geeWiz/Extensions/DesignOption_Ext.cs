@@ -18,7 +18,7 @@ namespace geeWiz.Extensions
         /// <param name="designOption">A DesignOption (extended).</param>
         /// <param name="includeId">Append the ElementId to the end.</param>
         /// <returns>A string.</returns>
-        public static string Ext_ToFamilyKey(this DesignOption designOption, bool includeId = false)
+        public static string Ext_ToDesignOptionKey(this DesignOption designOption, bool includeId = false)
         {
             // Null catch
             if (designOption is null) { return "???"; }

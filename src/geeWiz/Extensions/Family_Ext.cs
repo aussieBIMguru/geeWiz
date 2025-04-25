@@ -57,5 +57,30 @@ namespace geeWiz.Extensions
         }
 
         #endregion
+
+        #region Family document actions
+
+        /// <summary>
+        /// Opens a Family from a document.
+        /// </summary>
+        /// <param name="family">The family (extended).</param>
+        /// <returns>The family Document.</returns>
+        public static Document Ext_OpenFamilyAsDocument(this Family family)
+        {
+            // Null check
+            if (family is null) { return null; }
+
+            // Try to edit the family
+            try
+            {
+                return family.Document.EditFamily(family);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #endregion
     }
 }

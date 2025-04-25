@@ -343,5 +343,58 @@ namespace geeWiz.Utilities
         }
 
         #endregion
+
+        #region FamilyLoadOptions
+
+        /// <summary>
+        /// Family load options interfaced class.
+        /// </summary>
+        public class FamilyLoadOptions : IFamilyLoadOptions
+        {
+            // Private values to pass into
+            private readonly bool _overwriteValues;
+            private readonly bool _overwriteNested;
+
+            /// <summary>
+            /// Construct a FamilyLoadOptions object.
+            /// </summary>
+            /// <param name="overwriteValues">Overwrite parameter values.</param>
+            /// <param name="overwriteNested">Overwrite shared, nested families.</param>
+            public FamilyLoadOptions(bool overwriteValues = true, bool overwriteNested = false)
+            {
+                _overwriteValues = overwriteValues;
+                _overwriteNested = overwriteNested;
+            }
+
+            /// <summary>
+            /// Handle what to do if family already exists.
+            /// </summary>
+            /// <param name="familyInUse">If the family is in use.</param>
+            /// <param name="overwriteParameterValues">If parameters will be overwritten.</param>
+            /// <returns>A boolean.</returns>
+            public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues)
+            {
+                overwriteParameterValues = _overwriteValues;
+                return true;
+            }
+
+            /// <summary>
+            /// Handle what to do if a shared, nested family exists.
+            /// </summary>
+            /// <param name="sharedFamily">The nested family.</param>
+            /// <param name="familyInUse">If the family is in use.</param>
+            /// <param name="source">The FamilySource to use.</param>
+            /// <param name="overwriteParameterValues">If parameters will be overwritten.</param>
+            /// <returns>A boolean.</returns>
+            public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse,
+                out FamilySource source, out bool overwriteParameterValues)
+            {
+                source = _overwriteNested ? FamilySource.Family : FamilySource.Project;
+                overwriteParameterValues = _overwriteValues;
+                return true;
+            }
+        }
+
+        #endregion
     }
 }

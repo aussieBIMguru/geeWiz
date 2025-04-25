@@ -23,7 +23,7 @@ namespace geeWiz.Extensions
             // Return key with Id
             if (includeId)
             {
-                return $"{revision.SequenceNumber}: {revision.RevisionDate} - {revision.Description} [{revision.ToString()}]";
+                return $"{revision.SequenceNumber}: {revision.RevisionDate} - {revision.Description} [{revision.Id.ToString()}]";
             }
             // Return key without Id
             else

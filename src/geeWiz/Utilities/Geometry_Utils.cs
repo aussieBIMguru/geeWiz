@@ -33,5 +33,21 @@ namespace geeWiz.Utilities
         public static readonly Plane PLANE_XZ = Plane.CreateByNormalAndOrigin(AXIS_Y, POINT_ZERO);
 
         #endregion
+
+        #region SpatialElements
+
+        /// <summary>
+        /// Returns a boundary option for spatial elements (rooms etc.).
+        /// </summary>
+        /// <param name="boundaryLocation">A boundary location (finish by default).</param>
+        /// <returns>A SpatialElementBoundaryOptions object.</returns>
+        public static SpatialElementBoundaryOptions CreateSpaceBoundaryOptions(
+            SpatialElementBoundaryLocation boundaryLocation = SpatialElementBoundaryLocation.Finish)
+        {
+            // Return the optiuons
+            return new SpatialElementBoundaryOptions() { SpatialElementBoundaryLocation = boundaryLocation };
+        }
+
+        #endregion
     }
 }

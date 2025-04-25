@@ -1,8 +1,9 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
 using View = Autodesk.Revit.DB.View;
+using Category = Autodesk.Revit.DB.Category;
 // geeWiz
-using ParameterHelper = geeWiz.Utilities.ParameterHelper;
+using gPar = geeWiz.Utilities.Parameter_Utils;
 
 // The class belongs to the extensions namespace
 // Element element.ExtensionMethod()
@@ -297,9 +298,9 @@ namespace geeWiz.Extensions
         /// <param name="element">A Revit Element (extended).</param>
         /// <param name="parameterName">The parameter name to get.</param>
         /// <returns>A ParameterHelper object.</returns>
-        public static ParameterHelper Ext_GetParameterHelper(this Element element, string parameterName)
+        public static gPar.ParameterHelper Ext_GetParameterHelper(this Element element, string parameterName)
         {
-            return new ParameterHelper(element, parameterName);
+            return new gPar.ParameterHelper(element, parameterName);
         }
 
         /// <summary>
@@ -436,6 +437,63 @@ namespace geeWiz.Extensions
             // Set parameter value
             parameter.Set(value.Id);
             return Result.Succeeded;
+        }
+
+        #endregion
+
+        #region Design options
+
+        /// <summary>
+        /// Returns an Element's design option (if any).
+        /// </summary>
+        /// <param name="element">The Element (extended).</param>
+        /// <returns>A DesignOption.</returns>
+        public static DesignOption Ext_GetDesignOption(this Element element)
+        {
+            // Null check
+            if (element is null) { return null; }
+
+            // Get design option parameter, null check it
+            var parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.DESIGN_OPTION_ID);
+            if (parameter is null) { return null; }
+
+            // Return the design option
+            return parameter.AsElementId().Ext_GetElement<DesignOption>(element.Document);
+        }
+
+        /// <summary>
+        /// Returns if an Element is on a design option.
+        /// </summary>
+        /// <param name="element">The Element (extended).</param>
+        /// <returns>A Boolean.</returns>
+        public static bool Ext_IsOnDesignOption(this Element element)
+        {
+            // Null check
+            if (element is null) { return false; }
+
+            // Get design option parameter, null check it
+            return element.Ext_GetDesignOption() is not null;
+        }
+
+        /// <summary>
+        /// Returns if an Element is on a secondary design option.
+        /// </summary>
+        /// <param name="element">The Element (extended).</param>
+        /// <returns>A Boolean.</returns>
+        public static bool Ext_IsOnSecondaryDesignOption(this Element element)
+        {
+            // Null check
+            if (element is null) { return false; }
+
+            // Get design option, check if primary
+            if (element.Ext_GetDesignOption() is DesignOption designOption)
+            {
+                return !designOption.IsPrimary;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         #endregion

@@ -1,9 +1,9 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 using View = Autodesk.Revit.DB.View;
 // geeWiz
 using gFrm = geeWiz.Forms;
-using Autodesk.Revit.UI.Selection;
 
 // The class belongs to the extensions namespace
 // UIDocument uiDoc.ExtensionMethod()
@@ -25,11 +25,8 @@ namespace geeWiz.Extensions
         /// <returns>A Result.</returns>
         public static Result Ext_OpenView(this UIDocument uiDoc, View view, bool showMessage = true)
         {
-            // Ensure both are valid
-            if (uiDoc is null || view is null)
-            {
-                return Result.Failed;
-            }
+            // Null check
+            if (uiDoc is null || view is null) { return Result.Failed; }
 
             // Catch if view is already active and opened
             if (uiDoc.ActiveGraphicalView.Id == view.Id)
@@ -81,33 +78,26 @@ namespace geeWiz.Extensions
 
         #region Select element(s)
 
-        // Method overload - Select Elements / ElementIds
-
         /// <summary>
-        /// Set the current selection to given elements.
+        /// Set the current selection to given Elements.
         /// </summary>
         /// <param name="uiDoc">The UIDocument (extended).</param>
         /// <param name="elements">The elements to select.</param>
         /// <returns>A Result.</returns>
         public static Result Ext_SelectElements(this UIDocument uiDoc, List<Element> elements)
         {
-            // Ensure both are valid
+            // Null check
             if (uiDoc is null) { return Result.Failed; }
 
-            // Get element Ids as ICollection
-            var idsToSelect = elements
+            // Get element Ids to select
+            var elementIds = elements
                 .Select(e => e.Id)
                 .Where(i => i is not null)
                 .Distinct()
                 .ToList();
 
             // Select elements
-            if (idsToSelect.Count > 0)
-            {
-                uiDoc.Selection.SetElementIds(idsToSelect);
-            }
-
-            // Return success
+            uiDoc.Selection.SetElementIds(elementIds);
             return Result.Succeeded;
         }
 
@@ -117,25 +107,16 @@ namespace geeWiz.Extensions
         /// <param name="uiDoc">The UIDocument (extended).</param>
         /// <param name="elementIds">The element Ids to select.</param>
         /// <returns>A Result.</returns>
-        public static Result Ext_SelectElements(this UIDocument uiDoc, List<ElementId> elementIds)
+        public static Result Ext_SelectElementIds(this UIDocument uiDoc, List<ElementId> elementIds)
         {
-            // Ensure both are valid
-            if (uiDoc is null)
-            {
-                return Result.Failed;
-            }
+            // Null check
+            if (uiDoc is null) { return Result.Failed; }
 
             // Select elements
-            if (elementIds.Count > 0)
-            {
-                uiDoc.Selection.SetElementIds(elementIds);
-            }
-
-            // Return success
+            uiDoc.Selection.SetElementIds(elementIds);
             return Result.Succeeded;
         }
 
-        // Method overload - Select Element
         /// <summary>
         /// Set the current selection to given element.
         /// </summary>
@@ -144,21 +125,26 @@ namespace geeWiz.Extensions
         /// <returns>A Result.</returns>
         public static Result Ext_SelectElement(this UIDocument uiDoc, Element element)
         {
+            // Null check
+            if (uiDoc is null) { return Result.Failed; }
+
             // Run the elements method using a new list
             return Ext_SelectElements(uiDoc, new List<Element>() { element });
         }
 
-        // Method overload - Select Element
         /// <summary>
         /// Set the current selection to given ElementId.
         /// </summary>
         /// <param name="uiDoc">The UIDocument (extended).</param>
         /// <param name="elementId">The ElementId to select.</param>
         /// <returns>A Result.</returns>
-        public static Result Ext_SelectElement(this UIDocument uiDoc, ElementId elementId)
+        public static Result Ext_SelectElementId(this UIDocument uiDoc, ElementId elementId)
         {
+            // Null check
+            if (uiDoc is null) { return Result.Failed; }
+
             // Run the elementIds method using a new list
-            return Ext_SelectElements(uiDoc, new List<ElementId>() { elementId });
+            return Ext_SelectElementIds(uiDoc, new List<ElementId>() { elementId });
         }
 
         #endregion
@@ -172,6 +158,9 @@ namespace geeWiz.Extensions
         /// <returns>A list of elements.</returns>
         public static List<Element> Ext_SelectedElements(this UIDocument uiDoc)
         {
+            // Null check
+            if (uiDoc is null) { return new List<Element>(); }
+            
             // Get selected elements
             return uiDoc.Selection.GetElementIds()
                 .Select(i => uiDoc.Document.GetElement(i))
@@ -180,44 +169,20 @@ namespace geeWiz.Extensions
         }
 
         /// <summary>
-        /// Gets currently selected sheets.
+        /// Gets currently selected elements of a given type.
         /// </summary>
+        /// <typeparam name="T">The type of elements to get.</typeparam>
         /// <param name="uiDoc">The active UIDocument (extended).</param>
-        /// <returns>A list of sheets.</returns>
-        public static List<ViewSheet> Ext_SelectedSheets(this UIDocument uiDoc)
+        /// <returns>A list of elements.</returns>
+        public static List<T> Ext_SelectedElements<T>(this UIDocument uiDoc)
         {
-            // Get selected sheets
-            return uiDoc.Ext_SelectedElements()
-                .Where(e => e is ViewSheet)
-                .Cast<ViewSheet>()
-                .ToList();
-        }
+            // Null check
+            if (uiDoc is null) { return new List<T>(); }
 
-        /// <summary>
-        /// Gets currently selected views
-        /// </summary>
-        /// <param name="uiDoc">The active UIDocument (extended).</param>
-        /// <returns>A list of views.</returns>
-        public static List<View> Ext_SelectedViews(this UIDocument uiDoc)
-        {
-            // Get selected views
+            // Return selected elements of type
             return uiDoc.Ext_SelectedElements()
-                .Where(e => e is View)
-                .Cast<View>()
-                .ToList();
-        }
-
-        /// <summary>
-        /// Gets currently selected rooms.
-        /// </summary>
-        /// <param name="uiDoc">The active UIDocument (extended).</param>
-        /// <returns>A list of rooms.</returns>
-        public static List<SpatialElement> Ext_SelectedRooms(this UIDocument uiDoc)
-        {
-            // Get selected views
-            return uiDoc.Ext_SelectedElements()
-                .Where(e => e is Autodesk.Revit.DB.Architecture.Room)
-                .Cast<SpatialElement>()
+                .OfType<T>()
+                .Cast<T>()
                 .ToList();
         }
 

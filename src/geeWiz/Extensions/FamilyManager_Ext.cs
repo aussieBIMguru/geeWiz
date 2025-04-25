@@ -10,7 +10,7 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class FamilyManager_Ext
     {
-        #region Current type
+        #region Get/set current type
 
         /// <summary>
         /// Returns the current family type.
@@ -44,7 +44,7 @@ namespace geeWiz.Extensions
 
         #endregion
 
-        #region Family types
+        #region Get types
 
         /// <summary>
         /// Gets all types in the family.
@@ -53,25 +53,45 @@ namespace geeWiz.Extensions
         /// <returns> A list of FamilyTypes.</returns>
         public static List<FamilyType> Ext_GetFamilyTypes(this FamilyManager familyManager)
         {
-            // Empty list of types
-            var familyTypes = new List<FamilyType>();
-            
             // Null check
-            if (familyManager is null) { return familyTypes; }
+            if (familyManager is null) { return new List<FamilyType>(); }
+
+            // Return all types
+            return familyManager.Types
+                .Cast<FamilyType>()
+                .Where(t => t is not null)
+                .Where(t => !t.Name.IsNullOrEmpty())
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets a family type by name.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended).</param>
+        /// <param name="typeName">The type name to find.</param>
+        /// <returns>A FamilyType.</returns>
+        public static FamilyType Ext_GetFamilyTypeByName(this FamilyManager familyManager, string typeName)
+        {
+            // Null check
+            if (familyManager is null || typeName is null) { return null; }
 
             // Get and reset the iterator
             var familyTypeSet = familyManager.Types;
             var typesIterator = familyTypeSet.ForwardIterator();
             typesIterator.Reset();
 
-            // Get all types
+            // Iterate until we find it
             while (typesIterator.MoveNext())
             {
-                familyTypes.Add(typesIterator.Current as FamilyType);
+                var familyType = typesIterator.Current as FamilyType;
+                if (familyType.Name == typeName)
+                {
+                    return familyType;
+                }
             }
 
-            // Return all types
-            return familyTypes;
+            // Return null if we did not find it
+            return null;
         }
 
         #endregion
@@ -85,25 +105,14 @@ namespace geeWiz.Extensions
         /// <returns>A list of FamilyParameters.</returns>
         public static List<FamilyParameter> Ext_GetFamilyParameters(this FamilyManager familyManager)
         {
-            // Empty list of parameters
-            var familyParameters = new List<FamilyParameter>();
-
             // Null check
-            if (familyManager is null) { return familyParameters; }
+            if (familyManager is null) { return new List<FamilyParameter>(); }
 
-            // Get and reset the iterator
-            var familyParmeterSet = familyManager.Parameters;
-            var parametersIterator = familyParmeterSet.ForwardIterator();
-            parametersIterator.Reset();
-
-            // Get all parameters
-            while (parametersIterator.MoveNext())
-            {
-                familyParameters.Add(parametersIterator.Current as FamilyParameter);
-            }
-
-            // Return all parameters
-            return familyParameters;
+            // Return all types
+            return familyManager.Parameters
+                .Cast<FamilyParameter>()
+                .Where(p => p is not null)
+                .ToList();
         }
 
         /// <summary>
@@ -134,6 +143,69 @@ namespace geeWiz.Extensions
 
             // Return null if we did not find it
             return null;
+        }
+
+        #endregion
+
+        #region Add parameters
+
+        /// <summary>
+        /// Adds a new shared parameter to a family document.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended).</param>
+        /// <param name="definition">The shared parameter definition.</param>
+        /// <param name="groupType">The GroupType to put the parameter under.</param>
+        /// <param name="instance">If the parameter should be instance based.</param>
+        /// <returns>A FamilyParameter.</returns>
+        public static FamilyParameter Ext_AddSharedParameter(this FamilyManager familyManager,
+            ExternalDefinition definition, ForgeTypeId groupType, bool instance)
+        {
+            // Catch nulls (GroupType is "Other" if null)
+            if (familyManager is null || definition is null) { return null; }
+            
+            // Make sure parameter does not exist by name
+            if (familyManager.Ext_GetFamilyParameterByName(definition.Name) is not null) { return null; }
+
+            // Try to add the parameter
+            try
+            {
+                // Return the new parameter if successful
+                return familyManager.AddParameter(definition, groupType, instance);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds a new shared parameter to a family document.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended).</param>
+        /// <param name="parameterName">The name of the family parameter to make.</param>
+        /// <param name="groupType">The GroupType to put the parameter under.</param>
+        /// <param name="specType">The SpecType of the new parameter.</param>
+        /// <param name="instance">If the parameter should be instance based.</param>
+        /// <returns>A FamilyParameter.</returns>
+        public static FamilyParameter Ext_AddFamilyParameter(this FamilyManager familyManager,
+            string parameterName, ForgeTypeId groupType, ForgeTypeId specType, bool instance)
+        {
+            // Catch nulls (GroupType is "Other" if null)
+            if (familyManager is null || parameterName is null || specType is null) { return null; }
+
+            // Make sure parameter does not exist by name
+            if (familyManager.Ext_GetFamilyParameterByName(parameterName) is not null) { return null; }
+
+            // Try to add the parameter
+            try
+            {
+                // Return the new parameter if successful
+                return familyManager.AddParameter(parameterName, groupType, specType, instance);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         #endregion

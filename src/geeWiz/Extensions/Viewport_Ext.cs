@@ -10,6 +10,9 @@ namespace geeWiz.Extensions
     /// </summary>
     public static class Viewport_Ext
     {
+        // Category of base point for view isolation
+        private static readonly ElementId CATEGORYID_BASEPOINT = new ElementId(BuiltInCategory.OST_ProjectBasePoint);
+
         #region Owner view and sheet
 
         /// <summary>
@@ -38,6 +41,35 @@ namespace geeWiz.Extensions
 
             // Return view
             return viewport.SheetId.Ext_GetElement(viewport.Document) as ViewSheet;
+        }
+
+        #endregion
+
+        #region Box centre
+
+        /// <summary>
+        /// Get the box centre of a viewport.
+        /// </summary>
+        /// <param name="viewport">The viewport (extended).</param>
+        /// <param name="doc">A document (optional).</param>
+        /// <returns>An XYZ.</returns>
+        public static XYZ Ext_GetViewportCentre(this Viewport viewport, Document doc = null)
+        {
+            // Get document if null
+            doc ??= viewport.Document;
+
+            // Isolate all elements in viewports view
+            var viewportView = viewport.ViewId.Ext_GetElement<View>(doc);
+            viewportView.IsolateCategoryTemporary(CATEGORYID_BASEPOINT);
+
+            // Get actual box centre
+            var vpBoxCenter = viewport.GetBoxCenter();
+
+            // Disable temporary view override
+            viewportView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+
+            // Return box centre
+            return vpBoxCenter;
         }
 
         #endregion

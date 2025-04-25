@@ -134,7 +134,7 @@ namespace geeWiz.Cmds_Select
             var doc = uiDoc.Document;
 
             // Get selected sheet Ids
-            var selectedSheetIds = uiDoc.Ext_SelectedSheets()
+            var selectedSheetIds = uiDoc.Ext_SelectedElements<ViewSheet>()
                 .Select(s => s.Id)
                 .ToList();
 

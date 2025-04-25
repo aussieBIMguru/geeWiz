@@ -1,8 +1,11 @@
-﻿// Revit API
+﻿// System
+using System.IO;
+// Revit API
 using View = Autodesk.Revit.DB.View;
 using Autodesk.Revit.UI;
 // geeWiz
 using gFrm = geeWiz.Forms;
+using gFil = geeWiz.Utilities.File_Utils;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
 
@@ -33,6 +36,172 @@ namespace geeWiz.Extensions
                 return elementId.Ext_GetElement<View>(doc);
             }
             else
+            {
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region Family document actions
+
+        /// <summary>
+        /// Returns if a document is a family document.
+        /// </summary>
+        /// <param name="doc">The document (extended).</param>
+        /// <returns>A boolean.</returns>
+        public static bool Ext_IsFamilyDocument(this Document doc)
+        {
+            // Null and non-family document checks
+            if (doc is null) { return false; }
+
+            // Return if document is family
+            return doc.IsFamilyDocument;
+        }
+
+        /// <summary>
+        /// Closes a document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="save">If the document is to be saved.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_CloseFamilyDocument (this Document doc, bool save = false)
+        {
+            // Null and non-family document checks
+            if (!doc.Ext_IsFamilyDocument()) { return Result.Failed; }
+
+            // Try to close the document
+            try
+            {
+                doc.Close(save);
+                return Result.Succeeded;
+            }
+            catch
+            {
+                return Result.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Saves a document to a file path, with the option to close afterwards.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="filePath">The filepath to save the document to.</param>
+        /// <param name="options">SaveAsOptions (optional).</param>
+        /// <param name="closeAfterSaving">Close afterwards (without saving).</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_SaveAsFamilyFile(this Document doc, string filePath,
+            SaveAsOptions options = null, bool closeAfterSaving = false)
+        {
+            // Null and non-family document checks
+            if (!doc.Ext_IsFamilyDocument()) { return Result.Failed; }
+
+            // Default options
+            options ??= new SaveAsOptions() { OverwriteExistingFile = true };
+
+            // Save result
+            Result saveResult;
+
+            // Try to save the document
+            try
+            {
+                doc.SaveAs(filePath, options);
+                saveResult = Result.Succeeded;
+            }
+            catch
+            {
+                saveResult = Result.Failed;
+            }
+
+            // Optionally close the document
+            if (closeAfterSaving)
+            {
+                saveResult = doc.Ext_CloseFamilyDocument(save: false);
+            }
+
+            // Return if we saved successfully
+            return saveResult;
+        }
+
+        /// <summary>
+        /// Loads a family document into the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="familyDoc">The family document to load.</param>
+        /// <param name="options">The IFamilyLoadOptions.</param>
+        /// <returns>A Result.</returns>
+        public static Result Ext_LoadFamilyDocument(this Document doc, Document familyDoc, IFamilyLoadOptions options = null)
+        {
+            // Null check, ensure document is a family
+            if (doc is null || !familyDoc.Ext_IsFamilyDocument()) { return Result.Failed; }
+
+            // Default options
+            options ??= new gFil.FamilyLoadOptions(true, false);
+
+            // Try to load the family
+            try
+            {
+                familyDoc.LoadFamily(doc, options);
+                return Result.Succeeded;
+            }
+            catch
+            {
+                return Result.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Loads a family into the document from a file path.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="filePath">The filepath to load from.</param>
+        /// <param name="options">The IFamilyLoadOptions.</param>
+        /// <returns>The loaded Family.</returns>
+        public static Family Ext_LoadFamilyFromPath(this Document doc, string filePath, IFamilyLoadOptions options = null)
+        {
+            // Null check, ensure file exists
+            if (doc is null || !File.Exists(filePath)) { return null; }
+
+            // Default options
+            options ??= new gFil.FamilyLoadOptions(true, false);
+
+            // Try to load and return the family
+            try
+            {
+                if (doc.LoadFamily(filePath, options, out Family family))
+                {
+                    return family;
+                }
+            }
+            catch
+            {
+                ;
+            }
+
+            // If we got here, we failed to load
+            return null;
+        }
+
+        /// <summary>
+        /// Opens a Family from a document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="family">The family to edit.</param>
+        /// <returns>The family Document.</returns>
+        public static Document Ext_OpenFamilyAsDocument(this Document doc, Family family)
+        {
+            // Null checks
+            if (doc is null || family is null) { return null; }
+
+            // Make sure the family is from that document
+            if (doc != family.Document) { return null; }
+            
+            // Try to edit the family
+            try
+            {
+                return doc.EditFamily(family);
+            }
+            catch
             {
                 return null;
             }
@@ -258,6 +427,117 @@ namespace geeWiz.Extensions
                 .ToList();
         }
 
+        /// <summary>
+        /// Collects all elements of a given class.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="view">A Revit view.</param>
+        /// <returns>A list of elements of type T.</returns>
+        public static List<T> Ext_GetElementsOfClass<T>(this Document doc, View view = null)
+        {
+            return doc.Ext_Collector(view)
+                .OfClass(typeof(T))
+                .WhereElementIsNotElementType()
+                .Cast<T>()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Collects all types of a given class.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="view">A Revit view.</param>
+        /// <returns>A list of types of type T.</returns>
+        public static List<T> Ext_GetTypessOfClass<T>(this Document doc, View view = null)
+        {
+            return doc.Ext_Collector(view)
+                .OfClass(typeof(T))
+                .WhereElementIsElementType()
+                .Cast<T>()
+                .ToList();
+        }
+
+        #endregion
+
+        #region Phases and options
+
+        /// <summary>
+        /// Collect all phases in a document.
+        /// </summary>
+        /// <param name="doc">The Revit document (extended).</param>
+        /// <param name="sorted">Sort the phases by name.</param>
+        /// <returns>A list of Phases.</returns>
+        public static List<Phase> Ext_GetPhases(this Document doc, bool sorted = false)
+        {
+            // Get phases
+            var phases = doc.Phases
+                .Cast<Phase>()
+                .ToList();
+
+            // Return sorted or unsorted
+            if (sorted)
+            {
+                return phases
+                    .OrderBy(p => p.Name)
+                    .ToList();
+            }
+            else
+            {
+                return phases;
+            }
+        }
+
+        /// <summary>
+        /// Collect all DesignOptions in the document.
+        /// </summary>
+        /// <param name="doc">The Revit document (extended).</param>
+        /// <param name="sorted">Sort the options by name.</param>
+        /// <returns>A list of DesignOptions.</returns>
+        public static List<DesignOption> Ext_GetDesignOptions(this Document doc, bool sorted = false)
+        {
+            // Get options
+            var designOptions = doc.Ext_GetElementsOfClass<DesignOption>();
+
+            // Return sorted or unsorted
+            if (sorted)
+            {
+                return designOptions
+                    .OrderBy(d => d.Ext_GetDesignOptionSetName())
+                    .ToList();
+            }
+            else
+            {
+                return designOptions;
+            }
+        }
+
+        /// <summary>
+        /// Collect all DesignOption sets in the document.
+        /// </summary>
+        /// <param name="doc">The Revit document (extended).</param>
+        /// <param name="sorted">Sort the sets by name.</param>
+        /// <returns>A list of Elements.</returns>
+        public static List<Element> Ext_GetDesignOptionSets(this Document doc, bool sorted = false)
+        {
+            // Get option sets
+            var designOptionSets = doc.Ext_GetElementsOfClass<DesignOption>()
+                .Select(d => d.Ext_GetDesignOptionSet())
+                .Distinct()
+                .ToList();
+
+            // Return sorted or unsorted
+            if (sorted)
+            {
+                return designOptionSets
+                    .OrderBy(d => d.Name)
+                    .ToList();
+            }
+            else
+            {
+                return designOptionSets;
+            }
+        }
+
         #endregion
 
         #region Sheet collector/selection
@@ -272,11 +552,7 @@ namespace geeWiz.Extensions
         public static List<ViewSheet> Ext_GetSheets(this Document doc, bool sorted = false, bool includePlaceholders = false)
         {
             // Collect all viewsheets in document
-            var sheets = doc.Ext_Collector()
-                .OfClass(typeof(ViewSheet))
-                .ToElements()
-                .Cast<ViewSheet>()
-                .ToList();
+            var sheets = doc.Ext_GetElementsOfClass<ViewSheet>();
 
             // Filter our placeholders if not desired
             if (!includePlaceholders)
@@ -317,7 +593,7 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Sheet(s):" : "Select a sheet";
 
             // Get all Sheets in document if none provided
-            sheets ??= doc.Ext_GetSheets(sorted: sorted);
+            sheets ??= doc.Ext_GetSheets(sorted: sorted, includePlaceholders: includePlaceholders);
 
             // Process into keys (to return)
             var keys = sheets
@@ -353,10 +629,7 @@ namespace geeWiz.Extensions
             viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
             
             // Collect all views in document
-            var views = doc.Ext_Collector()
-                .OfClass(typeof(View))
-                .WhereElementIsNotElementType()
-                .Cast<View>()
+            var views = doc.Ext_GetElementsOfClass<View>()
                 .Where(v => !v.IsTemplate && viewTypes.Contains(v.ViewType))
                 .ToList();
 
@@ -427,10 +700,7 @@ namespace geeWiz.Extensions
             viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
 
             // Collect all view templates in document
-            var viewTemplates = doc.Ext_Collector()
-                .OfClass(typeof(View))
-                .WhereElementIsNotElementType()
-                .Cast<View>()
+            var viewTemplates = doc.Ext_GetElementsOfClass<View>()
                 .Where(v => v.IsTemplate)
                 .ToList();
 
@@ -488,9 +758,7 @@ namespace geeWiz.Extensions
             viewFamilies ??= gView.VIEWFAMILIES_GRAPHICAL;
 
             // Collect all viewsfamilytypes in document
-            var viewFamilyTypes = doc.Ext_Collector()
-                .OfClass(typeof(ViewFamilyType))
-                .Cast<ViewFamilyType>()
+            var viewFamilyTypes = doc.Ext_GetElementsOfClass<ViewFamilyType>()
                 .Where(vft => viewFamilies.Contains(vft.ViewFamily))
                 .ToList();
 
@@ -789,8 +1057,7 @@ namespace geeWiz.Extensions
             bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Collect all rooms in document
-            var rooms = doc.Ext_Collector(view)
-                .OfCategory(BuiltInCategory.OST_Rooms)
+            var rooms = doc.Ext_GetElementsOfCategory(BuiltInCategory.OST_Rooms, view)
                 .Cast<SpatialElement>()
                 .ToList();
 
@@ -927,6 +1194,123 @@ namespace geeWiz.Extensions
                 values: values,
                 title: title,
                 multiSelect: multiSelect);
+        }
+
+        #endregion
+
+        #region Revit/CAD link collectors
+
+        /// <summary>
+        /// Gets all Revit link instances in the given document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="sorted">Sort the Link instances by name.</param>
+        /// <returns>A list of RevitLinkInstances.</returns>
+        public static List<RevitLinkInstance> Ext_CollectRevitLinkInstances(this  Document doc, bool sorted = false)
+        {
+            // Collect all link instances in document
+            var revitLinkInstances = doc.Ext_GetElementsOfClass<RevitLinkInstance>();
+
+            // Return the link instances sorted or unsorted
+            if (sorted)
+            {
+                return revitLinkInstances
+                    .OrderBy(l => $"{l.Name}{l.Id}")
+                    .ToList();
+            }
+            else
+            {
+                return revitLinkInstances;
+            }
+        }
+
+        /// <summary>
+        /// Gets all CAD link instances in the given document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="includeLinked">Include linked instances.</param>
+        /// <param name="includeImported">Include imported instances.</param>
+        /// <param name="sorted">Sort the Link instances by name.</param>
+        /// <returns>A list of ImportInstances.</returns>
+        public static List<ImportInstance> Ext_CollectCadInstances(this Document doc, bool includeLinked = true,
+            bool includeImported = true, bool sorted = false)
+        {
+            // Collect all link instances in document
+            var cadLinkInstances = doc.Ext_GetElementsOfClass<ImportInstance>();
+
+            // Filter out imported and/or linked
+            if (!includeImported)
+            {
+                cadLinkInstances = cadLinkInstances
+                    .Where(c => c.IsLinked)
+                    .ToList();
+            }
+            if (!includeLinked)
+            {
+                cadLinkInstances = cadLinkInstances
+                    .Where(c => !c.IsLinked)
+                    .ToList();
+            }
+
+            // Return the link instances sorted or unsorted
+            if (sorted)
+            {
+                return cadLinkInstances
+                    .OrderBy(l => $"{l.Name}{l.Id}")
+                    .ToList();
+            }
+            else
+            {
+                return cadLinkInstances;
+            }
+        }
+
+        /// <summary>
+        /// Gets all Revit link types in the given document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="sorted">Sort the Link types by name.</param>
+        /// <returns>A list of RevitLinkTypes.</returns>
+        public static List<RevitLinkType> Ext_CollectRevitLinkTypes(this Document doc, bool sorted = false)
+        {
+            // Collect all link types in document
+            var revitLinkTypes = doc.Ext_GetElementsOfClass<RevitLinkType>();
+
+            // Return the link types sorted or unsorted
+            if (sorted)
+            {
+                return revitLinkTypes
+                    .OrderBy(l => $"{l.Name}{l.Id}")
+                    .ToList();
+            }
+            else
+            {
+                return revitLinkTypes;
+            }
+        }
+
+        /// <summary>
+        /// Gets all CAD link types in the given document.
+        /// </summary>
+        /// <param name="doc">A Revit document (extended).</param>
+        /// <param name="sorted">Sort the Link types by name.</param>
+        /// <returns>A list of CADLinkTypes.</returns>
+        public static List<CADLinkType> Ext_CollectCadLinkTypes(this Document doc, bool sorted = false)
+        {
+            // Collect all link types in document
+            var cadLinkTypes = doc.Ext_GetElementsOfClass<CADLinkType>();
+
+            // Return the link types sorted or unsorted
+            if (sorted)
+            {
+                return cadLinkTypes
+                    .OrderBy(l => $"{l.Name}{l.Id}")
+                    .ToList();
+            }
+            else
+            {
+                return cadLinkTypes;
+            }
         }
 
         #endregion

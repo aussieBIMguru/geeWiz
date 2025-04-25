@@ -1,4 +1,7 @@
-﻿// The class belongs to the utility namespace
+﻿// geeWiz
+using gPar = geeWiz.Utilities.Parameter_Utils;
+
+// The class belongs to the utility namespace
 // using gCnv = geeWiz.Utilities.Convert_Utils
 namespace geeWiz.Utilities
 {
@@ -222,6 +225,82 @@ namespace geeWiz.Utilities
             // Return the IntegerValue
             return elementId.IntegerValue;
             #endif
+        }
+
+        #endregion
+
+        #region ForgeTypeIds by name
+
+        /// <summary>
+        /// Gets a GroupType with a given name ("Other" = null).
+        /// </summary>
+        /// <param name="name">The name to get.</param>
+        /// <param name="forgeTypeIds">An optional list of ForgeTypeIds.</param>
+        /// <returns>A ForgeTypeId.</returns>
+        public static ForgeTypeId GroupTypeByName(string name, List<ForgeTypeId> forgeTypeIds = null)
+        {
+            // Catch other
+            if (name == "Other" || name is null) { return null; }
+
+            // Get ForgeTypeIds if needed
+            forgeTypeIds ??= gPar.GetGroupTypeIds();
+
+            // For each forgetypeId...
+            foreach (var forgeTypeId in forgeTypeIds)
+            {
+                // Given it might be a non group type Id, try
+                try
+                {
+                    // If the name matches, return it
+                    if (LabelUtils.GetLabelForGroup(forgeTypeId) == name)
+                    {
+                        return forgeTypeId;
+                    }
+                }
+                catch
+                {
+                    ;
+                }
+            }
+
+            // Return null (technically, "Other" group)
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a SpecType with a given name.
+        /// </summary>
+        /// <param name="name">The name to get.</param>
+        /// <param name="forgeTypeIds">An optional list of SpecTypeIds.</param>
+        /// <returns>A ForgeTypeId.</returns>
+        public static ForgeTypeId SpecTypeByName(string name, List<ForgeTypeId> forgeTypeIds = null)
+        {
+            // Catch null
+            if (name is null) { return null; }
+
+            // Get SpecTypeIds if needed
+            forgeTypeIds ??= gPar.GetSpecTypeIds();
+
+            // For each forgetypeId...
+            foreach (var forgeTypeId in forgeTypeIds)
+            {
+                // Given it might be a non group type Id, try
+                try
+                {
+                    // If the name matches, return it
+                    if (LabelUtils.GetLabelForSpec(forgeTypeId) == name)
+                    {
+                        return forgeTypeId;
+                    }
+                }
+                catch
+                {
+                    ;
+                }
+            }
+
+            // Return invalid
+            return null;
         }
 
         #endregion

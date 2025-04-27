@@ -159,7 +159,7 @@ namespace geeWiz.Extensions
             try
             {
                 var family = familyDoc.LoadFamily(doc, options);
-                processingOutcome.SetValues(family: family);
+                processingOutcome.SetValues(relatedFamily: family);
                 return processingOutcome;
             }
             catch
@@ -195,7 +195,7 @@ namespace geeWiz.Extensions
             {
                 if (doc.LoadFamily(filePath, options, out Family family))
                 {
-                    processingOutcome.SetValues(family: family);
+                    processingOutcome.SetValues(relatedFamily: family);
                     return processingOutcome;
                 }
             }

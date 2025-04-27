@@ -27,7 +27,7 @@ namespace geeWiz.Extensions
             if (familyManager is null) { return processingOutcome; }
 
             // Set current type
-            processingOutcome.SetValues(familyType: familyManager.CurrentType);
+            processingOutcome.SetValues(relatedType: familyManager.CurrentType);
             return processingOutcome;
         }
 
@@ -47,7 +47,7 @@ namespace geeWiz.Extensions
 
             // Set the current type
             familyManager.CurrentType = familyType;
-            processingOutcome.SetValues(familyType: familyType);
+            processingOutcome.SetValues(relatedType: familyType);
 
             // Return processing outcome
             return processingOutcome;
@@ -71,14 +71,14 @@ namespace geeWiz.Extensions
             if (familyManager is null) { return processingOutcome; }
 
             // Get family types
-            processingOutcome.RelatedTypes = familyManager.Types
+            var familyTypes = familyManager.Types
                 .Cast<FamilyType>()
                 .Where(t => t is not null)
                 .Where(t => !t.Name.IsNullOrEmpty())
                 .ToList();
 
             // Return successful outcome
-            processingOutcome.SetSuccess();
+            processingOutcome.SetValues(relatedTypes: familyTypes);
             return processingOutcome;
         }
 
@@ -104,7 +104,7 @@ namespace geeWiz.Extensions
             {
                 if (gDat.FindItemAtKey<FamilyType>(typeName, types, typeNames) is FamilyType familyType)
                 {
-                    processingOutcome.SetValues(familyType: familyType);
+                    processingOutcome.SetValues(relatedType: familyType);
                     return processingOutcome;
                 }
             }
@@ -120,7 +120,7 @@ namespace geeWiz.Extensions
                 var familyType = typesIterator.Current as FamilyType;
                 if (familyType.Name == typeName)
                 {
-                    processingOutcome.SetValues(familyType: familyType);
+                    processingOutcome.SetValues(relatedType: familyType);
                     return processingOutcome;
                 }
             }
@@ -148,13 +148,13 @@ namespace geeWiz.Extensions
             if (familyManager is null) { return processingOutcome; }
 
             // Get parameters
-            processingOutcome.RelatedParameters = familyManager.Parameters
+            var familyParameters = familyManager.Parameters
                 .Cast<FamilyParameter>()
                 .Where(p => p is not null)
                 .ToList();
 
             // Return successful outcome
-            processingOutcome.SetSuccess();
+            processingOutcome.SetValues(relatedParameters: familyParameters);
             return processingOutcome;
         }
 
@@ -180,7 +180,7 @@ namespace geeWiz.Extensions
             {
                 if (gDat.FindItemAtKey<FamilyParameter>(parameterName, parameters, parameterNames) is FamilyParameter familyParameter)
                 {
-                    processingOutcome.SetValues(familyParameter: familyParameter);
+                    processingOutcome.SetValues(relatedParameter: familyParameter);
                     return processingOutcome;
                 }
             }
@@ -196,7 +196,7 @@ namespace geeWiz.Extensions
                 var familyParameter = parametersIterator.Current as FamilyParameter;
                 if (familyParameter.Definition.Name == parameterName)
                 {
-                    processingOutcome.SetValues(familyParameter: familyParameter);
+                    processingOutcome.SetValues(relatedParameter: familyParameter);
                     return processingOutcome;
                 }
             }
@@ -228,7 +228,7 @@ namespace geeWiz.Extensions
             // Make sure parameter is not shared
             if (familyParameter.IsShared)
             {
-                processingOutcome.SetValues(familyParameter: familyParameter, setSuccess: false);
+                processingOutcome.SetValues(relatedParameter: familyParameter, setSuccess: false);
                 processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_RENAMESHARED;
                 return processingOutcome;
             }
@@ -289,7 +289,7 @@ namespace geeWiz.Extensions
             try
             {
                 var newParameter = familyManager.AddParameter(definition, groupType, instance);
-                processingOutcome.SetValues(familyParameter: newParameter);
+                processingOutcome.SetValues(relatedParameter: newParameter);
                 return processingOutcome;
             }
             catch
@@ -331,7 +331,7 @@ namespace geeWiz.Extensions
             try
             {
                 var newParameter = familyManager.AddParameter(parameterName, groupType, specType, instance);
-                processingOutcome.SetValues(familyParameter: newParameter);
+                processingOutcome.SetValues(relatedParameter: newParameter);
                 return processingOutcome;
             }
             catch
@@ -382,7 +382,7 @@ namespace geeWiz.Extensions
             try
             {
                 var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
-                processingOutcome.SetValues(familyParameter: newParameter);
+                processingOutcome.SetValues(relatedParameter: newParameter);
                 return processingOutcome;
             }
             catch
@@ -436,7 +436,7 @@ namespace geeWiz.Extensions
             try
             {
                 var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
-                processingOutcome.SetValues(familyParameter: newParameter);
+                processingOutcome.SetValues(relatedParameter: newParameter);
                 return processingOutcome;
             }
             catch
@@ -489,7 +489,7 @@ namespace geeWiz.Extensions
                 {
                     var tempParameter = familyManager.ReplaceParameter(replaceParameter, tempParameterName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
                     var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
-                    processingOutcome.SetValues(familyParameter: newParameter);
+                    processingOutcome.SetValues(relatedParameter: newParameter);
                     return processingOutcome;
                 }
                 catch
@@ -504,7 +504,7 @@ namespace geeWiz.Extensions
                 try
                 {
                     var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
-                    processingOutcome.SetValues(familyParameter: newParameter);
+                    processingOutcome.SetValues(relatedParameter: newParameter);
                     return processingOutcome;
                 }
                 catch
@@ -548,7 +548,7 @@ namespace geeWiz.Extensions
                 try
                 {
                     var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
-                    processingOutcome.SetValues(familyParameter: newParameter);
+                    processingOutcome.SetValues(relatedParameter: newParameter);
                     return processingOutcome;
                 }
                 catch
@@ -606,7 +606,7 @@ namespace geeWiz.Extensions
             {
                 familyManager.Ext_SetCurrentType(familyType);
                 familyManager.DeleteCurrentType();
-                processingOutcome.SetValues(familyType: null);
+                processingOutcome.SetValues(relatedType: null);
                 return processingOutcome;
             }
             catch
@@ -637,7 +637,7 @@ namespace geeWiz.Extensions
             try
             {
                 familyManager.RemoveParameter(familyParameter);
-                processingOutcome.SetValues(familyParameter: null);
+                processingOutcome.SetValues(relatedParameter: null);
                 return processingOutcome;
             }
             catch

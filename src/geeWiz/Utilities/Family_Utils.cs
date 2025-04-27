@@ -141,21 +141,21 @@ namespace geeWiz.Utilities
             /// <summary>
             /// Set various properties, with success by default.
             /// </summary>
-            /// <param name="familyParameter">Related family parameter.</param>
-            /// <param name="familyParameters">Related family parameters.</param>
-            /// <param name="familyType">Related family type.</param>
-            /// <param name="familyTypes">Related family types.</param>
-            /// <param name="family">Related family.</param>
+            /// <param name="relatedParameter">Related family parameter.</param>
+            /// <param name="relatedParameters">Related family parameters.</param>
+            /// <param name="relatedType">Related family type.</param>
+            /// <param name="relatedTypes">Related family types.</param>
+            /// <param name="relatedFamily">Related family.</param>
             /// <param name="setSuccess">If we want to set success.</param>
-            public void SetValues(FamilyParameter familyParameter = null, List<FamilyParameter> familyParameters = null,
-                FamilyType familyType = null, List<FamilyType> familyTypes = null, Family family = null, Document editedFamily = null,
+            public void SetValues(FamilyParameter relatedParameter = null, List<FamilyParameter> relatedParameters = null,
+                FamilyType relatedType = null, List<FamilyType> relatedTypes = null, Family relatedFamily = null, Document editedFamily = null,
                 bool setSuccess = true)
             {
-                if (familyParameter is not null) { this.RelatedParameters = familyParameters; }
-                if (familyParameters is not null) { this.RelatedParameters = familyParameters; }
-                if (familyType is not null) { this.RelatedType = familyType; }
-                if (familyTypes is not null) { this.RelatedTypes = familyTypes; }
-                if (family is not null) { this.RelatedFamily = family; }
+                if (relatedParameter is not null) { this.RelatedParameters = relatedParameters; }
+                if (relatedParameters is not null) { this.RelatedParameters = relatedParameters; }
+                if (relatedType is not null) { this.RelatedType = relatedType; }
+                if (relatedTypes is not null) { this.RelatedTypes = relatedTypes; }
+                if (relatedFamily is not null) { this.RelatedFamily = relatedFamily; }
                 if (editedFamily is not null) { this.EditedFamily = editedFamily; }
                 if (setSuccess) { this.SetSuccess(); }
             }

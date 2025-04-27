@@ -3,7 +3,6 @@ using Autodesk.Revit.UI;
 // geeWiz libraries
 using gFrm = geeWiz.Forms;
 using gCnv = geeWiz.Utilities.Convert_Utils;
-using gDat = geeWiz.Utilities.Data_Utils;
 
 // The class belongs to the forms namespace
 // using gFrm = geeWiz.Forms (+ .Custom)
@@ -467,37 +466,6 @@ namespace geeWiz.Forms
 
             // Return the step
             return step;
-        }
-
-        #endregion
-
-        #region Construct FormPairs from keys/values
-
-        /// <summary>
-        /// Combines keys and values into FormPairs.
-        /// </summary>
-        /// <param name="values">Objects to add to the FormPair.</param>
-        /// <param name="keys">The keys to connect to the FormPair.</param>
-        /// <returns>A list of FormPairs.</returns>
-        public static List<gDat.KeyedValue> CombineAsFormPairs(List<string> keys, List<object> values)
-        {
-            // Get the shortest count
-            var pairCount = keys.Count > values.Count ? values.Count : keys.Count;
-
-            // Empty list of form pairs
-            var formPairs = new List<gDat.KeyedValue>();
-
-            // Return the list if one list was empty
-            if (pairCount == 0) { return formPairs; }
-
-            // Construct the form pairs with indices
-            for (int i = 0; i < pairCount; i++)
-            {
-                formPairs.Add(new gDat.KeyedValue(values[i], keys[i], i));
-            }
-
-            // Return the formpairs
-            return formPairs;
         }
 
         #endregion

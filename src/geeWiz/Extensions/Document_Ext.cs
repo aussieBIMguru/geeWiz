@@ -1,22 +1,19 @@
-﻿// System
-using System.IO;
-// Revit API
+﻿// Revit API
 using View = Autodesk.Revit.DB.View;
 using Autodesk.Revit.UI;
 // geeWiz
 using gFrm = geeWiz.Forms;
-using gFil = geeWiz.Utilities.File_Utils;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
 
-// The class belongs to the extensions namespace
+// The class belongs to the extensions namespace (partial class)
 // Document doc.ExtensionMethod()
 namespace geeWiz.Extensions
 {
     /// <summary>
     /// Methods of this class generally relate to collecting and selecting objects.
     /// </summary>
-    public static class Document_Ext
+    public static partial class Document_Ext
     {
         #region Document properties
 
@@ -36,172 +33,6 @@ namespace geeWiz.Extensions
                 return elementId.Ext_GetElement<View>(doc);
             }
             else
-            {
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region Family document actions
-
-        /// <summary>
-        /// Returns if a document is a family document.
-        /// </summary>
-        /// <param name="doc">The document (extended).</param>
-        /// <returns>A boolean.</returns>
-        public static bool Ext_IsFamilyDocument(this Document doc)
-        {
-            // Null and non-family document checks
-            if (doc is null) { return false; }
-
-            // Return if document is family
-            return doc.IsFamilyDocument;
-        }
-
-        /// <summary>
-        /// Closes a document.
-        /// </summary>
-        /// <param name="doc">The Document (extended).</param>
-        /// <param name="save">If the document is to be saved.</param>
-        /// <returns>A Result.</returns>
-        public static Result Ext_CloseFamilyDocument (this Document doc, bool save = false)
-        {
-            // Null and non-family document checks
-            if (!doc.Ext_IsFamilyDocument()) { return Result.Failed; }
-
-            // Try to close the document
-            try
-            {
-                doc.Close(save);
-                return Result.Succeeded;
-            }
-            catch
-            {
-                return Result.Failed;
-            }
-        }
-
-        /// <summary>
-        /// Saves a document to a file path, with the option to close afterwards.
-        /// </summary>
-        /// <param name="doc">The Document (extended).</param>
-        /// <param name="filePath">The filepath to save the document to.</param>
-        /// <param name="options">SaveAsOptions (optional).</param>
-        /// <param name="closeAfterSaving">Close afterwards (without saving).</param>
-        /// <returns>A Result.</returns>
-        public static Result Ext_SaveAsFamilyFile(this Document doc, string filePath,
-            SaveAsOptions options = null, bool closeAfterSaving = false)
-        {
-            // Null and non-family document checks
-            if (!doc.Ext_IsFamilyDocument()) { return Result.Failed; }
-
-            // Default options
-            options ??= new SaveAsOptions() { OverwriteExistingFile = true };
-
-            // Save result
-            Result saveResult;
-
-            // Try to save the document
-            try
-            {
-                doc.SaveAs(filePath, options);
-                saveResult = Result.Succeeded;
-            }
-            catch
-            {
-                saveResult = Result.Failed;
-            }
-
-            // Optionally close the document
-            if (closeAfterSaving)
-            {
-                saveResult = doc.Ext_CloseFamilyDocument(save: false);
-            }
-
-            // Return if we saved successfully
-            return saveResult;
-        }
-
-        /// <summary>
-        /// Loads a family document into the document.
-        /// </summary>
-        /// <param name="doc">The Document (extended).</param>
-        /// <param name="familyDoc">The family document to load.</param>
-        /// <param name="options">The IFamilyLoadOptions.</param>
-        /// <returns>A Result.</returns>
-        public static Result Ext_LoadFamilyDocument(this Document doc, Document familyDoc, IFamilyLoadOptions options = null)
-        {
-            // Null check, ensure document is a family
-            if (doc is null || !familyDoc.Ext_IsFamilyDocument()) { return Result.Failed; }
-
-            // Default options
-            options ??= new gFil.FamilyLoadOptions(true, false);
-
-            // Try to load the family
-            try
-            {
-                familyDoc.LoadFamily(doc, options);
-                return Result.Succeeded;
-            }
-            catch
-            {
-                return Result.Failed;
-            }
-        }
-
-        /// <summary>
-        /// Loads a family into the document from a file path.
-        /// </summary>
-        /// <param name="doc">The Document (extended).</param>
-        /// <param name="filePath">The filepath to load from.</param>
-        /// <param name="options">The IFamilyLoadOptions.</param>
-        /// <returns>The loaded Family.</returns>
-        public static Family Ext_LoadFamilyFromPath(this Document doc, string filePath, IFamilyLoadOptions options = null)
-        {
-            // Null check, ensure file exists
-            if (doc is null || !File.Exists(filePath)) { return null; }
-
-            // Default options
-            options ??= new gFil.FamilyLoadOptions(true, false);
-
-            // Try to load and return the family
-            try
-            {
-                if (doc.LoadFamily(filePath, options, out Family family))
-                {
-                    return family;
-                }
-            }
-            catch
-            {
-                ;
-            }
-
-            // If we got here, we failed to load
-            return null;
-        }
-
-        /// <summary>
-        /// Opens a Family from a document.
-        /// </summary>
-        /// <param name="doc">The Document (extended).</param>
-        /// <param name="family">The family to edit.</param>
-        /// <returns>The family Document.</returns>
-        public static Document Ext_OpenFamilyAsDocument(this Document doc, Family family)
-        {
-            // Null checks
-            if (doc is null || family is null) { return null; }
-
-            // Make sure the family is from that document
-            if (doc != family.Document) { return null; }
-            
-            // Try to edit the family
-            try
-            {
-                return doc.EditFamily(family);
-            }
-            catch
             {
                 return null;
             }

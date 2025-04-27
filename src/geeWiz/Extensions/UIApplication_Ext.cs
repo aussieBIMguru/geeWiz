@@ -37,5 +37,22 @@ namespace geeWiz.Extensions
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns the current document.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication (extended).</param>
+        /// <returns>A Document</returns>
+        public static Document Ext_CurrentDocument(this UIApplication uiApp)
+        {
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
+            {
+                return uiDoc.Document;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

@@ -5,6 +5,9 @@ using System.Windows.Media.Imaging;
 using Form = System.Windows.Forms.Form;
 // Revit API
 using Autodesk.Revit.UI;
+// geeWiz
+using gStr = geeWiz.Utilities.String_Utils;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 // The class belongs to the utility namespace
 // using gFil = geeWiz.Utilities.File_Utils
@@ -133,10 +136,13 @@ namespace geeWiz.Utilities
                     // While we have more rows to read
                     while (!reader.EndOfStream)
                     {
-                        // If the row is a string, add it
-                        if (reader.ReadLine() is string rowString)
+                        // Read the line
+                        var line = reader.ReadLine();
+                        
+                        // If the row is not empty, add it
+                        if (!line.IsNullOrEmpty())
                         {
-                            rows.Add(rowString);
+                            rows.Add(line);
                         }
                         // If it isn't, and we don't skip, add empty
                         else if (!skipEmpty)
@@ -157,39 +163,69 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Returns the contents of a file, by row.
+        /// Returns the contents of a file, as a matrix.
         /// </summary>
         /// <param name="filePath">The file path to read.</param>
         /// <param name="separator">The separator string.</param>
         /// <param name="skipEmpty">Do not write empty rows.</param>
-        /// <returns>A list of strings.</returns>
+        /// <returns>A matrix of strings.</returns>
         public static List<List<string>> ReadFileAsMatrix(string filePath, string separator = ",", bool skipEmpty = false)
         {
             // List of list of strings to return
-            var matrix = new List<List<string>>();
+            var dataList = ReadFileAsRows(filePath, skipEmpty: skipEmpty);
 
-            // Separator to array of strings
-            var separators = new[] { separator };
+            // Return as matrix
+            return gStr.ListToMatrix(dataList, separator);
+        }
 
-            // Try to read the file...
+        #endregion
+
+        # region Read Resources
+
+        /// <summary>
+        /// Returns the contents of a resource, by row.
+        /// </summary>
+        /// <param name="resourceName">The name of the resource.</param>
+        /// <param name="resourceFolderName">The folder it is in.</param>
+        /// <param name="skipEmpty">Do not write empty rows.</param>
+        /// <returns>A list of strings.</returns>
+        public static List<string> ReadResourceAsRows(string resourceName, string resourceFolderName = "Files", bool skipEmpty = false)
+        {
+            // List of strings to return
+            var rows = new List<string>();
+
+            // Construct the full resource name
+            string fullResourceName = $"geeWiz.Resources.{resourceFolderName}.{resourceName}";
+
+            // Try to read the resource...
             try
             {
-                // Using a stream reader
-                using (var reader = new StreamReader(filePath))
+                // Using a stream reader...
+                using (var stream = Globals.Assembly.GetManifestResourceStream(fullResourceName))
                 {
-                    // While we have more rows to read
-                    while (!reader.EndOfStream)
+                    // If there is a stream
+                    if (stream is not null)
                     {
-                        // If the row is a string, split and add to matrix
-                        if (reader.ReadLine() is string rowString)
+                        // Using that stream
+                        using (var reader = new StreamReader(stream))
                         {
-                            var values = rowString.Split(separators, StringSplitOptions.None);
-                            matrix.Add(new List<string>(values));
-                        }
-                        // If it isn't, and we don't skip, add empty list
-                        else if (!skipEmpty)
-                        {
-                            matrix.Add(new List<string>());
+                            // While we have more rows to read
+                            while (!reader.EndOfStream)
+                            {
+                                // Read the line
+                                var line = reader.ReadLine();
+
+                                // If the row is not empty, add it
+                                if (!line.IsNullOrEmpty())
+                                {
+                                    rows.Add(line);
+                                }
+                                // If it isn't, and we don't skip, add empty
+                                else if (!skipEmpty)
+                                {
+                                    rows.Add(string.Empty);
+                                }
+                            }
                         }
                     }
                 }
@@ -197,11 +233,29 @@ namespace geeWiz.Utilities
             // Report exception
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while trying to read file: {ex.Message}");
+                Console.WriteLine($"An error occurred while trying to read the file: {ex.Message}");
             }
 
-            // Return the matrix
-            return matrix;
+            // Return the list of strings (rows)
+            return rows;
+        }
+
+        /// <summary>
+        /// Returns the contents of a resource, as a matrix.
+        /// </summary>
+        /// <param name="resourceName">The name of the resource.</param>
+        /// <param name="resourceFolderName">The folder it is in.</param>
+        /// <param name="separator">The separator string.</param>
+        /// <param name="skipEmpty">Do not write empty rows.</param>
+        /// <returns>A matrix of strings.</returns>
+        public static List<List<string>> ReadResourceAsMatrix(string resourceName, string resourceFolderName = "Files",
+            string separator = ",", bool skipEmpty = false)
+        {
+            // List of list of strings to return
+            var dataList = ReadResourceAsRows(resourceName, resourceFolderName, skipEmpty: skipEmpty);
+
+            // Return as matrix
+            return gStr.ListToMatrix(dataList, separator);
         }
 
         #endregion

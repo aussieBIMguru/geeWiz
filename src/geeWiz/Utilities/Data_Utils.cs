@@ -10,6 +10,76 @@ namespace geeWiz.Utilities
     /// </summary>
     public static class Data_Utils
     {
+        #region Data utilities
+
+        /// <summary>
+        /// Combines keys and values into FormPairs.
+        /// </summary>
+        /// <param name="values">Objects to add to the FormPair.</param>
+        /// <param name="keys">The keys to connect to the FormPair.</param>
+        /// <returns>A list of FormPairs.</returns>
+        public static List<KeyedValue> CombineAsFormPairs(List<string> keys, List<object> values)
+        {
+            // Get the shortest count
+            var pairCount = keys.Count > values.Count ? values.Count : keys.Count;
+
+            // Empty list of form pairs
+            var formPairs = new List<KeyedValue>();
+
+            // Return the list if one list was empty
+            if (pairCount == 0) { return formPairs; }
+
+            // Construct the form pairs with indices
+            for (int i = 0; i < pairCount; i++)
+            {
+                formPairs.Add(new KeyedValue(values[i], keys[i], i));
+            }
+
+            // Return the formpairs
+            return formPairs;
+        }
+
+        /// <summary>
+        /// Replaces all negative indices in a list of integers.
+        /// </summary>
+        /// <param name="integers">The integers to review.</param>
+        /// <param name="replaceWith">What to replace them with.</param>
+        /// <returns>A list of integers.</returns>
+        public static List<int> Positize(List<int> integers, int replaceWith = 0)
+        {
+            // Replace all negative indices
+            return integers
+                .Select(i => i > -1 ? i : replaceWith)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Replaces all negative indices in a list of integers.
+        /// </summary>
+        /// <param name="findKey">The Key to find.</param>
+        /// <param name="values">The values to search through.</param>
+        /// <returns>A list of integers.</returns>
+        public static T FindItemAtKey<T>(string findKey, List<T> values, List<string> keys)
+        {
+            // If key exists...
+            if (keys.Contains(findKey))
+            {
+                // Make sure index is lower than value count
+                int ind = keys.IndexOf(findKey);
+
+                // Return if inside the range of values
+                if (ind < values.Count)
+                {
+                    return values[ind];
+                }
+            }
+
+            // Otherwise, return the default type
+            return default(T);
+        }
+
+        #endregion
+
         #region KeyedItem class
 
         /// <summary>

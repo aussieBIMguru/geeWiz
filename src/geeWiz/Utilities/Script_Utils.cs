@@ -103,6 +103,86 @@ namespace geeWiz.Utilities
 
         #endregion
 
+        #region User folders
+
+        /// <summary>
+        /// Returns a path to a special folder.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public static string SpecialFolder(Environment.SpecialFolder folder)
+        {
+            return Environment.GetFolderPath(folder);
+        }
+
+        /// <summary>
+        /// Returns a path to the user's desktop.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public static string Desktop()
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        }
+
+        /// <summary>
+        /// Returns a path to the user's documents folder.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public static string MyDocuments()
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        }
+
+        /// <summary>
+        /// Returns a path to the user's roaming folder.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public static string AppData()
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        }
+
+        /// <summary>
+        /// Returns a path to the user's folder.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public static string UserFolder()
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        }
+
+        #endregion
+
+        #region DateTime
+
+        /// <summary>
+        /// Returns a YYMMDD prefix based on the current date.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public static string NowAsFormattedDate()
+        {
+            return DateTime.Now.ToString("yyMMdd");
+        }
+
+        /// <summary>
+        /// Returns a HH-MM-SS suffix based on the current time.
+        /// </summary>
+        /// <param name="includeSeconds">Includes the seconds on the end.</param>
+        /// <param name="separator">The separtor to use.</param>
+        /// <returns>A string.</returns>
+        public static string NowAsFormattedTime(bool includeSeconds = true, string separator = "-")
+        {
+            if (includeSeconds)
+            {
+                return DateTime.Now.ToString($"HH{separator}mm{separator}ss");
+            }
+            else
+            {
+                return DateTime.Now.ToString($"HH{separator}mm");
+            }
+        }
+
+        #endregion
+
         #region Other
 
         /// <summary>

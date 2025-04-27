@@ -7,6 +7,7 @@ using Autodesk.Revit.ApplicationServices;
 using System.Collections;
 using System.Globalization;
 using System.Resources;
+using DocumentFormat.OpenXml.Office.CoverPageProps;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -23,6 +24,7 @@ namespace geeWiz
         public static UIControlledApplication UiCtlApp { get; set; }
         public static ControlledApplication CtlApp { get; set; }
         public static UIApplication UiApp { get; set; }
+        public static Document CurrentDocument { get; set; }
         public static bool Idling { get; set; }
         public static bool IsDarkMode { get; set; }
 
@@ -71,6 +73,7 @@ namespace geeWiz
             // Store all available global variable values (available anywhere, effectively)
             UiCtlApp = uiApp;
             CtlApp = uiApp.ControlledApplication;
+            CurrentDocument = null;
             // (uiApp set by idling event)
             Idling = true;
             IsDarkMode = false;

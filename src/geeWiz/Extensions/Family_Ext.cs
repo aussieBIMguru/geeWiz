@@ -1,4 +1,7 @@
-﻿// The class belongs to the extensions namespace
+﻿// geeWiz
+using gFam = geeWiz.Utilities.Family_Utils;
+
+// The class belongs to the extensions namespace
 // Family family.ExtensionMethod()
 namespace geeWiz.Extensions
 {
@@ -64,20 +67,26 @@ namespace geeWiz.Extensions
         /// Opens a Family from a document.
         /// </summary>
         /// <param name="family">The family (extended).</param>
-        /// <returns>The family Document.</returns>
-        public static Document Ext_OpenFamilyAsDocument(this Family family)
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_OpenFamilyAsDocument(this Family family)
         {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(family.Document, processingResult: gFam.PROCESSING_RESULT.FAILURE_GENERAL_NULL);
+
             // Null check
-            if (family is null) { return null; }
+            if (family is null) { return processingOutcome; }
 
             // Try to edit the family
             try
             {
-                return family.Document.EditFamily(family);
+                var editedFamily = family.Document.EditFamily(family);
+                processingOutcome.SetValues(editedFamily: editedFamily);
+                return processingOutcome;
             }
             catch
             {
-                return null;
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
+                return processingOutcome;
             }
         }
 

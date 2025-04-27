@@ -1,5 +1,6 @@
-﻿// Autodesk
-using Autodesk.Revit.UI;
+﻿// geeWiz
+using gDat = geeWiz.Utilities.Data_Utils;
+using gFam = geeWiz.Utilities.Family_Utils;
 
 // The class belongs to the extensions namespace
 // FamilyManager familyManager.ExtensionMethod()
@@ -13,17 +14,21 @@ namespace geeWiz.Extensions
         #region Get/set current type
 
         /// <summary>
-        /// Returns the current family type.
+        /// Returns the current family type (via the CurrentType property).
         /// </summary>
         /// <param name="familyManager">The FamilyManager (extended).</param>
-        /// <returns>A FamilyType.</returns>
-        public static FamilyType Ext_GetCurrentType(this FamilyManager familyManager)
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_GetCurrentType(this FamilyManager familyManager)
         {
-            // Null check
-            if (familyManager is null) { return null; }
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
 
-            // Return current type
-            return familyManager.CurrentType;
+            // Null check
+            if (familyManager is null) { return processingOutcome; }
+
+            // Set current type
+            processingOutcome.RelatedType = familyManager.CurrentType;
+            return processingOutcome;
         }
 
         /// <summary>
@@ -31,15 +36,21 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="familyManager">The FamilyManager (extended).</param>
         /// <param name="familyType"></param>
-        /// <returns>A Result.</returns>
-        public static Result Ext_SetCurrentType(this FamilyManager familyManager, FamilyType familyType)
+        /// <returns>A FamilyProcessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_SetCurrentType(this FamilyManager familyManager, FamilyType familyType)
         {
-            // Null check
-            if (familyManager is null || familyType is null) { return Result.Failed; }
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
 
-            // Set the current type, return success
+            // Null check
+            if (familyManager is null || familyType is null) { return processingOutcome; }
+
+            // Set the current type
             familyManager.CurrentType = familyType;
-            return Result.Succeeded;
+            processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.SUCCESS;
+
+            // Return processing outcome
+            return processingOutcome;
         }
 
         #endregion
@@ -50,18 +61,25 @@ namespace geeWiz.Extensions
         /// Gets all types in the family.
         /// </summary>
         /// <param name="familyManager">The FamilyManager (extended).</param>
-        /// <returns> A list of FamilyTypes.</returns>
-        public static List<FamilyType> Ext_GetFamilyTypes(this FamilyManager familyManager)
+        /// <returns> A FamilyProcessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_GetFamilyTypes(this FamilyManager familyManager)
         {
-            // Null check
-            if (familyManager is null) { return new List<FamilyType>(); }
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
 
-            // Return all types
-            return familyManager.Types
+            // Null check
+            if (familyManager is null) { return processingOutcome; }
+
+            // Get family types
+            processingOutcome.RelatedTypes = familyManager.Types
                 .Cast<FamilyType>()
                 .Where(t => t is not null)
                 .Where(t => !t.Name.IsNullOrEmpty())
                 .ToList();
+
+            // Return successful outcome
+            processingOutcome.SetSuccess();
+            return processingOutcome;
         }
 
         /// <summary>
@@ -69,11 +87,27 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="familyManager">The FamilyManager (extended).</param>
         /// <param name="typeName">The type name to find.</param>
-        /// <returns>A FamilyType.</returns>
-        public static FamilyType Ext_GetFamilyTypeByName(this FamilyManager familyManager, string typeName)
+        /// <param name="types">Optional types to search through.</param>
+        /// <param name="typeNames">Optional types names to search through.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_GetFamilyTypeByName(this FamilyManager familyManager, string typeName,
+            List<FamilyType> types = null, List<string> typeNames = null)
         {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
             // Null check
-            if (familyManager is null || typeName is null) { return null; }
+            if (familyManager is null || typeName is null) { return processingOutcome; }
+
+            // Return the type if provided and found
+            if (types is not null && typeNames is not null)
+            {
+                if (gDat.FindItemAtKey<FamilyType>(typeName, types, typeNames) is FamilyType familyType)
+                {
+                    processingOutcome.SetValues(familyType: familyType);
+                    return processingOutcome;
+                }
+            }
 
             // Get and reset the iterator
             var familyTypeSet = familyManager.Types;
@@ -86,12 +120,14 @@ namespace geeWiz.Extensions
                 var familyType = typesIterator.Current as FamilyType;
                 if (familyType.Name == typeName)
                 {
-                    return familyType;
+                    processingOutcome.SetValues(familyType: familyType);
+                    return processingOutcome;
                 }
             }
 
-            // Return null if we did not find it
-            return null;
+            // Return failed to find result
+            processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_TYPE_NAMENOTFOUND;
+            return processingOutcome;
         }
 
         #endregion
@@ -102,17 +138,24 @@ namespace geeWiz.Extensions
         /// Gets all parameters in the family.
         /// </summary>
         /// <param name="familyManager">The FamilyManager (extended).</param>
-        /// <returns>A list of FamilyParameters.</returns>
-        public static List<FamilyParameter> Ext_GetFamilyParameters(this FamilyManager familyManager)
+        /// <returns>A FamilyProcessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_GetFamilyParameters(this FamilyManager familyManager)
         {
-            // Null check
-            if (familyManager is null) { return new List<FamilyParameter>(); }
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
 
-            // Return all types
-            return familyManager.Parameters
+            // Null check
+            if (familyManager is null) { return processingOutcome; }
+
+            // Get parameters
+            processingOutcome.RelatedParameters = familyManager.Parameters
                 .Cast<FamilyParameter>()
                 .Where(p => p is not null)
                 .ToList();
+
+            // Return successful outcome
+            processingOutcome.SetSuccess();
+            return processingOutcome;
         }
 
         /// <summary>
@@ -120,11 +163,27 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="familyManager">The FamilyManager (extended).</param>
         /// <param name="parameterName">The parameter name to find.</param>
-        /// <returns>A FamilyParameter.</returns>
-        public static FamilyParameter Ext_GetFamilyParameterByName(this FamilyManager familyManager, string parameterName)
+        /// <param name="parameters">Optional parameters to search through.</param>
+        /// <param name="parameterNames">Optional parameter names to search through.</param>
+        /// <returns>A FamilyProcessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_GetFamilyParameterByName(this FamilyManager familyManager, string parameterName,
+            List<FamilyParameter> parameters = null, List<string> parameterNames = null)
         {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
             // Null check
-            if (familyManager is null || parameterName is null) { return null; }
+            if (familyManager is null || parameterName is null) { return processingOutcome; }
+
+            // Catch if we have parameters and names provided
+            if (parameters is not null && parameterName is not null)
+            {
+                if (gDat.FindItemAtKey<FamilyParameter>(parameterName, parameters, parameterNames) is FamilyParameter familyParameter)
+                {
+                    processingOutcome.SetValues(familyParameter: familyParameter);
+                    return processingOutcome;
+                }
+            }
 
             // Get and reset the iterator
             var familyParmeterSet = familyManager.Parameters;
@@ -134,15 +193,65 @@ namespace geeWiz.Extensions
             // Iterate until we find it
             while (parametersIterator.MoveNext())
             {
-                var parameter = parametersIterator.Current as FamilyParameter;
-                if (parameter.Definition.Name == parameterName)
+                var familyParameter = parametersIterator.Current as FamilyParameter;
+                if (familyParameter.Definition.Name == parameterName)
                 {
-                    return parameter;
+                    processingOutcome.SetValues(familyParameter: familyParameter);
+                    return processingOutcome;
                 }
             }
 
-            // Return null if we did not find it
-            return null;
+            // Return failed to find result
+            processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMENOTFOUND;
+            return processingOutcome;
+        }
+
+        /// <summary>
+        /// Renames a family parameter.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended).</param>
+        /// <param name="familyParameter">The parameter to rename.</param>
+        /// <param name="newName">The new name to use.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_RenameFamilyParameter (this FamilyManager familyManager, FamilyParameter familyParameter, string newName)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null check
+            if (familyManager is null || familyParameter is null || newName is null) { return processingOutcome; }
+
+            // Store related properties
+            processingOutcome.RelatedParameter = familyParameter;
+            processingOutcome.RelatedParameterName = newName;
+
+            // Make sure parameter is not shared
+            if (familyParameter.IsShared)
+            {
+                processingOutcome.SetValues(familyParameter: familyParameter, setSuccess: false);
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_RENAMESHARED;
+                return processingOutcome;
+            }
+
+            // Make sure new name does not exist
+            if (familyManager.Ext_GetFamilyParameterByName(newName).Success == true)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
+
+            // Try to rename the parameter
+            try
+            {
+                familyManager.RenameParameter(familyParameter, newName);
+                processingOutcome.SetSuccess();
+                return processingOutcome;
+            }
+            catch
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_RENAMEFAMILY;
+                return processingOutcome;
+            }
         }
 
         #endregion
@@ -156,25 +265,37 @@ namespace geeWiz.Extensions
         /// <param name="definition">The shared parameter definition.</param>
         /// <param name="groupType">The GroupType to put the parameter under.</param>
         /// <param name="instance">If the parameter should be instance based.</param>
-        /// <returns>A FamilyParameter.</returns>
-        public static FamilyParameter Ext_AddSharedParameter(this FamilyManager familyManager,
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_AddSharedParameter(this FamilyManager familyManager,
             ExternalDefinition definition, ForgeTypeId groupType, bool instance)
         {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
             // Catch nulls (GroupType is "Other" if null)
-            if (familyManager is null || definition is null) { return null; }
+            if (familyManager is null || definition is null) { return processingOutcome; }
+
+            // Set the properties
+            processingOutcome.RelatedDefinition = definition;
             
             // Make sure parameter does not exist by name
-            if (familyManager.Ext_GetFamilyParameterByName(definition.Name) is not null) { return null; }
+            if (familyManager.Ext_GetFamilyParameterByName(definition.Name).Success == true)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
 
             // Try to add the parameter
             try
             {
-                // Return the new parameter if successful
-                return familyManager.AddParameter(definition, groupType, instance);
+                var newParameter = familyManager.AddParameter(definition, groupType, instance);
+                processingOutcome.SetValues(familyParameter: newParameter);
+                return processingOutcome;
             }
             catch
             {
-                return null;
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NEWSHARED;
+                return processingOutcome;
             }
         }
 
@@ -186,25 +307,343 @@ namespace geeWiz.Extensions
         /// <param name="groupType">The GroupType to put the parameter under.</param>
         /// <param name="specType">The SpecType of the new parameter.</param>
         /// <param name="instance">If the parameter should be instance based.</param>
-        /// <returns>A FamilyParameter.</returns>
-        public static FamilyParameter Ext_AddFamilyParameter(this FamilyManager familyManager,
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_AddFamilyParameter(this FamilyManager familyManager,
             string parameterName, ForgeTypeId groupType, ForgeTypeId specType, bool instance)
         {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
             // Catch nulls (GroupType is "Other" if null)
-            if (familyManager is null || parameterName is null || specType is null) { return null; }
+            if (familyManager is null || parameterName is null || specType is null) { return processingOutcome; }
+
+            // Set the properties
+            processingOutcome.RelatedParameterName = parameterName;
 
             // Make sure parameter does not exist by name
-            if (familyManager.Ext_GetFamilyParameterByName(parameterName) is not null) { return null; }
+            if (familyManager.Ext_GetFamilyParameterByName(parameterName).Success == true)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
 
             // Try to add the parameter
             try
             {
-                // Return the new parameter if successful
-                return familyManager.AddParameter(parameterName, groupType, specType, instance);
+                var newParameter = familyManager.AddParameter(parameterName, groupType, specType, instance);
+                processingOutcome.SetValues(familyParameter: newParameter);
+                return processingOutcome;
             }
             catch
             {
-                return null;
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NEWFAMILY;
+                return processingOutcome;
+            }
+        }
+
+        #endregion
+
+        #region Replace parameters
+
+        /// <summary>
+        /// Replaces a shared parameter with a new family parameter.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended)</param>
+        /// <param name="replaceParameter">The parameter to replace.</param>
+        /// <param name="withName">The name of the new family parameter.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_ReplaceSharedWithFamilyParameter(this FamilyManager familyManager, FamilyParameter replaceParameter, string withName)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null check
+            if (familyManager is null || replaceParameter is null || withName is null) { return processingOutcome; }
+
+            // Set the properties
+            processingOutcome.RelatedParameter = replaceParameter;
+            processingOutcome.RelatedParameterName = withName;
+
+            // Cancel if parameter is not shared
+            if (!replaceParameter.IsShared)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHFAMILY;
+                return processingOutcome;
+            }
+
+            // Cancel if parameter name exists
+            if (familyManager.Ext_GetFamilyParameterByName(withName).Success == true)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
+
+            // Try to replace it
+            try
+            {
+                var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                processingOutcome.SetValues(familyParameter: newParameter);
+                return processingOutcome;
+            }
+            catch
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHFAMILY;
+                return processingOutcome;
+            }
+        }
+
+        /// <summary>
+        /// Replaces a shared parameter with a new family parameter.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended)</param>
+        /// <param name="replaceParameter">The parameter to replace.</param>
+        /// <param name="withDefinition">The shared parameter definition to use.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_ReplaceFamilyWithSharedParameter(this FamilyManager familyManager, FamilyParameter replaceParameter, ExternalDefinition withDefinition)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null check
+            if (familyManager is null || replaceParameter is null || withDefinition is null) { return processingOutcome; }
+
+            // Set the properties
+            processingOutcome.RelatedParameter = replaceParameter;
+            processingOutcome.RelatedDefinition = withDefinition;
+
+            // Cancel if parameter is shared
+            if (replaceParameter.IsShared)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHSHARED;
+                return processingOutcome;
+            }
+
+            // Cancel if spec type does not match
+            if (replaceParameter.Definition.GetDataType() != withDefinition.GetDataType())
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_SPECMISMATCH;
+                return processingOutcome;
+            }
+
+            // Cancel if parameter name exists, allowing for the shared and family parameter to match in name
+            if (familyManager.Ext_GetFamilyParameterByName(withDefinition.Name).Success == true && replaceParameter.Definition.Name != withDefinition.Name)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
+
+            // Try to replace it
+            try
+            {
+                var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                processingOutcome.SetValues(familyParameter: newParameter);
+                return processingOutcome;
+            }
+            catch
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHSHARED;
+                return processingOutcome;
+            }
+        }
+
+        /// <summary>
+        /// Replaces a parameter with a shared parameter.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended)</param>
+        /// <param name="replaceParameter">The parameter to replace.</param>
+        /// <param name="withDefinition">The shared parameter definition to use.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_ReplaceParameterWithSharedParameter(this FamilyManager familyManager, FamilyParameter replaceParameter, ExternalDefinition withDefinition)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null check
+            if (familyManager is null || replaceParameter is null || withDefinition is null) { return processingOutcome; }
+
+            // Set the properties
+            processingOutcome.RelatedParameter = replaceParameter;
+            processingOutcome.RelatedDefinition = withDefinition;
+
+            // Make temporary name
+            var tempParameterName = $"TEMP_{withDefinition.Name}";
+
+            // Check if parameter exists already, allowing for the shared and family parameter to match in name
+            if (familyManager.Ext_GetFamilyParameterByName(withDefinition.Name).Success == true && replaceParameter.Definition.Name != withDefinition.Name)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
+
+            // Check if temporary parameter exists already
+            if (familyManager.Ext_GetFamilyParameterByName(tempParameterName).Success == true)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
+
+            // If parameter is shared, replace with project then shared
+            if (replaceParameter.IsShared)
+            {
+                try
+                {
+                    var tempParameter = familyManager.ReplaceParameter(replaceParameter, tempParameterName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    processingOutcome.SetValues(familyParameter: newParameter);
+                    return processingOutcome;
+                }
+                catch
+                {
+                    processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHSHARED;
+                    return processingOutcome;
+                }
+            }
+            // Otherwise, replace as family
+            else
+            {
+                try
+                {
+                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    processingOutcome.SetValues(familyParameter: newParameter);
+                    return processingOutcome;
+                }
+                catch
+                {
+                    processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHSHARED;
+                    return processingOutcome;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Replaces a parameter with a family parameter.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended)</param>
+        /// <param name="replaceParameter">The parameter to replace.</param>
+        /// <param name="withName">The new family parameter name to use.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_ReplaceParameterWithFamilyParameter(this FamilyManager familyManager, FamilyParameter replaceParameter, string withName)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null check
+            if (familyManager is null || replaceParameter is null || withName is null) { return processingOutcome; }
+
+            // Set the properties
+            processingOutcome.RelatedParameter = replaceParameter;
+            processingOutcome.RelatedParameterName = withName;
+
+            // Check if parameter exists already, allowing for the shared and family parameter to match in name
+            if (familyManager.Ext_GetFamilyParameterByName(withName).Success == true && replaceParameter.Definition.Name != withName)
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NAMEEXISTS;
+                return processingOutcome;
+            }
+
+            // If parameter is shared, replace it
+            if (replaceParameter.IsShared)
+            {
+                // Try to replace it
+                try
+                {
+                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    processingOutcome.SetValues(familyParameter: newParameter);
+                    return processingOutcome;
+                }
+                catch
+                {
+                    processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHFAMILY;
+                    return processingOutcome;
+                }
+            }
+            // Otherwise, rename the parameter
+            else
+            {
+                try
+                {
+                    familyManager.RenameParameter(replaceParameter, withName);
+                    processingOutcome.SetSuccess();
+                    return processingOutcome;
+                }
+                catch
+                {
+                    processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_REPLACEWITHFAMILY;
+                    return processingOutcome;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Parameter formulae
+
+        // Coming soon :)
+
+        #endregion
+
+        #region Delete parameters and types
+
+        /// <summary>
+        /// Deletes a family type.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended).</param>
+        /// <param name="familyType">The family type to delete.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_DeleteFamilyType(this FamilyManager familyManager, FamilyType familyType)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null catch
+            if (familyManager is null || familyType is null) { return processingOutcome; }
+            
+            // Store the properties
+            processingOutcome.RelatedType = familyType;
+
+            // Try to delete the type
+            try
+            {
+                familyManager.Ext_SetCurrentType(familyType);
+                familyManager.DeleteCurrentType();
+                processingOutcome.SetValues(familyType: null);
+                return processingOutcome;
+            }
+            catch
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_TYPE_NOTDELETED;
+                return processingOutcome;
+            }
+        }
+
+        /// <summary>
+        /// Deletes a family parameter.
+        /// </summary>
+        /// <param name="familyManager">The FamilyManager (extended).</param>
+        /// <param name="familyParameter">The family parameter to delete.</param>
+        /// <returns>A FamilyProccessingOutcome.</returns>
+        public static gFam.FamilyProccessingOutcome Ext_DeleteFamilyParameter(this FamilyManager familyManager, FamilyParameter familyParameter)
+        {
+            // Processing result
+            var processingOutcome = new gFam.FamilyProccessingOutcome(familyManager);
+
+            // Null catch
+            if (familyManager is null || familyParameter is null) { return processingOutcome; }
+
+            // Store the properties
+            processingOutcome.RelatedParameter = familyParameter;
+
+            // Try to delete the parameter
+            try
+            {
+                familyManager.RemoveParameter(familyParameter);
+                processingOutcome.SetValues(familyParameter: null);
+                return processingOutcome;
+            }
+            catch
+            {
+                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_PARAM_NOTDELETED;
+                return processingOutcome;
             }
         }
 

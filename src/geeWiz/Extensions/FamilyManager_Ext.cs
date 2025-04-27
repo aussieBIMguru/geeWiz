@@ -27,7 +27,7 @@ namespace geeWiz.Extensions
             if (familyManager is null) { return processingOutcome; }
 
             // Set current type
-            processingOutcome.RelatedType = familyManager.CurrentType;
+            processingOutcome.SetValues(familyType: familyManager.CurrentType);
             return processingOutcome;
         }
 
@@ -47,7 +47,7 @@ namespace geeWiz.Extensions
 
             // Set the current type
             familyManager.CurrentType = familyType;
-            processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.SUCCESS;
+            processingOutcome.SetValues(familyType: familyType);
 
             // Return processing outcome
             return processingOutcome;

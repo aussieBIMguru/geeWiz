@@ -33,7 +33,7 @@ namespace geeWiz
             _failureSwallower = new FailureSwallower();
 
             // If a transaction is provided...
-            if (transaction is Transaction)
+            if (transaction is not null)
             {
                 // Get failure handling options
                 var options = transaction.GetFailureHandlingOptions();

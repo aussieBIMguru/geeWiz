@@ -74,7 +74,7 @@ namespace geeWiz.Cmds_Export
             // Select a directory, make file path
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Choose where to save the file");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object as string;
+            var directoryPath = directoryResult.Object;
             var filePath = Path.Combine(directoryPath, "Export schedule.xlsx");
 
             // Accessibility check if it exists
@@ -157,12 +157,12 @@ namespace geeWiz.Cmds_Export
             // Select sheets to export
             var formResults = doc.Ext_SelectSheets(title: "Select sheets to export", sorted: true);
             if (formResults.Cancelled) { return Result.Cancelled; }
-            var sheets = formResults.Objects.Cast<ViewSheet>().ToList();
+            var sheets = formResults.Objects;
 
             // Select directory to export to
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to export to");
             if (directoryResult.Cancelled) {  return Result.Cancelled; }
-            var directoryPath = directoryResult.Object as string;
+            var directoryPath = directoryResult.Object;
 
             // Pdf export options
             var options = gView.DefaultPdfExportOptions(hideCrop: !altFire);
@@ -234,12 +234,12 @@ namespace geeWiz.Cmds_Export
             // Select sheets to export
             var formResults = doc.Ext_SelectSheets(title: "Select sheets to export", sorted: true);
             if (formResults.Cancelled) { return Result.Cancelled; }
-            var sheets = formResults.Objects.Cast<ViewSheet>().ToList();
+            var sheets = formResults.Objects;
 
             // Select directory to export to
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to export to");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object as string;
+            var directoryPath = directoryResult.Object;
 
             // Dwg export options
             var options = gView.DefaultDwgExportOptions(shared: altFire);

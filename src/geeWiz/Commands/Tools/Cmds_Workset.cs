@@ -50,11 +50,11 @@ namespace geeWiz.Cmds_Workset
             }
 
             // Choose which worksets to create
-            var formResult = gFrm.Custom.SelectFromList(keys: names,
-                values: names.Cast<object>().ToList(),
+            var formResult = gFrm.Custom.SelectFromList<string>(keys: names,
+                values: names,
                 title: "Select worksets to create");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var chosenNames = formResult.Objects.Cast<string>().ToList();
+            var chosenNames = formResult.Objects;
 
             // If default grids name exists, offer to rename
             if (worksetNames.Contains("Shared Levels and Grids"))

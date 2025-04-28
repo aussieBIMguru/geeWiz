@@ -1,6 +1,6 @@
 ﻿namespace geeWiz.Forms.Bases
 {
-    partial class BaseListView
+    partial class BaseListView<T>
     {
         /// <summary>
         /// Required designer variable.

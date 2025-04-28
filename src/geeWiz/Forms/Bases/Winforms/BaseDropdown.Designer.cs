@@ -1,6 +1,6 @@
 ﻿namespace geeWiz.Forms.Bases
 {
-    partial class BaseDropdown
+    partial class BaseDropdown<T>
     {
         /// <summary>
         /// Required designer variable.

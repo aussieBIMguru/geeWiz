@@ -5,16 +5,10 @@ using System.Windows.Forms;
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
-    #region Class summary
-
     /// <summary>
     /// Standard class for showing a form for entering values.
-    /// 
     /// This is implemented in the Custom form, do not use this class directly.
     /// </summary>
-
-    #endregion
-
     public partial class BaseEnterValue : System.Windows.Forms.Form
     {
         #region Class properties

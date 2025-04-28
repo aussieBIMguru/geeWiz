@@ -1,10 +1,11 @@
 ﻿// Revit API
-using View = Autodesk.Revit.DB.View;
 using Autodesk.Revit.UI;
+using View = Autodesk.Revit.DB.View;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
+using Autodesk.Revit.DB;
 
 // The class belongs to the extensions namespace (partial class)
 // Document doc.ExtensionMethod()
@@ -48,20 +49,30 @@ namespace geeWiz.Extensions
         /// Attempts to delete an element from the document.
         /// </summary>
         /// <param name="doc">The Document to delete from (extended).</param>
-        /// <param name="element">A Revit Element.</param>
+        /// <param name="obj">A Revit Element.</param>
+        /// <typeparam name="T">The type of Element to delete.</typeparam>
         /// <returns>A Result object.</returns>
-        public static Result Ext_DeleteElement(this Document doc, Element element)
+        public static Result Ext_DeleteElement<T>(this Document doc, T obj)
         {
+            // Null check
+            if (doc is null) { return Result.Failed; }
+
             // Try to delete the element
-            try
+            if (obj is Element element)
             {
-                doc.Delete(element.Id);
-                return Result.Succeeded;
+                try
+                {
+                    doc.Delete(element.Id);
+                    return Result.Succeeded;
+                }
+                catch
+                {
+                    // Proceed to final step
+                }
             }
-            catch
-            {
-                return Result.Failed;
-            }
+
+            // If we got here, we failed
+            return Result.Failed;
         }
 
         /// <summary>
@@ -70,8 +81,11 @@ namespace geeWiz.Extensions
         /// <param name="doc">The Document to delete from (extended).</param>
         /// <param name="elementId">A Revit ElementId.</param>
         /// <returns>A Result object.</returns>
-        public static Result Ext_DeleteElement(this Document doc, ElementId elementId)
+        public static Result Ext_DeleteElementId(this Document doc, ElementId elementId)
         {
+            // Null check
+            if (doc is null ||  elementId is null) { return Result.Failed; }
+            
             // Try to delete the element
             try
             {
@@ -84,24 +98,23 @@ namespace geeWiz.Extensions
             }
         }
 
-        // DeleteElements has 2 overloads (Elements / ElementIds)
-
         /// <summary>
         /// Attempts to delete elements from the document.
         /// </summary>
         /// <param name="doc">The Document to delete from (extended).</param>
-        /// <param name="elements">Revit Elements.</param>
+        /// <param name="objects">Revit Elements.</param>
+        /// <typeparam name="T">The type of Element to delete.</typeparam>
         /// <returns>A list of Results.</returns>
-        public static List<Result> Ext_DeleteElements(this Document doc, List<Element> elements)
+        public static List<Result> Ext_DeleteElements<T>(this Document doc, List<T> objects)
         {
             // Result list to return
             var results = new List<Result>();
             
             // For each element
-            foreach (Element element in elements)
+            foreach (var obj in objects)
             {
                 // Try to delete, add result
-                results.Add(doc.Ext_DeleteElement(element));
+                results.Add(doc.Ext_DeleteElement<T>(obj));
             }
 
             // Return the results
@@ -114,16 +127,16 @@ namespace geeWiz.Extensions
         /// <param name="doc">The Document to delete from (extended).</param>
         /// <param name="elementIds">Revit ElementIds.</param>
         /// <returns>A list of Results.</returns>
-        public static List<Result> Ext_DeleteElements(this Document doc, List<ElementId> elementIds)
+        public static List<Result> Ext_DeleteElementIds(this Document doc, List<ElementId> elementIds)
         {
             // Result list to return
             var results = new List<Result>();
 
             // For each element
-            foreach (ElementId elementId in elementIds)
+            foreach (var elementId in elementIds)
             {
                 // Try to delete, add result
-                results.Add(doc.Ext_DeleteElement(elementId));
+                results.Add(doc.Ext_DeleteElementId(elementId));
             }
 
             // Return the results
@@ -134,14 +147,15 @@ namespace geeWiz.Extensions
         /// Attempts to delete elements from the document with a transaction and progress bar.
         /// </summary>
         /// <param name="doc">The Document to delete from (extended).</param>
-        /// <param name="elements">Revit ElementIds.</param>
+        /// <param name="objects">Revit objects.</param>
         /// <param name="typeName">Name of element type to delete.</param>
         /// <param name="showMessage">Show messages to the user.</param>
+        /// <typeparam name="T">The type of Element to delete.</typeparam>
         /// <returns>A result.</returns>
-        public static Result Ext_DeleteElementsRoutine(this Document doc, List<Element> elements, string typeName = "Element", bool showMessage = true)
+        public static Result Ext_DeleteElementsRoutine<T>(this Document doc, List<T> objects, string typeName = "Element", bool showMessage = true)
         {
             // If no elements, we are finished
-            if (elements.Count == 0)
+            if (objects.Count == 0)
             {
                 // Optional message
                 if (showMessage)
@@ -154,7 +168,7 @@ namespace geeWiz.Extensions
             }
 
             // Progress bar properties
-            int pbTotal = elements.Count;
+            int pbTotal = objects.Count;
             int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
             int deleteCount = 0;
 
@@ -168,7 +182,7 @@ namespace geeWiz.Extensions
                     t.Start();
 
                     // For each element
-                    foreach (var element in elements)
+                    foreach (var obj in objects)
                     {
                         // Check for cancellation
                         if (pb.CancelCheck(t))
@@ -177,7 +191,7 @@ namespace geeWiz.Extensions
                         }
 
                         // Try to delete the element, uptick deletCount if we do
-                        if (doc.Ext_DeleteElement(element) == Result.Succeeded)
+                        if (doc.Ext_DeleteElement<T>(obj) == Result.Succeeded)
                         {
                             deleteCount++;
                         }
@@ -417,7 +431,7 @@ namespace geeWiz.Extensions
         /// <param name="includePlaceholders">Include placeholder sheets.</param>
         /// <param name="includeId">Append the ElementId to the end.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectSheets(this Document doc, List<ViewSheet> sheets = null, string title = null,
+        public static gFrm.FormResult<ViewSheet> Ext_SelectSheets(this Document doc, List<ViewSheet> sheets = null, string title = null,
             bool multiSelect = true, bool sorted = false, bool includePlaceholders = false, bool includeId = false)
         {
             // Set the default form title if not provided
@@ -431,14 +445,9 @@ namespace geeWiz.Extensions
                 .Select(s => s.Ext_ToSheetKey(includeId))
                 .ToList();
 
-            // Process into values (to display)
-            var values = sheets
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<ViewSheet>(keys: keys,
+                values: sheets,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -488,7 +497,7 @@ namespace geeWiz.Extensions
         /// <param name="sorted">Sort the levels by elevation.</param>
         /// <param name="includeId">Append the ElementId to the end.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectViews(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
+        public static gFrm.FormResult<View> Ext_SelectViews(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
             string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
         {
             // Set the default form title if not provided
@@ -502,14 +511,9 @@ namespace geeWiz.Extensions
                 .Select(v => v.Ext_ToViewKey(includeId))
                 .ToList();
 
-            // Process into values (to display)
-            var values = views
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<View>(keys: keys,
+                values: views,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -559,7 +563,7 @@ namespace geeWiz.Extensions
         /// <param name="sorted">Sort the levels by elevation.</param>
         /// <param name="includeId">Append the ElementId to the end.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectViewTemplates(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
+        public static gFrm.FormResult<View> Ext_SelectViewTemplates(this Document doc, List<View> views = null, List<ViewType> viewTypes = null,
             string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
         {
             // Set the default form title if not provided
@@ -616,7 +620,7 @@ namespace geeWiz.Extensions
         /// <param name="sorted">Sort the levels by elevation.</param>
         /// <param name="includeId">Append the ElementId to the end.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectViewFamilyTypes(this Document doc, List<ViewFamily> viewFamilies= null,
+        public static gFrm.FormResult<ViewFamilyType> Ext_SelectViewFamilyTypes(this Document doc, List<ViewFamily> viewFamilies= null,
             string title = null, bool multiSelect = true, bool sorted = false, bool includeId = false)
         {
             // Set the default form title if not provided
@@ -630,14 +634,9 @@ namespace geeWiz.Extensions
                 .Select(v => v.Ext_ToViewFamilyTypeKey(includeId))
                 .ToList();
 
-            // Process into values (to display)
-            var values = viewFamilyTypes
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<ViewFamilyType>(keys: keys,
+                values: viewFamilyTypes,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -681,7 +680,7 @@ namespace geeWiz.Extensions
         /// <param name="multiSelect">Select more than one item.</param>
         /// <param name="sorted">Sort the levels by elevation.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectLevels(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        public static gFrm.FormResult<Level> Ext_SelectLevels(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
         {
             // Set the default form title if not provided
             title ??= multiSelect ? "Select Level(s):" : "Select a Level:";
@@ -694,14 +693,9 @@ namespace geeWiz.Extensions
                 .Select(l => l.Name)
                 .ToList();
 
-            // Process into values (to display)
-            var values = levels
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<Level>(keys: keys,
+                values: levels,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -746,7 +740,7 @@ namespace geeWiz.Extensions
         /// <param name="multiSelect">Select more than one item.</param>
         /// <param name="sorted">Sort the types by name.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectTitleblockTypes(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        public static gFrm.FormResult<FamilySymbol> Ext_SelectTitleblockTypes(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
         {
             // Set the default form title if not provided
             title ??= multiSelect ? "Select Titleblock type(s):" : "Select a Titleblock type:";
@@ -759,14 +753,9 @@ namespace geeWiz.Extensions
                 .Select(t => t.Ext_ToFamilySymbolKey())
                 .ToList();
 
-            // Process into values (to display)
-            var values = titleblockTypes
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<FamilySymbol>(keys: keys,
+                values: titleblockTypes,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -810,7 +799,7 @@ namespace geeWiz.Extensions
         /// <param name="multiSelect">Select more than one item.</param>
         /// <param name="sorted">Sort the revisions by sequence.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectRevisions(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        public static gFrm.FormResult<Revision> Ext_SelectRevisions(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
         {
             // Set the default form title if not provided
             title ??= multiSelect ? "Select Revision(s):" : "Select a Revision:";
@@ -823,14 +812,9 @@ namespace geeWiz.Extensions
                 .Select(r => r.Ext_ToRevisionKey())
                 .ToList();
 
-            // Process into values (to display)
-            var values = revisions
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<Revision>(keys: keys,
+                values: revisions,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -843,7 +827,7 @@ namespace geeWiz.Extensions
         /// <param name="message">The form message (optional).</param>
         /// <param name="sorted">Sort the Revisions by sequence.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectRevision(Document doc, string title = null, string message = null, bool sorted = false)
+        public static gFrm.FormResult<Revision> Ext_SelectRevision(Document doc, string title = null, string message = null, bool sorted = false)
         {
             // Set the default form title/message if not provided
             title ??= "Select Revision";
@@ -857,14 +841,9 @@ namespace geeWiz.Extensions
                 .Select(r => r.Ext_ToRevisionKey())
                 .ToList();
 
-            // Process into values (to display)
-            var values = revisions
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromDropdown(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromDropdown<Revision>(keys: keys,
+                values: revisions,
                 title: title,
                 message: message);
         }
@@ -928,7 +907,7 @@ namespace geeWiz.Extensions
         /// <param name="includeUnenclosed">Include unenclosed rooms.</param>
         /// <param name="includeUnplaced">Include unplaced rooms.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectRooms(this Document doc, List<SpatialElement> rooms = null, string title = null, bool multiSelect = true,
+        public static gFrm.FormResult<SpatialElement> Ext_SelectRooms(this Document doc, List<SpatialElement> rooms = null, string title = null, bool multiSelect = true,
             bool sorted = false, bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Set the default form title if not provided
@@ -948,14 +927,9 @@ namespace geeWiz.Extensions
                 .Select(r => r.Ext_ToRoomKey())
                 .ToList();
 
-            // Process into values (to display)
-            var values = rooms
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<SpatialElement>(keys: keys,
+                values: rooms,
                 title: title,
                 multiSelect: multiSelect);
         }
@@ -1002,7 +976,7 @@ namespace geeWiz.Extensions
         /// <param name="multiSelect">Select more than one item.</param>
         /// <param name="sorted">Sort the revisions by sequence.</param>
         /// <returns>A FormResult object.</returns>
-        public static gFrm.FormResult Ext_SelectWorksets(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        public static gFrm.FormResult<Workset> Ext_SelectWorksets(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
         {
             // Set the default form title if not provided
             title ??= multiSelect ? "Select Workset(s):" : "Select a Workset:";
@@ -1015,14 +989,9 @@ namespace geeWiz.Extensions
                 .Select(w => $"{w.Name}")
                 .ToList();
 
-            // Process into values (to display)
-            var values = worksets
-                .Cast<object>()
-                .ToList();
-
             // Run the selection from list
-            return gFrm.Custom.SelectFromList(keys: keys,
-                values: values,
+            return gFrm.Custom.SelectFromList<Workset>(keys: keys,
+                values: worksets,
                 title: title,
                 multiSelect: multiSelect);
         }

@@ -1,6 +1,7 @@
 ﻿// Revit API
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+using View = Autodesk.Revit.DB.View;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
@@ -20,9 +21,9 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Collect fill and line patterns
             var deletePatterns = doc.Ext_Collector()
@@ -38,12 +39,12 @@ namespace geeWiz.Cmds_Audit
             // Keep editable elements only
             if (doc.IsWorkshared)
             {
-                var worksharingResults = gWsh.ProcessElements(deletePatterns, doc);
-                deletePatterns = worksharingResults.Editable.Cast<Element>().ToList();
+                var worksharingResults = gWsh.ProcessElements<Element>(deletePatterns, doc);
+                deletePatterns = worksharingResults.Editable;
             }
 
             // Deletion routine
-            return doc.Ext_DeleteElementsRoutine(deletePatterns, typeName: "Fill/Line Pattern");
+            return doc.Ext_DeleteElementsRoutine<Element>(deletePatterns, typeName: "Fill/Line Pattern");
         }
     }
 
@@ -60,9 +61,9 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Collect unplaced rooms
             var rooms = doc.Ext_GetRooms(
@@ -79,17 +80,17 @@ namespace geeWiz.Cmds_Audit
             // Select rooms from a list
             var formResult = doc.Ext_SelectRooms(rooms: rooms, title: "Select rooms to delete");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var deleteRooms = formResult.Objects.Cast<Element>().ToList();
+            var deleteRooms = formResult.Objects;
 
             // Keep editable elements only
             if (doc.IsWorkshared)
             {
-                var worksharingResults = gWsh.ProcessElements(deleteRooms, doc);
-                deleteRooms = worksharingResults.Editable.Cast<Element>().ToList();
+                var worksharingResults = gWsh.ProcessElements<SpatialElement>(deleteRooms, doc);
+                deleteRooms = worksharingResults.Editable;
             }
 
             // Deletion routine
-            return doc.Ext_DeleteElementsRoutine(deleteRooms, typeName: "unplaced Room");
+            return doc.Ext_DeleteElementsRoutine<SpatialElement>(deleteRooms, typeName: "unplaced Room");
         }
     }
 
@@ -106,9 +107,9 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Get used view templates Id strings
             var usedIdStrings = doc.Ext_GetViewFamilyTypes()
@@ -134,17 +135,17 @@ namespace geeWiz.Cmds_Audit
             // Select view templates from a list
             var formResult = doc.Ext_SelectViewTemplates(unusedTemplates, title: "Select templates to delete");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var deleteTemplates = formResult.Objects.Cast<Element>().ToList();
+            var deleteTemplates = formResult.Objects;
 
             // Keep editable elements only
             if (doc.IsWorkshared)
             {
-                var worksharingResults = gWsh.ProcessElements(deleteTemplates, doc);
-                deleteTemplates = worksharingResults.Editable.Cast<Element>().ToList();
+                var worksharingResults = gWsh.ProcessElements<View>(deleteTemplates, doc);
+                deleteTemplates = worksharingResults.Editable;
             }
 
             // Deletion routine
-            return doc.Ext_DeleteElementsRoutine(deleteTemplates, typeName: "View Template");
+            return doc.Ext_DeleteElementsRoutine<View>(deleteTemplates, typeName: "View Template");
         }
     }
 
@@ -161,9 +162,9 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            UIApplication uiApp = commandData.Application;
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+            var uiApp = commandData.Application;
+            var uiDoc = uiApp.ActiveUIDocument;
+            var doc = uiDoc.Document;
 
             // Get used view filter Id strings
             var usedIdStrings = doc.Ext_GetViews()
@@ -186,24 +187,23 @@ namespace geeWiz.Cmds_Audit
                 return gFrm.Custom.Completed("No unused View Filters found in the current document.");
             }
 
-            // Construct key and value lists
+            // Construct keys
             var keys = unusedFilters.Select(f => f.Name).ToList();
-            var values = unusedFilters.Cast<object>().ToList();
 
             // Select view filters from a list
-            var formResult = gFrm.Custom.SelectFromList(keys, values, "Select view filters to delete");
+            var formResult = gFrm.Custom.SelectFromList<Element>(keys, unusedFilters, "Select view filters to delete");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var deleteFilters = formResult.Objects.Cast<Element>().ToList();
+            var deleteFilters = formResult.Objects;
 
             // Keep editable elements only
             if (doc.IsWorkshared)
             {
-                var worksharingResults = gWsh.ProcessElements(deleteFilters, doc);
-                deleteFilters = worksharingResults.Editable.Cast<Element>().ToList();
+                var worksharingResults = gWsh.ProcessElements<Element>(deleteFilters, doc);
+                deleteFilters = worksharingResults.Editable;
             }
 
             // Deletion routine
-            return doc.Ext_DeleteElementsRoutine(deleteFilters, typeName: "View Filter");
+            return doc.Ext_DeleteElementsRoutine<Element>(deleteFilters, typeName: "View Filter");
         }
     }
 

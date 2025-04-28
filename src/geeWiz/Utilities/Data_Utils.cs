@@ -15,16 +15,17 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Combines keys and values into FormPairs.
         /// </summary>
+        /// <typeparam name="T">The type of object being stored.</typeparam>
         /// <param name="values">Objects to add to the FormPair.</param>
         /// <param name="keys">The keys to connect to the FormPair.</param>
         /// <returns>A list of FormPairs.</returns>
-        public static List<KeyedValue> CombineAsFormPairs(List<string> keys, List<object> values)
+        public static List<KeyedValue<T>> CombineAsFormPairs<T>(List<string> keys, List<T> values)
         {
             // Get the shortest count
             var pairCount = keys.Count > values.Count ? values.Count : keys.Count;
 
             // Empty list of form pairs
-            var formPairs = new List<KeyedValue>();
+            var formPairs = new List<KeyedValue<T>>();
 
             // Return the list if one list was empty
             if (pairCount == 0) { return formPairs; }
@@ -32,7 +33,7 @@ namespace geeWiz.Utilities
             // Construct the form pairs with indices
             for (int i = 0; i < pairCount; i++)
             {
-                formPairs.Add(new KeyedValue(values[i], keys[i], i));
+                formPairs.Add(new KeyedValue<T>(values[i], keys[i], i));
             }
 
             // Return the formpairs
@@ -56,6 +57,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Replaces all negative indices in a list of integers.
         /// </summary>
+        /// <typeparam name="T">The type of object being found.</typeparam>
         /// <param name="findKey">The Key to find.</param>
         /// <param name="values">The values to search through.</param>
         /// <returns>A list of integers.</returns>
@@ -75,7 +77,7 @@ namespace geeWiz.Utilities
             }
 
             // Otherwise, return the default type
-            return default(T);
+            return default;
         }
 
         #endregion
@@ -85,11 +87,12 @@ namespace geeWiz.Utilities
         /// <summary>
         /// A class for holding form items, with various data in parallel.
         /// </summary>
-        public class KeyedItem
+        /// <typeparam name="T">The type of object being stored.</typeparam>
+        public class KeyedItem<T>
         {
             // These properties hold an item and group object
-            public object ItemValue { get; set; }
-            public object GroupValue { get; set; }
+            public T ItemValue { get; set; }
+            public T GroupValue { get; set; }
 
             // These properties hold the key values for the objects
             public string ItemKey { get; set; }
@@ -124,8 +127,8 @@ namespace geeWiz.Utilities
             /// <param name="groupValue"></param>
             /// <param name="groupKey"></param>
             public KeyedItem(
-                object itemValue, string itemKey, int itemIndex,
-                object groupValue, string groupKey, int groupIndex)
+                T itemValue, string itemKey, int itemIndex,
+                T groupValue, string groupKey, int groupIndex)
             {
                 // Pass the properties
                 this.ItemValue = itemValue;
@@ -151,12 +154,13 @@ namespace geeWiz.Utilities
         /// <summary>
         /// A class for holding keys aligned with a matrix of FormItems.
         /// </summary>
-        public class KeyedMatrix
+        /// <typeparam name="T">The type of object being stored.</typeparam>
+        public class KeyedMatrix<T>
         {
             // Properties
             public List<string> GroupKeys { get; set; }
-            public List<List<KeyedItem>> Matrix { get; set; }
-            public List<KeyedItem> UnkeyedItems { get; set; }
+            public List<List<KeyedItem<T>>> Matrix { get; set; }
+            public List<KeyedItem<T>> UnkeyedItems { get; set; }
             public bool UnkeyedItemsFound { get; set; }
 
             /// <summary>
@@ -165,7 +169,7 @@ namespace geeWiz.Utilities
             /// <param name="keys"></param>
             /// <param name="formItems"></param>
             /// <param name="sortKeys"></param>
-            public KeyedMatrix(List<string> keys, List<KeyedItem> formItems, bool sortKeys = true)
+            public KeyedMatrix(List<string> keys, List<KeyedItem<T>> formItems, bool sortKeys = true)
             {
                 // Cancel if no keys
                 if (keys.Count == 0) { return; }
@@ -174,13 +178,13 @@ namespace geeWiz.Utilities
                 if (sortKeys) { keys.Sort(); }
 
                 // New matrix
-                var matrixOut = new List<List<KeyedItem>>();
-                var unKeyedItems = new List<KeyedItem>();
+                var matrixOut = new List<List<KeyedItem<T>>>();
+                var unKeyedItems = new List<KeyedItem<T>>();
 
                 // Add a list for each key
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    matrixOut.Add(new List<KeyedItem>());
+                    matrixOut.Add(new List<KeyedItem<T>>());
                 }
 
                 // For each form item...
@@ -240,7 +244,7 @@ namespace geeWiz.Utilities
             /// </summary>
             /// <param name="item">The item to check using.</param>
             /// <returns>A boolean.</returns>
-            public bool ItemIsAccessible(KeyedItem item)
+            public bool ItemIsAccessible(KeyedItem<T> item)
             {
                 if (this.GroupKeys.Count > item.GroupIndex)
                 {
@@ -270,7 +274,7 @@ namespace geeWiz.Utilities
             /// <param name="item">The item to update.</param>
             /// <param name="show">Show the item.</param>
             /// <returns>A Result.</returns>
-            public Result SetItemVisibility(KeyedItem item, bool show = true)
+            public Result SetItemVisibility(KeyedItem<T> item, bool show = true)
             {
                 if (ItemIsAccessible(item))
                 {
@@ -286,7 +290,7 @@ namespace geeWiz.Utilities
             /// <param name="item">The item to update.</param>
             /// <param name="check">Check the item.</param>
             /// <returns>A Result</returns>
-            public Result SetItemChecked(KeyedItem item, bool check = true)
+            public Result SetItemChecked(KeyedItem<T> item, bool check = true)
             {
                 if (ItemIsAccessible(item))
                 {
@@ -301,7 +305,7 @@ namespace geeWiz.Utilities
             /// </summary>
             /// <param name="key">The key to return the items for.</param>
             /// <returns>A list of FormItems</returns>
-            public List<KeyedItem> GetGroupByKey(string key)
+            public List<KeyedItem<T>> GetGroupByKey(string key)
             {
                 if (this.GroupKeys.Contains(key))
                 {
@@ -318,10 +322,11 @@ namespace geeWiz.Utilities
         /// <summary>
         /// A class for holding a key value pair.
         /// </summary>
-        public class KeyedValue
+        /// <typeparam name="T">The type of object being stored.</typeparam>
+        public class KeyedValue<T>
         {
             // These properties relate to the item
-            public object ItemValue { get; set; }
+            public T ItemValue { get; set; }
             public string ItemKey { get; set; }
             public int ItemIndex { get; set; }
 
@@ -334,7 +339,7 @@ namespace geeWiz.Utilities
             /// </summary>
             public KeyedValue()
             {
-                this.ItemValue = null;
+                this.ItemValue = default;
                 this.ItemKey = null;
                 this.ItemIndex = -1;
                 this.Visible = true;
@@ -346,7 +351,7 @@ namespace geeWiz.Utilities
             /// </summary>
             /// <param name="itemValue">The object to store.</param>
             /// <param name="itemKey">The key for the item.</param>
-            public KeyedValue(object itemValue, string itemKey)
+            public KeyedValue(T itemValue, string itemKey)
             {
                 this.ItemValue = itemValue;
                 this.ItemKey = itemKey;
@@ -361,7 +366,7 @@ namespace geeWiz.Utilities
             /// <param name="itemValue">The object to store.</param>
             /// <param name="itemKey">The key for the item.</param>
             /// <param name="itemIndex">The index to store the item at.</param>
-            public KeyedValue(object itemValue, string itemKey, int itemIndex)
+            public KeyedValue(T itemValue, string itemKey, int itemIndex)
             {
                 this.ItemValue = itemValue;
                 this.ItemKey = itemKey;

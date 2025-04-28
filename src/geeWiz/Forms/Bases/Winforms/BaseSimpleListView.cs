@@ -1,22 +1,19 @@
 ﻿// The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
-    #region Class summary
     /// <summary>
     /// Standard class for showing a form for selecting from a listview.
-    /// 
     /// This is implemented in the Custom form, do not use this class directly.
     /// </summary>
-#endregion
-
-    public partial class BaseSimpleListView : System.Windows.Forms.Form
+    /// <typeparam name="T">The type of object being stored.</typeparam>
+    public partial class BaseSimpleListView<T> : System.Windows.Forms.Form
     {
         #region Class properties
 
         // Properties belonging to the form
         private bool MultiSelect;
         private List<string> Keys;
-        private List<object> Values;
+        private List<T> Values;
 
         #endregion
 
@@ -30,7 +27,7 @@ namespace geeWiz.Forms.Bases
         /// <param name="title">A title to display.</param>
         /// <param name="multiSelect">Allow selection of multiple keys.</param>
         /// <returns>A BaseSimpleListView form.</returns>
-        public BaseSimpleListView(List<string> keys, List<object> values, string title, bool multiSelect = true)
+        public BaseSimpleListView(List<string> keys, List<T> values, string title, bool multiSelect = true)
         {
             // Initialize the form, set the icon
             InitializeComponent();

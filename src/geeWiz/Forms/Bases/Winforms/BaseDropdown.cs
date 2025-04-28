@@ -3,16 +3,16 @@ namespace geeWiz.Forms.Bases
 {
     /// <summary>
     /// Standard class for showing a form for selecting from a dropdown (combobox).
-    /// 
     /// This is implemented in the Custom form, do not use this class directly.
     /// </summary>
-    public partial class BaseDropdown : System.Windows.Forms.Form
+    /// <typeparam name="T">The type of object being stored.</typeparam>
+    public partial class BaseDropdown<T> : System.Windows.Forms.Form
     {
         #region Class properties
 
         // Properties belonging to the form
         private List<string> keys;
-        private List<object> values;
+        private List<T> values;
         private int defaultIndex;
 
         #endregion
@@ -28,7 +28,7 @@ namespace geeWiz.Forms.Bases
         /// <param name="message">A message to display.</param>
         /// <param name="defaultIndex">An optional index to initialize at.</param>
         /// <returns>A BaseDropDown form.</returns>
-        public BaseDropdown(List<string> keys, List<object> values, string title, string message, int defaultIndex = -1)
+        public BaseDropdown(List<string> keys, List<T> values, string title, string message, int defaultIndex = -1)
         {
             // Initialize form, set the icon
             InitializeComponent();

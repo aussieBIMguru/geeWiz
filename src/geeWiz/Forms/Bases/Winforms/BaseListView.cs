@@ -4,25 +4,20 @@ using gDat = geeWiz.Utilities.Data_Utils;
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
-    #region Class summary
     /// <summary>
     /// Standard class for showing a form for selecting from a listview.
-    /// 
     /// Includes a text filter to filter keys from the list.
-    /// 
     /// Form leverages index filtering to retrieve final values.
-    /// 
     /// This is implemented in the Custom form, do not use this class directly.
     /// </summary>
-#endregion
-
-    public partial class BaseListView : System.Windows.Forms.Form
+    /// <typeparam name="T">The type of object being stored.</typeparam>
+    public partial class BaseListView<T> : System.Windows.Forms.Form
     {
         #region Class properties
 
         // Properties belonging to the form
         private bool MultiSelect;
-        private List<gDat.KeyedValue> FormPairs;
+        private List<gDat.KeyedValue<T>> FormPairs;
         private string FilterString;
         private List<int> VisibleIndices;
 
@@ -38,7 +33,7 @@ namespace geeWiz.Forms.Bases
         /// <param name="title">A title to display.</param>
         /// <param name="multiSelect">Allow selection of multiple keys.</param>
         /// <returns>A BaseListView form.</returns>
-        public BaseListView(List<string> keys, List<object> values, string title, bool multiSelect = true)
+        public BaseListView(List<string> keys, List<T> values, string title, bool multiSelect = true)
         {
             // Initialize the form, set the icon
             InitializeComponent();

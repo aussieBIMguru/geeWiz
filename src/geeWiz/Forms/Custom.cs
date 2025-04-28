@@ -76,11 +76,11 @@ namespace geeWiz.Forms
         /// <param name="noCancel">Does not offer a cancel button.</param>
         /// <param name="icon">The icon type to display.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult Message(string title = null, string message = null,
+        public static FormResult<bool> Message(string title = null, string message = null,
             bool yesNo = false, bool noCancel = false, MessageBoxIcon icon = MessageBoxIcon.None)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<bool>(valid: false);
 
             // Default values if not provided
             title ??= "Message";
@@ -186,10 +186,10 @@ namespace geeWiz.Forms
         /// <param name="filter">An optional file type filter.</param>
         /// <param name="multiSelect">If we want to select more than one file path.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectFilePaths(string title = null, string filter = null, bool multiSelect = true)
+        public static FormResult<string> SelectFilePaths(string title = null, string filter = null, bool multiSelect = true)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<string>(valid: false);
 
             // Using a dialog object
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -206,10 +206,7 @@ namespace geeWiz.Forms
                 // Process the results
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    var filePaths = openFileDialog
-                        .FileNames
-                        .Cast<object>()
-                        .ToList();
+                    var filePaths = openFileDialog.FileNames.ToList();
 
                     if (multiSelect) { formResult.Validate(filePaths); }
                     else { formResult.Validate(filePaths.First()); }
@@ -225,10 +222,10 @@ namespace geeWiz.Forms
         /// </summary>
         /// <param name="title">An optional title to display.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectDirectoryPath(string title = null)
+        public static FormResult<string> SelectDirectoryPath(string title = null)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<string>(valid: false);
 
             // Default title
             title ??= "Select folder";
@@ -239,7 +236,7 @@ namespace geeWiz.Forms
                 // Process the result
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Validate(folderBrowserDialog.SelectedPath as object);
+                    formResult.Validate(folderBrowserDialog.SelectedPath);
                 }
             }
 
@@ -260,11 +257,11 @@ namespace geeWiz.Forms
         /// <param name="numberOnly">Enforce a number input only.</param>
         /// <param name="allowEmptyString">An empty string counts as a valid result.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult EnterValue(string title = null, string message = null,
+        public static FormResult<object> EnterValue(string title = null, string message = null,
             string defaultValue = "", bool numberOnly = false, bool allowEmptyString = false)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<object>(valid: false);
 
             // Returned value and number
             string inputValue = "";
@@ -340,24 +337,25 @@ namespace geeWiz.Forms
         /// <param name="values">A list of values to pass by key.</param>
         /// <param name="title">An optional title to display.</param>
         /// <param name="multiSelect">If we want to select more than one item.</param>
+        /// <typeparam name="T">The type of object being stored.</typeparam>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectFromList(List<string> keys, List<object> values,
+        public static FormResult<T> SelectFromList<T>(List<string> keys, List<T> values,
             string title = null, bool multiSelect = true)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<T>(valid: false);
 
             // Default title
             title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
 
             // Using a select items form
-            using (var form = new gFrm.Bases.BaseListView(keys, values, title: title, multiSelect: multiSelect))
+            using (var form = new gFrm.Bases.BaseListView<T>(keys, values, title: title, multiSelect: multiSelect))
             {
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    if (multiSelect) { formResult.Validate(form.Tag as List<object>); ; }
-                    else { formResult.Validate(form.Tag as object); } 
+                    if (multiSelect) { formResult.Validate(form.Tag as List<T>); ; }
+                    else { formResult.Validate((T)form.Tag); } 
                 }
             }
 
@@ -372,24 +370,25 @@ namespace geeWiz.Forms
         /// <param name="values">A list of values to pass by key.</param>
         /// <param name="title">An optional title to display.</param>
         /// <param name="multiSelect">If we want to select more than one item.</param>
+        /// <typeparam name="T">The type of object being stored.</typeparam>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectFromSimpleList(List<string> keys, List<object> values,
+        public static FormResult<T> SelectFromSimpleList<T>(List<string> keys, List<T> values,
             string title = null, bool multiSelect = true)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<T>(valid: false);
 
             // Default title
             title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
 
             // Using a select items form
-            using (var form = new gFrm.Bases.BaseSimpleListView(keys, values, title: title, multiSelect: multiSelect))
+            using (var form = new gFrm.Bases.BaseSimpleListView<T>(keys, values, title: title, multiSelect: multiSelect))
             {
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    if (multiSelect) { formResult.Validate(form.Tag as List<object>); ; }
-                    else { formResult.Validate(form.Tag as object); }
+                    if (multiSelect) { formResult.Validate(form.Tag as List<T>); ; }
+                    else { formResult.Validate((T)form.Tag); }
                 }
             }
 
@@ -409,24 +408,25 @@ namespace geeWiz.Forms
         /// <param name="title">An optional title to display.</param>
         /// <param name="message">An optional message to display.</param>
         /// <param name="defaultIndex">An optional index to initialize at.</param>
+        /// <typeparam name="T">The type of object being stored.</typeparam>
         /// <returns>A FormResult object.</returns>
-        public static FormResult SelectFromDropdown(List<string> keys, List<object> values,
+        public static FormResult<T> SelectFromDropdown<T>(List<string> keys, List<T> values,
             string title = null, string message = null, int defaultIndex = -1)
         {
             // Establish the form result to return
-            var formResult = new FormResult(valid: false);
+            var formResult = new FormResult<T>(valid: false);
 
             // Default title and message
             title ??= "Select object from dropdown";
             message ??= "Select an object from the dropdown:";
 
             // Using a dropdown form
-            using (var form = new gFrm.Bases.BaseDropdown(keys, values, title: title, message: message, defaultIndex: defaultIndex))
+            using (var form = new gFrm.Bases.BaseDropdown<T>(keys, values, title: title, message: message, defaultIndex: defaultIndex))
             {
                 // Process the outcome
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    formResult.Validate(form.Tag as object);
+                    formResult.Validate((T)form.Tag);
                 }
             }
 
@@ -476,11 +476,12 @@ namespace geeWiz.Forms
     /// <summary>
     /// A class for holding form outcomes, used by custom forms.
     /// </summary>
-    public class FormResult
+    /// <typeparam name="T">The type of object being stored.</typeparam>
+    public class FormResult<T>
     {
         // These properties hold the resulting object or objects from the form
-        public List<object> Objects { get; set; }
-        public object Object { get; set; }
+        public List<T> Objects { get; set; }
+        public T Object { get; set; }
 
         // These properties allow us to verify the outcome of the form
         public bool Cancelled { get; set; }
@@ -498,8 +499,8 @@ namespace geeWiz.Forms
         /// <param name="valid">Should the result begin as valid.</param>
         public FormResult(bool valid)
         {
-            Objects = new List<object>();
-            Object = null;
+            Objects = new List<T>();
+            Object = default;
             Cancelled = !valid;
             Valid = valid;
             Affirmative = valid;
@@ -519,7 +520,7 @@ namespace geeWiz.Forms
         /// Sets the dialog result to valid, passing an object.
         /// </summary>
         /// <param name="obj">Object to pass to result.</param>
-        public void Validate(object obj)
+        public void Validate(T obj)
         {
             this.Validate();
             this.Object = obj;
@@ -529,7 +530,7 @@ namespace geeWiz.Forms
         /// Sets the dialog result to valid, passing a list of objects.
         /// </summary>
         /// <param name="objs">Objects to pass to result.</param>
-        public void Validate(List<object> objs)
+        public void Validate(List<T> objs)
         {
             this.Validate();
             this.Objects = objs;

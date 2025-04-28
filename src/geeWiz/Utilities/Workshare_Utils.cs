@@ -16,26 +16,38 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Reviews multiple elements for editability, allowing for further processing.
         /// </summary>
-        /// <param name="elements">Elements to process.</param>
+        /// <param name="objects">Elements to process.</param>
+        /// <typeparam name="T">The type of object to process.</typeparam>
         /// <returns>A WorksharingResult object.</returns>
-        public static WorksharingResult ProcessElements(List<Element> elements, Document doc = null)
+        public static WorksharingResult<T> ProcessElements<T>(List<T> objects, Document doc = null)
         {
             // Variables for use later
-            var worksharingResults = new WorksharingResult();
-            var editable = new List<Element>();
-            var nonEditable = new List<Element>();
+            var worksharingResults = new WorksharingResult<T>();
+            var editable = new List<T>();
+            var nonEditable = new List<T>();
 
-            // Iterate over elements
-            foreach (Element element in elements)
+            // For each object...
+            foreach (var obj in objects)
             {
-                if (element.Ext_IsEditable(doc))
+                // If the object is an Element...
+                if (obj is Element element)
                 {
-                    editable.Add(element);
+                    // Check for editability
+                    if (element.Ext_IsEditable(doc))
+                    {
+                        editable.Add(obj);
+                    }
+                    else
+                    {
+                        nonEditable.Add(obj);
+                    }
                 }
+                // Otherwise it is not an element, and is available
                 else
                 {
-                    nonEditable.Add(element);
+                    editable.Add(obj);
                 }
+                
             }
 
             // Assign worksharing results
@@ -47,7 +59,7 @@ namespace geeWiz.Utilities
             if (editable.Count == 0)
             {
                 // Message to user if we lost all elements
-                if (elements.Count > 0)
+                if (objects.Count > 0)
                 {
                     gFrm.Custom.Cancelled("Elements were found, but all of them are not editable\n\n" +
                         "The task cannot proceed, and has been cancelled.");
@@ -60,7 +72,7 @@ namespace geeWiz.Utilities
             else if (nonEditable.Count > 0)
             {
                 // Present form to user
-                gFrm.FormResult formResult = gFrm.Custom.Message(title: "Please choose an option",
+                var formResult = gFrm.Custom.Message(title: "Please choose an option",
                     message: "Not all elements are editable.\n\nProceed with only editable elements?",
                     yesNo: true);
 
@@ -83,10 +95,11 @@ namespace geeWiz.Utilities
     /// <summary>
     /// Class to store and process editable element checks.
     /// </summary>
-    public class WorksharingResult
+    /// <typeparam name="T">The type of object to process.</typeparam>
+    public class WorksharingResult<T>
     {
-        public List<Element> Editable { get; set; }
-        public List<Element> NotEditable { get; set; }
+        public List<T> Editable { get; set; }
+        public List<T> NotEditable { get; set; }
         public bool Cancelled { get; set; }
     }
 

@@ -79,7 +79,7 @@ namespace geeWiz.Utilities
             // Try to open the file with exclusive access
             try
             {
-                using (FileStream stream = new FileStream(filePath,
+                using (var stream = new FileStream(filePath,
                     FileMode.Open, FileAccess.Read, FileShare.None))
                 {
                     // If we managed to run a stream, we can just return true
@@ -279,7 +279,7 @@ namespace geeWiz.Utilities
             // Write to the file as list
             try
             {
-                using (StreamWriter writer = new StreamWriter(filePath, false))
+                using (var writer = new StreamWriter(filePath, false))
                 {
                     foreach (string row in dataRows)
                     {
@@ -307,7 +307,7 @@ namespace geeWiz.Utilities
         {
             var iconPath = "geeWiz.Resources.Icons16.IconList16.ico";
 
-            using (Stream stream = Globals.Assembly.GetManifestResourceStream(iconPath))
+            using (var stream = Globals.Assembly.GetManifestResourceStream(iconPath))
             {
                 if (stream != null)
                 {
@@ -362,7 +362,7 @@ namespace geeWiz.Utilities
             var resourcePath = $"{Globals.AddinName}.Resources.Icons{resolution}.{iconName}{resolution}{suffix}.png";
 
             // Read the resource from its full path
-            using (Stream stream = Globals.Assembly.GetManifestResourceStream(resourcePath))
+            using (var stream = Globals.Assembly.GetManifestResourceStream(resourcePath))
             {
                 // Throw exception if stream not made
                 if (stream == null)

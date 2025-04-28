@@ -39,18 +39,18 @@ namespace geeWiz.Cmds_Revision
                 multiSelect: false,
                 sorted: true);
             if (formResultRevision.Cancelled) { return Result.Cancelled; }
-            var selectedRevision = formResultRevision.Object as Revision;
+            var selectedRevision = formResultRevision.Object;
 
             // Select sheets
             var formResultSheets = doc.Ext_SelectSheets(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
-            var sheets = formResultSheets.Objects.Cast<ViewSheet>().ToList();
+            var sheets = formResultSheets.Objects;
 
             //Filter out workshared sheets
             if (doc.IsWorkshared)
             {
-                var worksharingResult = gWsh.ProcessElements(sheets.Cast<Element>().ToList(), doc);
-                sheets = worksharingResult.Editable.Cast<ViewSheet>().ToList();
+                var worksharingResult = gWsh.ProcessElements<ViewSheet>(sheets, doc);
+                sheets = worksharingResult.Editable;
             }
 
             // Progress bar properties
@@ -166,7 +166,7 @@ namespace geeWiz.Cmds_Revision
                     if ((sheetSetExisting as Element).Ext_IsEditable(doc))
                     {
                         // Delete the sheetset
-                        doc.Ext_DeleteElement(sheetSetExisting);
+                        doc.Ext_DeleteElement<ViewSheetSet>(sheetSetExisting);
                     }
                     else
                     {
@@ -218,12 +218,12 @@ namespace geeWiz.Cmds_Revision
             // Select a revision
             var formResultRevision = doc.Ext_SelectRevisions(sorted: true);
             if (formResultRevision.Cancelled) { return Result.Cancelled; }
-            var revisions = formResultRevision.Objects.Cast<Revision>().ToList();
+            var revisions = formResultRevision.Objects;
 
             // Select sheets
             var formResultSheets = doc.Ext_SelectSheets(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
-            var sheets = formResultSheets.Objects.Cast<ViewSheet>().ToList();
+            var sheets = formResultSheets.Objects;
 
             // Construct doctans, header row
             var matrix = new List<List<string>>();
@@ -275,8 +275,8 @@ namespace geeWiz.Cmds_Revision
             // Select directory
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to save the transmittal");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object as string;
-            var filePath = $"{directoryPath}\\Doctrans.xlsx";
+            var directoryPath = directoryResult.Object;
+            var filePath = Path.Combine(directoryPath, "Doctrans.xlsx");
 
             // Accessibility check if it exists
             if (File.Exists(filePath))

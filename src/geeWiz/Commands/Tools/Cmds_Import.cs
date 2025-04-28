@@ -34,7 +34,7 @@ namespace geeWiz.Cmds_Import
             // Select a directory, make file path
             var directoryResult = gFrm.Custom.SelectDirectoryPath("Choose where to save template");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object as string;
+            var directoryPath = directoryResult.Object;
             var filePath = Path.Combine(directoryPath, "Import sheets.xlsx");
 
             // Accessibility check if it exists
@@ -133,7 +133,7 @@ namespace geeWiz.Cmds_Import
                 filter: gFrm.Custom.FILTER_EXCEL,
                 multiSelect: false);
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var filePath = formResult.Object as string;
+            var filePath = formResult.Object;
 
             // Accessible check
             if (!gFil.FileIsAccessible(filePath))

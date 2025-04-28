@@ -58,7 +58,7 @@ namespace geeWiz
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
-                return uiApp.ActiveUIDocument is UIDocument uiDoc;
+                return uiApp.ActiveUIDocument is not null;
             }
         }
 
@@ -115,7 +115,7 @@ namespace geeWiz
         {
             public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
             {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
+                if (uiApp.ActiveUIDocument is not null)
                 {
                     return categories.Size > 0;
                 }

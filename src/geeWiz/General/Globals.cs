@@ -7,7 +7,6 @@ using Autodesk.Revit.ApplicationServices;
 using System.Collections;
 using System.Globalization;
 using System.Resources;
-using DocumentFormat.OpenXml.Office.CoverPageProps;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz

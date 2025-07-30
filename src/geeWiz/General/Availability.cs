@@ -13,22 +13,19 @@ namespace geeWiz
     {
         #region AvailabilityNames class
 
-        // Availability class prefix
-        internal static string PATH_AVAILABILITY = "geeWiz.Availability";
-
         // Limit the options we can choose as availabilities using a class
         public static class AvailabilityNames
         {
-            public static string Disabled {get { return $"{PATH_AVAILABILITY}+Disabled";} }
-            public static string ZeroDoc { get { return $"{PATH_AVAILABILITY}+ZeroDoc"; } }
-            public static string Document { get { return $"{PATH_AVAILABILITY}+Document"; } }
-            public static string Project { get { return $"{PATH_AVAILABILITY}+Project"; } }
-            public static string Family { get { return $"{PATH_AVAILABILITY}+Family"; } }
-            public static string Workshared { get { return $"{PATH_AVAILABILITY}+Workshared"; } }
-            public static string Selection { get { return $"{PATH_AVAILABILITY}+Selection"; } }
-            public static string ActiveViewSchedule { get { return $"{PATH_AVAILABILITY}+ActiveViewSchedule"; } }
-            public static string SelectionIncludesSheets { get { return $"{PATH_AVAILABILITY}+SelectionIncludesSheets"; } }
-            public static string SelectionOnlySheets { get { return $"{PATH_AVAILABILITY}+SelectionOnlySheets"; } }
+            public static readonly string Disabled = typeof(Disabled).FullName;
+            public static readonly string ZeroDoc = typeof(ZeroDoc).FullName;
+            public static readonly string Document = typeof(Document).FullName;
+            public static readonly string Project = typeof(Project).FullName;
+            public static readonly string Family = typeof(Family).FullName;
+            public static readonly string Workshared = typeof(Workshared).FullName;
+            public static readonly string Selection = typeof(Selection).FullName;
+            public static readonly string ActiveViewSchedule = typeof(ActiveViewSchedule).FullName;
+            public static readonly string SelectionIncludesSheets = typeof(SelectionIncludesSheets).FullName;
+            public static readonly string SelectionOnlySheets = typeof(SelectionOnlySheets).FullName;
         }
 
         #endregion

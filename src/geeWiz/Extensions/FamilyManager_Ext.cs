@@ -381,7 +381,7 @@ namespace geeWiz.Extensions
             // Try to replace it
             try
             {
-                var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.GetGroupTypeId(), replaceParameter.IsInstance);
                 processingOutcome.SetValues(relatedParameter: newParameter);
                 return processingOutcome;
             }
@@ -435,7 +435,7 @@ namespace geeWiz.Extensions
             // Try to replace it
             try
             {
-                var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.GetGroupTypeId(), replaceParameter.IsInstance);
                 processingOutcome.SetValues(relatedParameter: newParameter);
                 return processingOutcome;
             }
@@ -487,8 +487,8 @@ namespace geeWiz.Extensions
             {
                 try
                 {
-                    var tempParameter = familyManager.ReplaceParameter(replaceParameter, tempParameterName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
-                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    var tempParameter = familyManager.ReplaceParameter(replaceParameter, tempParameterName, replaceParameter.Definition.GetGroupTypeId(), replaceParameter.IsInstance);
+                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.GetGroupTypeId(), replaceParameter.IsInstance);
                     processingOutcome.SetValues(relatedParameter: newParameter);
                     return processingOutcome;
                 }
@@ -503,7 +503,7 @@ namespace geeWiz.Extensions
             {
                 try
                 {
-                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withDefinition, replaceParameter.Definition.GetGroupTypeId(), replaceParameter.IsInstance);
                     processingOutcome.SetValues(relatedParameter: newParameter);
                     return processingOutcome;
                 }
@@ -547,7 +547,7 @@ namespace geeWiz.Extensions
                 // Try to replace it
                 try
                 {
-                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.ParameterGroup, replaceParameter.IsInstance);
+                    var newParameter = familyManager.ReplaceParameter(replaceParameter, withName, replaceParameter.Definition.GetGroupTypeId(), replaceParameter.IsInstance);
                     processingOutcome.SetValues(relatedParameter: newParameter);
                     return processingOutcome;
                 }

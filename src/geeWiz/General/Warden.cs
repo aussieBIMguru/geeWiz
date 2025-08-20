@@ -17,25 +17,27 @@ namespace geeWiz
         /// <summary>
         /// Registers all commands to Warden.
         /// </summary>
-        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="uiCtlApp">The UIControlleApplication.</param>
         /// <returns>Void (nothing).</returns>
-        public static void Register(UIControlledApplication uiApp)
+        public static void Register(UIControlledApplication uiCtlApp = null)
         {
-            WatchCommand(uiApp, commandName: "ID_INPLACE_COMPONENT");
-            WatchCommand(uiApp, commandName: "ID_FILE_IMPORT");
-            WatchCommand(uiApp, commandName: "ID_EDIT_PAINT");
+            uiCtlApp ??= Globals.UiCtlApp;
+            WatchCommand(uiCtlApp, commandName: "ID_INPLACE_COMPONENT");
+            WatchCommand(uiCtlApp, commandName: "ID_FILE_IMPORT");
+            WatchCommand(uiCtlApp, commandName: "ID_EDIT_PAINT");
         }
 
         /// <summary>
         /// Registers all commands to Warden.
         /// </summary>
-        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="uiCtlApp">The UIControlledApplication.</param>
         /// <returns>Void (nothing).</returns>
-        public static void DeRegister(UIControlledApplication uiApp)
+        public static void DeRegister(UIControlledApplication uiCtlApp = null)
         {
-            IgnoreCommand(uiApp, commandName: "ID_INPLACE_COMPONENT");
-            IgnoreCommand(uiApp, commandName: "ID_FILE_IMPORT");
-            IgnoreCommand(uiApp, commandName: "ID_EDIT_PAINT");
+            uiCtlApp ??= Globals.UiCtlApp;
+            IgnoreCommand(uiCtlApp, commandName: "ID_INPLACE_COMPONENT");
+            IgnoreCommand(uiCtlApp, commandName: "ID_FILE_IMPORT");
+            IgnoreCommand(uiCtlApp, commandName: "ID_EDIT_PAINT");
         }
 
         #endregion

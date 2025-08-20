@@ -48,7 +48,7 @@ namespace geeWiz
 
             #endregion
 
-            #region Register Globals and Warden
+            #region Register Globals and Automations
 
             // Store all other global variables and tooltips
             Globals.RegisterVariables(uiCtlApp);
@@ -56,6 +56,9 @@ namespace geeWiz
 
             // Register the warden commands
             Warden.Register(uiCtlApp);
+
+            // Register the sync timer
+            SyncTimer.Register(uiCtlApp.ControlledApplication);
 
             #endregion
 
@@ -252,15 +255,18 @@ namespace geeWiz
         /// Runs when the application closes down.
         /// We use this part of the interface to cleanup geeWiz.
         /// </summary>
-        public Result OnShutdown(UIControlledApplication application)
+        public Result OnShutdown(UIControlledApplication uiCtlApp)
         {
             #region Unsubscribe from events
 
             // Deregister coloured tabs
-            if (Globals.ColouringTabs) { ColouredTabs.DeRegister(); }
+            ColouredTabs.DeRegister(uiCtlApp.ControlledApplication, Globals.UiApp);
 
             // Deregister Warden
-            if (Globals.WardenActive) { Warden.DeRegister(Globals.UiCtlApp); }
+            Warden.DeRegister(uiCtlApp);
+
+            // Deregister SyncTimer
+            SyncTimer.DeRegister(uiCtlApp.ControlledApplication);
 
             #endregion
 

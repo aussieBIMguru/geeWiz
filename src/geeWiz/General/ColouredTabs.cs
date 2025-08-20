@@ -9,6 +9,8 @@ using Autodesk.Revit.UI.Events;
 // UI Libraries
 using UIFramework;
 using Xceed.Wpf.AvalonDock.Controls;
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.UI;
 
 // This class belongs to the root namespace
 namespace geeWiz
@@ -42,6 +44,34 @@ namespace geeWiz
 
         // List of unique document titles we will add to and index
         private static List<string> DOC_TITLES = new List<string>();
+
+        #endregion
+
+        #region Registration to events
+
+        /// <summary>
+        /// Register the events to the document opened/activated events.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
+        public static void Register(ControlledApplication ctlApp = null, UIApplication uiApp = null)
+        {
+            ctlApp ??= Globals.CtlApp;
+            uiApp ??= Globals.UiApp;
+            ctlApp.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
+            uiApp.ViewActivated += new EventHandler<ViewActivatedEventArgs>(ViewActivated);
+        }
+
+        /// <summary>
+        /// De-register the events from the document opened/activated events.
+        /// </summary>
+        /// <returns>Void (nothing).</returns>
+        public static void DeRegister(ControlledApplication ctlApp = null, UIApplication uiApp = null)
+        {
+            ctlApp ??= Globals.CtlApp;
+            uiApp ??= Globals.UiApp;
+            ctlApp.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
+            uiApp.ViewActivated -= new EventHandler<ViewActivatedEventArgs>(ViewActivated);
+        }
 
         #endregion
 
@@ -123,30 +153,6 @@ namespace geeWiz
                 }
             }
 
-        }
-
-        #endregion
-
-        #region Registration to events
-
-        /// <summary>
-        /// Register the events to the document opened/activated events.
-        /// </summary>
-        /// <returns>Void (nothing).</returns>
-        public static void Register()
-        {
-            Globals.CtlApp.DocumentOpened += new EventHandler<Autodesk.Revit.DB.Events.DocumentOpenedEventArgs>(DocumentOpened);
-            Globals.UiApp.ViewActivated += new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(ViewActivated);
-        }
-
-        /// <summary>
-        /// De-register the events from the document opened/activated events.
-        /// </summary>
-        /// <returns>Void (nothing).</returns>
-        public static void DeRegister()
-        {
-            Globals.CtlApp.DocumentOpened -= new EventHandler<Autodesk.Revit.DB.Events.DocumentOpenedEventArgs>(DocumentOpened);
-            Globals.UiApp.ViewActivated -= new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(ViewActivated);
         }
 
         #endregion

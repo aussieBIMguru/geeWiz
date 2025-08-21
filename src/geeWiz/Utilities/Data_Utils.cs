@@ -377,5 +377,41 @@ namespace geeWiz.Utilities
         }
 
         #endregion
+
+        #region Quick dictionary
+
+        /// <summary>
+        /// Constructs a dictionary safely versis Linq approach.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the objects in the list.</typeparam>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="source">The source list.</param>
+        /// <param name="keySelector">The functional key selection.</param>
+        /// <param name="valueSelector">The functional value selection.</param>
+        /// <param name="comparer">An optional string comparer.</param>
+        /// <returns>A dictionary.</returns>
+        public static Dictionary<TKey, TValue> QuickDictionary<TSource, TKey, TValue>(
+        this IEnumerable<TSource> source,
+        Func<TSource, TKey> keySelector,
+        Func<TSource, TValue> valueSelector,
+        IEqualityComparer<TKey> comparer = null)
+        {
+            // Produce the base dictionary
+            var dict = (comparer != null)
+                ? new Dictionary<TKey, TValue>(comparer)
+                : new Dictionary<TKey, TValue>();
+
+            // For each list item, functionally key it to the dictionary
+            foreach (var item in source)
+            {
+                dict[keySelector(item)] = valueSelector(item);
+            }
+
+            // Return the dictionary
+            return dict;
+        }
+
+        #endregion
     }
 }

@@ -5,6 +5,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 // geeWiz
 using geeWiz.Extensions;
+using geeWiz.Utilities;
 using gFrm = geeWiz.Forms;
 using gFil = geeWiz.Utilities.File_Utils;
 using gXcl = geeWiz.Utilities.Excel_Utils;
@@ -162,11 +163,12 @@ namespace geeWiz.Cmds_Import
             // Select titleblock type
             var formResultTtb = doc.Ext_SelectTitleblockTypes(multiSelect: false, sorted: true);
             if (formResultTtb.Cancelled) { return Result.Cancelled; }
-            var titleblockTypeId = (formResultTtb.Object as Element).Id;
+            var titleblockTypeId = formResultTtb.Object.Id;
 
             // Collect sheets and numbers
             var sheets = doc.Ext_GetSheets(includePlaceholders: true);
-            var sheetNumbers = sheets.Select(s => s.SheetNumber).ToList();
+            // var sheetDictionar = sheets.ToDictionary(s => s.SheetNumber); easier, but not assured in 2026+
+            var sheetDictionary = sheets.QuickDictionary(s => s.SheetNumber.ToLower(), s => s);
 
             // Progress bar properties
             int pbTotal = matrix.Count;
@@ -175,6 +177,7 @@ namespace geeWiz.Cmds_Import
             // Tracker variables
             int updated = 0;
             int created = 0;
+            int skipped = 0;
 
             // Using a progress bar
             using (var pb = new gFrm.Bases.ProgressBar(taskName: "Creating/updating sheets...", pbTotal: pbTotal))
@@ -199,29 +202,24 @@ namespace geeWiz.Cmds_Import
                         var newName = row[1];
 
                         // If the sheet number exists
-                        if (sheetNumbers.Contains(newNumber))
+                        if (sheetDictionary.TryGetValue(newNumber.ToLower(), out ViewSheet exSheet))
                         {
-                            // Get the sheet
-                            int ind = sheetNumbers.IndexOf(newNumber);
-                            var sheet = sheets[ind];
-
-                            // If it is editable, update its name
-                            if ((sheet as Element).Ext_IsEditable(doc) && sheet.Name != newName)
+                            if (exSheet.Ext_IsEditable(doc) && exSheet.Name != newName)
                             {
-                                sheet.Name = newName;
-                                updated++;
+                                exSheet.Name = newName;
+                                created++;
+                            }
+                            else
+                            {
+                                skipped++;
                             }
                         }
                         else
                         {
-                            // Otherwise, create a sheet
-                            var sheet = ViewSheet.Create(doc, titleblockTypeId);
-                            sheet.SheetNumber = newNumber;
-                            sheet.Name = newName;
-
-                            // Add to the lists (to catch duplicates)
-                            sheets.Add(sheet);
-                            sheetNumbers.Add(newNumber);
+                            var newSheet = ViewSheet.Create(doc, titleblockTypeId);
+                            sheetDictionary[newNumber.ToLower()] = newSheet;
+                            newSheet.SheetNumber = newNumber;
+                            newSheet.Name = newName;
                             created++;
                         }
 
@@ -238,7 +236,8 @@ namespace geeWiz.Cmds_Import
             // Return the result
             return gFrm.Custom.Completed(
                 $"{created} sheets created.\n" +
-                $"{updated} sheet names updated.");
+                $"{updated} sheet names updated.\n" +
+                $"{skipped} sheet names not editable.");
         }
     }
 

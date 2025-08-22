@@ -49,7 +49,7 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="ClosedXML" Version="0.104.2" />
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
 		<PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />

@@ -1,11 +1,10 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
-using View = Autodesk.Revit.DB.View;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using gSpa = geeWiz.Utilities.Spatial_Utils;
 using gView = geeWiz.Utilities.View_Utils;
-using Autodesk.Revit.DB;
+using View = Autodesk.Revit.DB.View;
 
 // The class belongs to the extensions namespace (partial class)
 // Document doc.ExtensionMethod()
@@ -167,49 +166,48 @@ namespace geeWiz.Extensions
                 return Result.Succeeded;
             }
 
-            // Progress bar properties
-            int pbTotal = objects.Count;
-            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
+            // Create a progress bar
+            var pb = new gFrm.ProgressController(total: objects.Count, taskName: $"Deleting {typeName}(s)...");
             int deleteCount = 0;
 
-            // Using a progress bar
-            using (var pb = new gFrm.Bases.ProgressBar($"Deleting {typeName}(s)...", pbTotal: pbTotal))
+            // Using a transaction
+            using (var t = new Transaction(doc, $"geeWiz: Delete {typeName}(s)"))
             {
-                // Using a transaction
-                using (var t = new Transaction(doc, $"geeWiz: Delete {typeName}(s)"))
+                // Start the transaction
+                t.Start();
+
+                // For each element
+                foreach (var obj in objects)
                 {
-                    // Start the transaction
-                    t.Start();
-
-                    // For each element
-                    foreach (var obj in objects)
+                    // Check for cancellation
+                    if (pb.CancelCheck(t: t))
                     {
-                        // Check for cancellation
-                        if (pb.CancelCheck(t))
-                        {
-                            return Result.Cancelled;
-                        }
-
-                        // Try to delete the element, uptick deletCount if we do
-                        if (doc.Ext_DeleteElement<T>(obj) == Result.Succeeded)
-                        {
-                            deleteCount++;
-                        }
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pb.Increment();
+                        break;
                     }
 
-                    // Commit the transaction
-                    pb.Commit(t);
+                    // Try to delete the element, uptick deletCount if we do
+                    if (doc.Ext_DeleteElement<T>(obj) == Result.Succeeded)
+                    {
+                        deleteCount++;
+                    }
                 }
+
+                // Commit the transaction
+                pb.Commit(t: t);
             }
 
             // Optional message
             if (showMessage)
             {
-                gFrm.Custom.Completed($"{deleteCount}/{pbTotal} {typeName}s deleted.");
+                if (pb.CancelledByUser)
+                {
+                    gFrm.Custom.Cancelled("Deletion process cancelled by user.\n\n" +
+                        "Changes to the model have been rolled back.");
+                }
+                else
+                {
+                    gFrm.Custom.Completed($"{deleteCount}/{objects.Count} {typeName}s deleted.");
+                }
             }
 
             // Return the result
@@ -447,6 +445,38 @@ namespace geeWiz.Extensions
 
             // Run the selection from list
             return gFrm.Custom.SelectFromList<ViewSheet>(keys: keys,
+                values: sheets,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        /// <summary>
+        /// Select sheet(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="sheets">An optional list of sheets to show.</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the levels by elevation.</param>
+        /// <param name="includePlaceholders">Include placeholder sheets.</param>
+        /// <param name="includeId">Append the ElementId to the end.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult<ViewSheet> Ext_SelectSheetsWpf(this Document doc, List<ViewSheet> sheets = null, string title = null,
+            bool multiSelect = true, bool sorted = false, bool includePlaceholders = false, bool includeId = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select Sheet(s):" : "Select a sheet";
+
+            // Get all Sheets in document if none provided
+            sheets ??= doc.Ext_GetSheets(sorted: sorted, includePlaceholders: includePlaceholders);
+
+            // Process into keys (to return)
+            var keys = sheets
+                .Select(s => s.Ext_ToSheetKey(includeId))
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.CustomWpf.SelectFromList<ViewSheet>(keys: keys,
                 values: sheets,
                 title: title,
                 multiSelect: multiSelect);
@@ -814,6 +844,34 @@ namespace geeWiz.Extensions
 
             // Run the selection from list
             return gFrm.Custom.SelectFromList<Revision>(keys: keys,
+                values: revisions,
+                title: title,
+                multiSelect: multiSelect);
+        }
+
+        /// <summary>
+        /// Select revision(s) from the document.
+        /// </summary>
+        /// <param name="doc">The Document (extended).</param>
+        /// <param name="title">The form title (optional).</param>
+        /// <param name="multiSelect">Select more than one item.</param>
+        /// <param name="sorted">Sort the revisions by sequence.</param>
+        /// <returns>A FormResult object.</returns>
+        public static gFrm.FormResult<Revision> Ext_SelectRevisionsWpf(this Document doc, string title = null, bool multiSelect = true, bool sorted = false)
+        {
+            // Set the default form title if not provided
+            title ??= multiSelect ? "Select Revision(s):" : "Select a Revision:";
+
+            // Get all revisions in document
+            var revisions = doc.Ext_GetRevisions(sorted: sorted);
+
+            // Process into keys (to return)
+            var keys = revisions
+                .Select(r => r.Ext_ToRevisionKey())
+                .ToList();
+
+            // Run the selection from list
+            return gFrm.CustomWpf.SelectFromList<Revision>(keys: keys,
                 values: revisions,
                 title: title,
                 multiSelect: multiSelect);

@@ -1,0 +1,64 @@
+﻿<Window x:Class="geeWiz.Forms.Mvvm.Views.ViewProgress"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Title="PROGRESS BAR"
+        Height="Auto"
+        Width="300"
+        SizeToContent="Height"
+        ShowInTaskbar="True">
+
+    <!-- SHARED STYLING -->
+    <Window.Resources>
+        <ResourceDictionary Source="/geeWiz;component/Resources/SharedStyles.xaml" />
+    </Window.Resources>
+
+    <!-- MAIN GRID -->
+    <Grid Margin="10">
+
+        <!-- 3 ROWS -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ROW 1 - PROGRESS LABEL -->
+        <TextBlock HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Grid.Row="0"
+                   Margin="0,0,0,0"
+                   Style="{StaticResource TextBlock_Label}">
+            
+            <!-- TEXT STRING -->
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0}... {1}/{2}">
+                    <Binding Path="TaskName" RelativeSource="{RelativeSource AncestorType={x:Type Window}}" />
+                    <Binding Path="Value" ElementName="progressBar" />
+                    <Binding Path="Maximum" ElementName="progressBar" />
+                </MultiBinding>
+            </TextBlock.Text>
+            
+        </TextBlock>
+
+        <!-- ROW 2 - PROGRESSBAR -->
+        <Border Grid.Row="1" Margin="8">
+            <ProgressBar x:Name="progressBar"
+             Height="Auto"
+             Width="Auto"/>
+        </Border>
+
+        <!-- ROW 3 - CANCEL BUTTON -->
+        <Button Content="CANCEL"
+                Width="80"
+                Height="Auto"
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                Click="Cancel_Click"/>
+    </Grid>
+
+</Window>

@@ -43,7 +43,7 @@ namespace geeWiz.Forms.Bases
             this.Text = title;
 
             // Create the key and value pairs
-            this.FormPairs = gDat.CombineAsFormPairs(keys, values);
+            this.FormPairs = gDat.CombineAsKeyedValues(keys, values);
             this.FilterString = "";
 
             // Establish multi selection behavior

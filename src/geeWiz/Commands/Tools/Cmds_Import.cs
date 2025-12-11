@@ -33,7 +33,7 @@ namespace geeWiz.Cmds_Import
             var altFired = gScr.KeyHeldShift();
 
             // Select a directory, make file path
-            var directoryResult = gFrm.Custom.SelectDirectoryPath("Choose where to save template");
+            var directoryResult = gFrm.Custom.SelectFolder("Choose where to save template");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
             var directoryPath = directoryResult.Object;
             var filePath = Path.Combine(directoryPath, "Import sheets.xlsx");

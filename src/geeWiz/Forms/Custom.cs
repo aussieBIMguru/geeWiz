@@ -1,8 +1,14 @@
-﻿// Revit API
+﻿// System
+using System.Windows;
+using MessageBox = System.Windows.Forms.MessageBox;
+// Revit API
 using Autodesk.Revit.UI;
 // geeWiz libraries
 using gFrm = geeWiz.Forms;
 using gCnv = geeWiz.Utilities.Convert_Utils;
+using gDat = geeWiz.Utilities.Data_Utils;
+// Microsoft
+using MsDialogs = Microsoft.WindowsAPICodePack.Dialogs;
 
 // The class belongs to the forms namespace
 // using gFrm = geeWiz.Forms (+ .Custom)
@@ -222,7 +228,7 @@ namespace geeWiz.Forms
         /// </summary>
         /// <param name="title">An optional title to display.</param>
         /// <returns>A FormResult object.</returns>
-        public static FormResult<string> SelectDirectoryPath(string title = null)
+        public static FormResult<string> SelectDirectory_FailSafe(string title = null)
         {
             // Establish the form result to return
             var formResult = new FormResult<string>(valid: false);
@@ -237,6 +243,53 @@ namespace geeWiz.Forms
                 if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
                     formResult.Validate(folderBrowserDialog.SelectedPath);
+                }
+            }
+
+            // Return the outcome
+            return formResult;
+        }
+
+        /// <summary>
+        /// Allows the user to select a directory path (uses code pack dll).
+        /// </summary>
+        /// <param name="title">An optional title to display.</param>
+        /// <param name="multiSelect">An optional title to display.</param>
+        /// <returns>A directory path.</returns>
+        public static FormResult<string> SelectFolder(string title = null, bool multiSelect = false)
+        {
+            // Make sure the platform supports this type of directory browser
+            if (!MsDialogs.CommonFileDialog.IsPlatformSupported)
+            {
+                return SelectDirectory_FailSafe(title);
+            }
+
+            // Establish the form result to return
+            var formResult = new FormResult<string>(valid: false);
+
+            // Using a dialog object
+            using (var dialog = new MsDialogs.CommonOpenFileDialog())
+            {
+                // Set title and default values
+                title ??= multiSelect ? "Select folder(s)" : "Select a folder";
+                dialog.Title = title;
+
+                // Set properties
+                dialog.RestoreDirectory = true;
+                dialog.IsFolderPicker = true;
+                dialog.Multiselect = multiSelect;
+
+                // Process the result
+                if (dialog.ShowDialog() == MsDialogs.CommonFileDialogResult.Ok)
+                {
+                    if (multiSelect)
+                    {
+                        formResult.Validate(dialog.FileNames.ToList());
+                    }
+                    else
+                    {
+                        formResult.Validate(dialog.FileName);
+                    }
                 }
             }
 
@@ -437,6 +490,68 @@ namespace geeWiz.Forms
         #endregion
     }
 
+    // These classes provide alternative Wpf based form examples
+    public static class CustomWpf
+    {
+        #region SelectFromList
+
+        /// <summary>
+        /// Processes a generic form for showing objects in a list with a text filter.
+        /// </summary>
+        /// <param name="keys">A list of keys to display.</param>
+        /// <param name="values">A list of values to pass by key.</param>
+        /// <param name="title">An optional title to display.</param>
+        /// <param name="multiSelect">If we want to select more than one item.</param>
+        /// <param name="allowNoSelection">The form permits the user to proceed with no chosen items.</param>
+        /// <typeparam name="T">The type of object being stored.</typeparam>
+        /// <returns>A FormResult object.</returns>
+        public static FormResult<T> SelectFromList<T>(List<string> keys, List<T> values,
+            string title = null, bool multiSelect = true, bool allowNoSelection = false)
+        {
+            // Establish the form result to return
+            var formResult = new FormResult<T>(valid: false);
+
+            // Default title
+            title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
+
+            // Keyed object process
+            var keyedObjects = gDat.CombineAsKeyedObjects<T>(keys, values, showMessages: true);
+            if (keyedObjects is null) { return formResult; }
+
+            // Run the Wpf form
+            var dlg = new Bases.WpfListView(keyedObjects, multiSelect, title, allowNoSelection);
+
+            // Process the outcome if affirmative
+            if (dlg.ShowDialog() == true)
+            {
+                var chosenItems = dlg.GetChosenItems()
+                    .Select(i => i.ItemValue)
+                    .OfType<T>()
+                    .ToList();
+
+                if (multiSelect)
+                {
+                    if (chosenItems.Count > 0 || allowNoSelection)
+                    {
+                        formResult.Validate(objs: chosenItems);
+                    }
+                }
+                else
+                {
+                    if (chosenItems.Count > 0)
+                    {
+                        formResult.Validate(obj: chosenItems.First());
+                    }
+                }
+            }
+
+            // Return the result
+            return formResult;
+        }
+
+        #endregion
+    }
+
     // These classes provide form utility
     public static class Utilities
     {
@@ -466,6 +581,77 @@ namespace geeWiz.Forms
 
             // Return the step
             return step;
+        }
+
+        #endregion
+
+        #region Wpf utilities
+
+        /// <summary>
+        /// Sets the selection behavior of a listbox in Wpf.
+        /// </summary>
+        /// <param name="multiSelect">If we want multiselection behavior.</param>
+        /// <param name="listBox">The related listbox.</param>
+        /// <param name="checkAllButton">Optional button for check all.</param>
+        /// <param name="uncheckAllButton">Optional button for uncheck all.</param>
+        /// <returns>The name of the item template to use.</returns>
+        public static string Wpf_SetListBoxMode(bool multiSelect, System.Windows.Controls.ListBox listBox,
+            System.Windows.Controls.Button checkAllButton = null, System.Windows.Controls.Button uncheckAllButton = null)
+        {
+            // Set state of check all buttons (single select = off)
+            checkAllButton?.IsEnabled = multiSelect;
+            uncheckAllButton?.IsEnabled = multiSelect;
+
+            // Return resource and set the behavior of the listbox
+            if (multiSelect)
+            {
+                listBox.SelectionMode = System.Windows.Controls.SelectionMode.Extended;
+                return "DataTemplate_MultiSelect";
+            }
+            else
+            {
+                listBox.SelectionMode = System.Windows.Controls.SelectionMode.Single;
+                return "DataTemplate_SingleSelect";
+            }
+        }
+
+        /// <summary>
+        /// Runs a shift click process on a listbox.
+        /// </summary>
+        /// <typeparam name="T">The type of object bound to the checkbox.</typeparam>
+        /// <param name="sender">The </param>
+        /// <param name="multiSelect"></param>
+        /// <param name="listBox"></param>
+        public static void Wpf_ShiftClickProcess<T>(object sender, bool multiSelect, System.Windows.Controls.ListBox listBox)
+        {
+            // Stop here if we are single selecting
+            if (!multiSelect) { return; }
+
+            // Ensure a valid check box sent the event
+            if (sender is not System.Windows.Controls.CheckBox cb) { return; }
+            if (cb.DataContext is not gDat.KeyedValue<T> clickedItem) { return; }
+
+            // State to assign to other selected objects
+            bool newState = cb.IsChecked == true;
+
+            // Switch to checkbox if it was not selected
+            if (!listBox.SelectedItems.Contains(clickedItem))
+            {
+                listBox.SelectedItems.Clear();
+                listBox.SelectedItem = clickedItem;
+            }
+
+            // Apply the state to all selected items
+            foreach (var obj in listBox.SelectedItems)
+            {
+                if (obj is gDat.KeyedValue<T> t)
+                {
+                    t.Checked = newState;
+                }
+            }
+
+            // Force UI to refresh all item states
+            listBox.Items.Refresh();
         }
 
         #endregion

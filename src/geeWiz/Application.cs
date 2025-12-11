@@ -22,6 +22,7 @@ namespace geeWiz
         // Ribbon construction constants
         public const string PANEL1_NAME = "General";
         public const string PANEL2_NAME = "Tools";
+        public const string PANELD_NAME = "DEBUG";
 
         #endregion
 
@@ -245,6 +246,16 @@ namespace geeWiz
 
             #endregion
 
+            #endregion
+
+            #region Panel Debug
+
+            // Only add the Debug panel when in debug mode
+#if DEBUG
+            var ribbonPanelDebug = uiCtlApp.Ext_AddRibbonPanelToTab(Globals.AddinName, PANELD_NAME);
+            ribbonPanelDebug.Ext_AddPushButton<Cmds_Testing.Cmd_TestGeneral>("Test", gAva.Project);
+            ribbonPanelDebug.Ext_AddPushButton<Cmds_Testing.Cmd_TestMvvm>("Mvvm", gAva.Project);
+#endif
             #endregion
 
             // Return succeeded

@@ -1,0 +1,136 @@
+﻿<!-- OVERALL WINDOW -->
+<Window x:Class="geeWiz.Forms.Bases.WpfListView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SELECT ITEMS FROM LIST"
+        MinHeight="700"
+        MinWidth="500"
+        Height="700"
+        Width="500"
+        WindowStartupLocation="CenterScreen">
+
+    <!-- RESOURCES -->
+    <Window.Resources>
+
+        <ResourceDictionary>
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/geeWiz;component/Resources/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- CHECKBOX: MULTI SELECT -->
+            <Style TargetType="CheckBox" x:Key="CheckBox_MultiSelect">
+                <EventSetter Event="Click" Handler="CheckBox_Click" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,0,6,0" />
+            </Style>
+
+            <!-- DATA TEMPLATE - MULTISELECT -->
+            <DataTemplate x:Key="DataTemplate_MultiSelect">
+                <Grid Margin="2">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0"
+                              IsChecked="{Binding Checked, Mode=TwoWay}"
+                              Style="{StaticResource CheckBox_MultiSelect}"/>
+
+                    <TextBlock Grid.Column="1"
+                               VerticalAlignment="Center"
+                               Text="{Binding ItemKey}"
+                               Foreground="Black"
+                               FontFamily="Verdana"/>
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+
+    </Window.Resources>
+
+    <!-- MAIN GRID -->
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ROW 1 - BUTTONS -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LABEL -->
+            <TextBlock Grid.Column="0"
+                       Text="FILTER:"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource TextBlock_LabelBold}"/>
+
+            <!-- FILTER -->
+            <TextBox x:Name="FilterTextBox"
+                     Grid.Column="1"
+                     Margin="8,0,0,0"
+                     VerticalAlignment="Center"
+                     TextChanged="FilterTextBox_TextChanged"/>
+        </Grid>
+
+        <!-- ROW 2 - LISTBOX -->
+        <Border Grid.Row="1" Margin="0,8,0,8">
+            <ListBox x:Name="ListBox"
+                     SelectionMode="Extended"
+                     ItemTemplate="{StaticResource DataTemplate_MultiSelect}">
+            </ListBox>
+        </Border>
+
+        <!-- ROW 3 - BUTTONS -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- BUTTON - CHECK ALL -->
+            <Button x:Name="CheckAllButton"
+                    Grid.Column="0"
+                    Content="CHECK ALL"
+                    Margin="0,0,4,0"
+                    Click="CheckAll_Click"/>
+
+            <!-- BUTTON - UNCHECK ALL -->
+            <Button x:Name="UncheckAllButton"
+                    Grid.Column="1"
+                    Content="UNCHECK ALL"
+                    Margin="4,0,0,0"
+                    Click="UncheckAll_Click"/>
+        </Grid>
+
+        <!-- ROW 4 - BUTTONS -->
+        <Grid Grid.Row="3" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- BUTTON - OK -->
+            <Button Grid.Column="0"
+                    Content="OK"
+                    Margin="0,0,4,0"
+                    IsDefault="True"
+                    Click="OkButton_Click"/>
+
+            <!-- BUTTON - CANCEL -->
+            <Button Grid.Column="1"
+                    Content="CANCEL"
+                    Margin="4,0,0,0"
+                    IsCancel="True"
+                    Click="CancelButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>

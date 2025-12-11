@@ -1,5 +1,7 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
+// geeWiz
+using gFrm = geeWiz.Forms;
 
 // The class belongs to the geeWiz namespace
 // using gDat = geeWiz.Utilities.Data_Utils
@@ -18,22 +20,66 @@ namespace geeWiz.Utilities
         /// <typeparam name="T">The type of object being stored.</typeparam>
         /// <param name="values">Objects to add to the FormPair.</param>
         /// <param name="keys">The keys to connect to the FormPair.</param>
+        /// <param name="showMessages">Show error messages.</param>
         /// <returns>A list of FormPairs.</returns>
-        public static List<KeyedValue<T>> CombineAsFormPairs<T>(List<string> keys, List<T> values)
+        public static List<KeyedValue<T>> CombineAsKeyedValues<T>(List<string> keys, List<T> values, bool showMessages = false)
         {
-            // Get the shortest count
-            var pairCount = keys.Count > values.Count ? values.Count : keys.Count;
+            // Catch if invalid outcomes
+            if (keys is null || values is null
+                || keys.Count != values.Count || keys.Count == 0)
+            {
+                if (showMessages)
+                {
+                    gFrm.Custom.Error("Invalid key/value pairing provided.\n\n" +
+                        "This is typically due to an error in the code, or no objects were provided.");
+                }
 
+                return null;
+            }
+            
             // Empty list of form pairs
             var formPairs = new List<KeyedValue<T>>();
 
-            // Return the list if one list was empty
-            if (pairCount == 0) { return formPairs; }
-
             // Construct the form pairs with indices
-            for (int i = 0; i < pairCount; i++)
+            for (int i = 0; i < keys.Count; i++)
             {
                 formPairs.Add(new KeyedValue<T>(values[i], keys[i], i));
+            }
+
+            // Return the formpairs
+            return formPairs;
+        }
+
+        /// <summary>
+        /// Combines keys and values into FormPairs of the Object type.
+        /// </summary>
+        /// <typeparam name="T">The type of object being stored.</typeparam>
+        /// <param name="values">Objects to add to the FormPair.</param>
+        /// <param name="keys">The keys to connect to the FormPair.</param>
+        /// <param name="showMessages">Show error messages.</param>
+        /// <returns>A list of FormPairs of the Object type.</returns>
+        public static List<KeyedValue<object>> CombineAsKeyedObjects<T>(List<string> keys, List<T> values, bool showMessages = false)
+        {
+            // Catch if invalid outcomes
+            if (keys is null || values is null
+                || keys.Count != values.Count || keys.Count == 0)
+            {
+                if (showMessages)
+                {
+                    gFrm.Custom.Error("Invalid key/value pairing provided.\n\n" +
+                        "This is typically due to an error in the code, or no objects were provided.");
+                }
+
+                return null;
+            }
+
+            // Empty list of form pairs
+            var formPairs = new List<KeyedValue<object>>();
+
+            // Construct the form pairs with indices
+            for (int i = 0; i < keys.Count; i++)
+            {
+                formPairs.Add(new KeyedValue<object>(values[i] as object, keys[i], i));
             }
 
             // Return the formpairs

@@ -34,7 +34,7 @@ namespace geeWiz.Cmds_Revision
             var altFired = gScr.KeyHeldShift();
 
             // Select a revision
-            var formResultRevision = doc.Ext_SelectRevisions(
+            var formResultRevision = doc.Ext_SelectRevisionsWpf(
                 title: altFired ? "Revision to remove" : "Revision to add",
                 multiSelect: false,
                 sorted: true);
@@ -42,7 +42,7 @@ namespace geeWiz.Cmds_Revision
             var selectedRevision = formResultRevision.Object;
 
             // Select sheets
-            var formResultSheets = doc.Ext_SelectSheets(sorted: true);
+            var formResultSheets = doc.Ext_SelectSheetsWpf(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
             var sheets = formResultSheets.Objects;
 
@@ -53,54 +53,44 @@ namespace geeWiz.Cmds_Revision
                 sheets = worksharingResult.Editable;
             }
 
-            // Progress bar properties
-            int pbTotal = sheets.Count;
-            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
-            int updated = 0;
+            // Progress bar for the task
+            var taskName = altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...";
+            var pb = new gFrm.ProgressController(total: sheets.Count, taskName: taskName);
+            int updatedCount = 0;
 
-            // Using a progress bar
-            using (var pb = new gFrm.Bases.ProgressBar(
-                taskName: altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...",
-                pbTotal: pbTotal))
+            // Using a transaction
+            using (var t = new Transaction(doc, "geeWiz: BulkRev"))
             {
-                // Using a transaction
-                using (var t = new Transaction(doc, "geeWiz: BulkRev"))
+                // Start the transaction
+                t.Start();
+
+                // For each sheet
+                foreach (var sheet in sheets)
                 {
-                    // Start the transaction
-                    t.Start();
-
-                    // For each sheet
-                    foreach (var sheet in sheets)
+                    // Check for cancellation
+                    if (pb.CancelCheck(t: t))
                     {
-                        // Check for cancellation
-                        if (pb.CancelCheck(t))
-                        {
-                            return Result.Cancelled;
-                        }
-
-                        // Add or remove result if altfired
-                        if (altFired)
-                        {
-                            updated += sheet.Ext_RemoveRevision(selectedRevision).Ext_ToInteger();
-                        }
-                        else
-                        {
-                            updated += sheet.Ext_AddRevision(selectedRevision).Ext_ToInteger();
-                        }
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pb.Increment();
+                        return Result.Cancelled;
                     }
 
-                    // Commit the transaction
-                    pb.Commit(t);
+                    // Add or remove result if altfired
+                    if (altFired)
+                    {
+                        updatedCount += sheet.Ext_RemoveRevision(selectedRevision).Ext_ToInteger();
+                    }
+                    else
+                    {
+                        updatedCount += sheet.Ext_AddRevision(selectedRevision).Ext_ToInteger();
+                    }
                 }
+
+                // Commit the transaction
+                pb.Commit(t: t);
             }
 
             // Return the result
             return gFrm.Custom.Completed(
-                $"{updated}/{pbTotal} sheets updated.\n\n" +
+                $"{updatedCount}/{sheets.Count} sheets updated.\n\n" +
                 $"Skipped sheets required no changes.");
         }
     }
@@ -273,7 +263,7 @@ namespace geeWiz.Cmds_Revision
             }
 
             // Select directory
-            var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to save the transmittal");
+            var directoryResult = gFrm.Custom.SelectFolder("Select where to save the transmittal");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
             var directoryPath = directoryResult.Object;
             var filePath = Path.Combine(directoryPath, "Doctrans.xlsx");

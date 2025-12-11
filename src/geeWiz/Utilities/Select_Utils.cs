@@ -94,6 +94,32 @@ namespace geeWiz.Utilities
             }
         }
 
+        /// <summary>
+        /// ISelectionFilter that filters by provided view.
+        /// Provide view as null for no owner view.
+        /// </summary>
+        public class ISF_AnyElement : ISelectionFilter
+        {
+            // Default constructor
+            public ISF_AnyElement()
+            {
+                // Any element
+            }
+
+            // Condition for allowing elements by owner view Id
+            public bool AllowElement(Element element)
+            {
+                // Always true
+                return true;
+            }
+
+            // Do not allow reference selection
+            public bool AllowReference(Reference reference, XYZ position)
+            {
+                return false;
+            }
+        }
+
         #endregion
     }
 }

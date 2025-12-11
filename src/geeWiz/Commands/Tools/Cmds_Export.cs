@@ -72,7 +72,7 @@ namespace geeWiz.Cmds_Export
             }
 
             // Select a directory, make file path
-            var directoryResult = gFrm.Custom.SelectDirectoryPath("Choose where to save the file");
+            var directoryResult = gFrm.Custom.SelectFolder("Choose where to save the file");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
             var directoryPath = directoryResult.Object;
             var filePath = Path.Combine(directoryPath, "Export schedule.xlsx");
@@ -160,7 +160,7 @@ namespace geeWiz.Cmds_Export
             var sheets = formResults.Objects;
 
             // Select directory to export to
-            var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to export to");
+            var directoryResult = gFrm.Custom.SelectFolder("Select where to export to");
             if (directoryResult.Cancelled) {  return Result.Cancelled; }
             var directoryPath = directoryResult.Object;
 
@@ -237,7 +237,7 @@ namespace geeWiz.Cmds_Export
             var sheets = formResults.Objects;
 
             // Select directory to export to
-            var directoryResult = gFrm.Custom.SelectDirectoryPath("Select where to export to");
+            var directoryResult = gFrm.Custom.SelectFolder("Select where to export to");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
             var directoryPath = directoryResult.Object;
 

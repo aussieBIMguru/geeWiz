@@ -1,0 +1,166 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- WINDOW - IMPLICIT -->
+    <Style TargetType="Window">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderThickness" Value="3" />
+        <Setter Property="BorderBrush" Value="SlateGray" />
+        <Setter Property="FontFamily" Value="Verdana" />
+    </Style>
+
+    <!-- TEXTBLOCK - LABEL -->
+    <Style x:Key="TextBlock_Label" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="FontFamily" Value="Verdana" />
+    </Style>
+
+    <!-- TEXTBLOCK - LABEL, BOLD -->
+    <Style x:Key="TextBlock_LabelBold" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontFamily" Value="Verdana" />
+    </Style>
+
+    <!-- TEXTBOX - IMPLICIT -->
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="BorderBrush" Value="SlateGray" />
+        <Setter Property="BorderThickness" Value="3" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="AcceptsReturn" Value="False" />
+        <Setter Property="AcceptsTab" Value="False" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    
+    <!-- BUTTON - IMPLICIT -->
+    <Style TargetType="Button">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="DarkSlateBlue" />
+        <Setter Property="Background" Value="SlateBlue" />
+        <Setter Property="BorderThickness" Value="3"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontFamily" Value="Verdana" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+
+        <!-- ALTERNATIVE STATES-->
+        <Style.Triggers>
+            
+            <!-- MOUSE OVER -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="MediumSlateBlue"/>
+            </Trigger>
+
+            <!-- PRESSED -->
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="DarkSlateBlue"/>
+            </Trigger>
+
+            <!-- DISABLED -->
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="DarkSlateGray" />
+                <Setter Property="BorderBrush" Value="DarkSlateGray" />
+                <Setter Property="Background" Value="SlateGray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- LISTBOX - IMPLICIT -->
+    <Style TargetType="ListBox">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+
+    <!-- LISTBOX ITEM - IMPLICIT -->
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="FontFamily" Value="Verdana" />
+
+        <!-- ALTERNATIVE STATES-->
+        <Style.Triggers>
+
+            <!-- MOUSE OVER -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="Cyan" />
+            </Trigger>
+
+            <!-- SELECTED -->
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="LightSlateGray" />
+                <Setter Property="Foreground" Value="Black" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!-- PROGRESS BAR - IMPLICIT -->
+    <Style TargetType="ProgressBar">
+        <Setter Property="Foreground" Value="SlateBlue"/>
+        <Setter Property="Background" Value="LightGray"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- BORDER - IMPLICIT -->
+    <Style TargetType="Border">
+        <Setter Property="BorderBrush" Value="SlateGray"/>
+        <Setter Property="BorderThickness" Value="3"/>
+        <Setter Property="CornerRadius" Value="3"/>
+    </Style>
+
+    <!-- SCROLL BAR - IMPLICIT -->
+    <Style  TargetType="ScrollBar">
+        <Setter Property="Background" Value="LightSlateGray" />
+        <Setter Property="Foreground" Value="DarkSlateBlue" />
+    </Style>
+
+    <!-- DATA TEMPLATE: SINGLE SELECT -->
+    <DataTemplate x:Key="DataTemplate_SingleSelect">
+
+        <TextBlock VerticalAlignment="Center"
+                   Margin="2"
+                   Text="{Binding ItemKey}"
+                   Foreground="Black"
+                   FontFamily="Verdana"/>
+    </DataTemplate>
+    
+    <!-- DATA TEMPLATE: MULTI SELECT (MUST LIVE IN ACTUAL CLASS) -->
+    
+    <!-- CHECKBOX: REFERENCE ONLY -->
+    <Style TargetType="CheckBox" x:Key="CheckBox_MultiSelect_Reference">
+        <!--<EventSetter Event="Click" Handler="CheckBox_Click" />-->
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+
+    <!-- DATA TEMPLATE - MULTISELECT -->
+    <DataTemplate x:Key="DataTemplate_MultiSelect_Reference">
+        <Grid Margin="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Column="0"
+              IsChecked="{Binding Checked, Mode=TwoWay}"
+              Style="{StaticResource CheckBox_MultiSelect_Reference}"/>
+
+            <TextBlock Grid.Column="1"
+               VerticalAlignment="Center"
+               Text="{Binding ItemKey}"
+               Foreground="Black"
+               FontFamily="Verdana"/>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>

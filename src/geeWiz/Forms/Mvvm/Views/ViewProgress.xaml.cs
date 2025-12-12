@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
-using MessageBox = System.Windows.MessageBox;
 using ProgressBar = System.Windows.Controls.ProgressBar;
 
 // Using the Mvvm namespace
@@ -24,6 +23,8 @@ namespace geeWiz.Forms.Mvvm.Views
         #region Control bar properties
 
         // AI Written - no idea how it actually works...
+        // The point of all of this is to block access to minimize/close controls
+        // We only want user to cancel via the provided button we can subscribe to
 
         // Constants for window styles
         private const int GWL_STYLE = -16;
@@ -35,6 +36,19 @@ namespace geeWiz.Forms.Mvvm.Views
 
         [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        /// <summary>
+        /// Executes when the form loads.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // AI Written - removes the close button in principle
+            var hwnd = new WindowInteropHelper(this).Handle;
+            int style = GetWindowLong(hwnd, GWL_STYLE);
+            SetWindowLong(hwnd, GWL_STYLE, (style & ~WS_SYSMENU) | WS_MINIMIZEBOX);
+        }
 
         #endregion
 
@@ -64,34 +78,22 @@ namespace geeWiz.Forms.Mvvm.Views
             InitializeComponent();
 
             // Handle the removal of the default controls
-            Loaded += OnLoaded;
+            this.Loaded += OnLoaded;
 
             // Associate to the model
             this.DataContext = viewModel;
 
             // Register the closing event as cancellation
+            // This is here to guard if the user closes the form without our button
             this.Closed += (s, e) =>
             {
-                Cancel();
+                this.Cancel(cancelledByUser: false);
             };
 
             // Bind the progress value and set the range
             this.progressBar.SetBinding(ProgressBar.ValueProperty, "ProgressValue");
             this.progressBar.Minimum = 0;
             this.progressBar.Maximum = total;
-        }
-
-        /// <summary>
-        /// Executes when the form loads.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            // AI Written - removes the close button in principle
-            var hwnd = new WindowInteropHelper(this).Handle;
-            int style = GetWindowLong(hwnd, GWL_STYLE);
-            SetWindowLong(hwnd, GWL_STYLE, (style & ~WS_SYSMENU) | WS_MINIMIZEBOX);
         }
 
         #endregion
@@ -103,44 +105,65 @@ namespace geeWiz.Forms.Mvvm.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Cancel_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             // Set flag, close window
             this.CancelledByUser = true;
-            this.Close();
+            this.Cancel(cancelledByUser: true);
         }
 
         /// <summary>
         /// Runs when form is closed to tell the model we closed also.
         /// </summary>
-        public void Cancel()
+        public void Cancel(bool cancelledByUser = false)
         {
-            // Tell the model to run its closing function
+            // If the model is valid (nearly always should be)...
             if (this.DataContext is Models.ModelProgress viewModel)
             {
-                viewModel.CloseWindow(this.CancelMessage, this.CancelledByUser);
+                // Close the model
+                viewModel.CloseWindow(cancelledByUser: cancelledByUser);
             }
-            // Catch if the model is not valid
-            else
+        }
+
+        /// <summary>
+        /// Run an action on the View thread safely.
+        /// </summary>
+        /// <param name="action"></param>
+        public void ThreadSafeAction(Action action)
+        {
+            // If we are on the UI thread, run the action
+            if (this.Dispatcher.CheckAccess())
             {
-                MessageBox.Show("Error: DataContext is not set correctly.",
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                action();
+            }
+            // If not, queue the action to run on the UI thread when available
+            else if (!this.Dispatcher.HasShutdownStarted && !this.Dispatcher.HasShutdownFinished)
+            {
+                this.Dispatcher.BeginInvoke(action);
             }
         }
 
         /// <summary>
         /// Runs a dispatcher closure.
         /// </summary>
-        public void CloseSafelyWithDispatcher()
+        public void CloseThreadSafe()
         {
-            // Close the current dispatcher
+            // If the dispatcher is shutting down, do nothing
+            if (this.Dispatcher.HasShutdownStarted || this.Dispatcher.HasShutdownFinished)
+            {
+                return;
+            }
+
+            // If the view is visible, close it
+            if (this.IsVisible)
+            {
+                this.Close();
+            }
+
+            // If the dispatcher is still available and running, shut it down
             if (!this.Dispatcher.HasShutdownStarted && !this.Dispatcher.HasShutdownFinished)
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    this.Close();
-                    this.Dispatcher.InvokeShutdown();
-                });
+                this.Dispatcher.InvokeShutdown();
             }
         }
 

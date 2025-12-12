@@ -167,7 +167,7 @@ namespace geeWiz.Extensions
             }
 
             // Create a progress bar
-            var pb = new gFrm.ProgressController(total: objects.Count, taskName: $"Deleting {typeName}(s)...");
+            var pb = new gFrm.ProgressCoordinator(total: objects.Count, taskName: $"Deleting {typeName}(s)...");
             int deleteCount = 0;
 
             // Using a transaction
@@ -180,7 +180,7 @@ namespace geeWiz.Extensions
                 foreach (var obj in objects)
                 {
                     // Check for cancellation
-                    if (pb.CancelCheck(t: t))
+                    if (pb.CancelCheckOrUpdate(t: t))
                     {
                         break;
                     }

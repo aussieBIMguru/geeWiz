@@ -55,7 +55,7 @@ namespace geeWiz.Cmds_Revision
 
             // Progress bar for the task
             var taskName = altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...";
-            var pb = new gFrm.ProgressController(total: sheets.Count, taskName: taskName);
+            var pb = new gFrm.ProgressCoordinator(total: sheets.Count, taskName: taskName);
             int updatedCount = 0;
 
             // Using a transaction
@@ -68,7 +68,7 @@ namespace geeWiz.Cmds_Revision
                 foreach (var sheet in sheets)
                 {
                     // Check for cancellation
-                    if (pb.CancelCheck(t: t))
+                    if (pb.CancelCheckOrUpdate(t: t))
                     {
                         return Result.Cancelled;
                     }

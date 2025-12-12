@@ -58,7 +58,7 @@
                 Height="Auto"
                 Grid.Row="2"
                 HorizontalAlignment="Center"
-                Click="Cancel_Click"/>
+                Click="CancelButton_Click"/>
     </Grid>
 
 </Window>

@@ -1,11 +1,4 @@
-﻿// System
-using MessageBox = System.Windows.MessageBox;
-using MessageBoxButton = System.Windows.MessageBoxButton;
-using MessageBoxImage = System.Windows.MessageBoxImage;
-// geeWiz
-using geeWiz.Extensions;
-
-// Using the Mvvm Models namespace
+﻿// Using the Mvvm Models namespace
 namespace geeWiz.Forms.Mvvm.Models
 {
     /// <summary>
@@ -17,6 +10,7 @@ namespace geeWiz.Forms.Mvvm.Models
 
         public bool IsClosed = false;
         public bool IsCancelled = false;
+
         private int _progressValue;
         private int _progressTotal;
 
@@ -42,13 +36,13 @@ namespace geeWiz.Forms.Mvvm.Models
         /// </summary>
         public int ProgressTotal
         {
-            get => _progressTotal;
+            get => this._progressTotal;
 
             set
             {
-                if (_progressTotal != value)
+                if (this._progressTotal != value)
                 {
-                    _progressTotal = value;
+                    this._progressTotal = value;
                     OnPropertyChanged();
                 }
             }
@@ -57,41 +51,38 @@ namespace geeWiz.Forms.Mvvm.Models
         /// <summary>
         /// Fired when the model signals that progress is complete or cancelled
         /// </summary>
-        public event EventHandler Completed;
+        public event EventHandler ModelCompleted;
 
         #endregion
 
         #region Close/cancel the viewmodel
 
         /// <summary>
-        /// Closes the window (sent via the view closure).
+        /// Closes the window.
         /// </summary>
-        /// <param name="cancelMessage">Message to display to user.</param>
         /// <param name="cancelledByUser">Was the form cancelled by the user.</param>
-        public void CloseWindow(string cancelMessage = null, bool cancelledByUser = false)
+        public void CloseWindow(bool cancelledByUser = false)
         {
-            // Set the models respective properties
+            // If already closed, stop here
+            if (this.IsClosed)
+            { 
+                return;
+            }
+
+            // Set closed and cancelled properties
             this.IsClosed = true;
             this.IsCancelled = cancelledByUser;
 
-            // If cancel message is valid and user cancelled the form...
-            if (cancelMessage.Ext_HasChars() && cancelledByUser)
-            {
-                // Display a cancellation dialog
-                MessageBox.Show(cancelMessage,"Cancelled",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-
-            // Fire the Completed event so any subscriber (e.g., view or controller) can shutdown the dispatcher
-            this.Completed?.Invoke(this, EventArgs.Empty);
+            // Fire the completion handler
+            this.ModelCompleted?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// Shortcut to mark as complete without user cancellation
+        /// Shortcut to mark as complete (typically without cancellation).
         /// </summary>
-        public void Complete()
+        public void Complete(bool cancelledByUser = false)
         {
-            CloseWindow(cancelledByUser: false);
+            this.CloseWindow(cancelledByUser: cancelledByUser);
         }
 
         #endregion

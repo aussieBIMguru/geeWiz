@@ -1,8 +1,9 @@
 ﻿// Autodesk
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using View = Autodesk.Revit.DB.View;
 // geeWiz
 using gFrm = geeWiz.Forms;
+using View = Autodesk.Revit.DB.View;
 
 // The class belongs to the extensions namespace
 // View view.ExtensionMethod()
@@ -34,17 +35,10 @@ namespace geeWiz.Extensions
             {
                 viewPrefix += " Template";
             }
-            
-            // Return key with Id
-            if (includeId)
-            {
-                return $"{viewPrefix}: {view.Name} [{view.Id.ToString()}]";
-            }
-            // Return key without Id
-            else
-            {
-                return $"{viewPrefix}: {view.Name}";
-            }
+
+            // Return the name key
+            var nameKey = $"{viewPrefix}: {view.Name}";
+            return view.Ext_FinalizeKey(nameKey, includeId);
         }
 
         #endregion

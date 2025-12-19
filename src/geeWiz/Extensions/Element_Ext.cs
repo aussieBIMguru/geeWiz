@@ -75,16 +75,30 @@ namespace geeWiz.Extensions
             }
             catch {; }
 
-            // Return key with Id
-            if (includeId)
+            // Return the name key
+            var nameKey = $"{categoryName}: {typeName} - {elementName}";
+            return element.Ext_FinalizeKey(nameKey, includeId);
+        }
+
+        /// <summary>
+        /// Optionally add the Id to a name key.
+        /// </summary>
+        /// <param name="element">The element to append from.</param>
+        /// <param name="nameKey">The name to prefix with.</param>
+        /// <param name="includeId">If we want to include the Id.</param>
+        /// <returns>A string.</returns>
+        public static string Ext_FinalizeKey(this Element element, string nameKey, bool includeId = false)
+        {
+            if (!includeId) { return nameKey; }
+
+            string id = "-1";
+
+            if (element is Element)
             {
-                return $"{categoryName}: {typeName} - {elementName} [{element.Id.ToString()}]";
+                id = element.Id.ToString();
             }
-            // Return key without Id
-            else
-            {
-                return $"{categoryName}: {typeName} - {elementName}";
-            }
+
+            return $"{nameKey} [Id: {id}]";
         }
 
         #endregion

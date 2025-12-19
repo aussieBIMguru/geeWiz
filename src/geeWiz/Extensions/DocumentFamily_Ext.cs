@@ -26,7 +26,7 @@ namespace geeWiz.Extensions
             if (doc is null) { return null; }
 
             // Set the global properties
-            Globals.CurrentDocument = doc;
+            Globals.FocalDocument = doc;
 
             // Return if document is family
             return doc.FamilyManager;

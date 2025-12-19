@@ -1,8 +1,9 @@
 ﻿// Autodesk
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using gStr = geeWiz.Utilities.String_Utils;
 // geeWiz
 using gView = geeWiz.Utilities.View_Utils;
-using gStr = geeWiz.Utilities.String_Utils;
 
 // The class belongs to the extensions namespace
 // ViewSheet viewSheet.ExtensionMethod()
@@ -25,17 +26,10 @@ namespace geeWiz.Extensions
         {
             // Null catch
             if (sheet is null) { return "???"; }
-            
-            // Return key with Id
-            if (includeId)
-            {
-                return $"{sheet.SheetNumber}: {sheet.Name} [{sheet.Id.ToString()}]";
-            }
-            // Return key without Id
-            else
-            {
-                return $"{sheet.SheetNumber}: {sheet.Name}";
-            }
+
+            // Return the name key
+            var nameKey = $"{sheet.SheetNumber}: {sheet.Name}";
+            return sheet.Ext_FinalizeKey(nameKey, includeId);
         }
 
         /// <summary>

@@ -101,7 +101,7 @@ namespace geeWiz.Utilities
                 this.FamilyManager = familyManager;
                 this.ProcessingResult = processingResult;
 
-                if (Globals.CurrentDocument is Document doc)
+                if (Globals.FocalDocument is Document doc)
                 {
                     this.Document = doc;
                     this.DocumentTitle = doc.Title;
@@ -118,7 +118,7 @@ namespace geeWiz.Utilities
             /// <param name="processingResult">The default processing result to use.</param>
             public FamilyProccessingOutcome(Document doc, PROCESSING_RESULT processingResult = PROCESSING_RESULT.FAILURE_DOC_NOTFAMILY)
             {
-                Globals.CurrentDocument = doc;
+                Globals.FocalDocument = doc;
                 this.Document = doc;
                 this.DocumentTitle = doc.Title;
                 this.FamilyManager = doc.FamilyManager;

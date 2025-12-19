@@ -1,6 +1,7 @@
 ﻿// The class belongs to the extensions namespace
 // ViewFamilyType viewFamilyType.ExtensionMethod()
 using Autodesk.Revit.UI;
+using DocumentFormat.OpenXml.Spreadsheet;
 using View = Autodesk.Revit.DB.View;
 
 namespace geeWiz.Extensions
@@ -23,16 +24,9 @@ namespace geeWiz.Extensions
             // Null catch
             if (viewFamilyType is null) { return "???"; }
 
-            // Return key with Id
-            if (includeId)
-            {
-                return $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name} [{viewFamilyType.Id.ToString()}]";
-            }
-            // Return key without Id
-            else
-            {
-                return $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name}";
-            }
+            // Return the name key
+            var nameKey = $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name}";
+            return viewFamilyType.Ext_FinalizeKey(nameKey, includeId);
         }
 
         #endregion

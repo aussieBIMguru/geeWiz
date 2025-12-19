@@ -1,4 +1,5 @@
 ﻿// geeWiz
+using Autodesk.Revit.DB;
 using gFam = geeWiz.Utilities.Family_Utils;
 
 // The class belongs to the extensions namespace
@@ -23,19 +24,9 @@ namespace geeWiz.Extensions
             // Null catch
             if (family is null) { return "???"; }
 
-            // Construct the key without Id
-            string familyKey = $"{family.FamilyCategory.Name}: {family.Name}";
-
-            // Return key with Id
-            if (includeId)
-            {
-                return $"{familyKey} [{family.Id.ToString()}]";
-            }
-            // Return key without Id
-            else
-            {
-                return familyKey;
-            }
+            // Return the name key
+            var nameKey = $"{family.FamilyCategory.Name}: {family.Name}";
+            return family.Ext_FinalizeKey(nameKey, includeId);
         }
 
         #endregion

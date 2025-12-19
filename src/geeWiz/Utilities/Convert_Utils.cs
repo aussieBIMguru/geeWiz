@@ -1,11 +1,11 @@
 ﻿// geeWiz
+using geeWiz.Extensions;
 using gPar = geeWiz.Utilities.Parameter_Utils;
 
 // The class belongs to the utility namespace
 // using gCnv = geeWiz.Utilities.Convert_Utils
 namespace geeWiz.Utilities
 {
-    /// <summary>
     /// Methods of this class generally relate to converting units
     /// </summary>
     public static class Convert_Utils
@@ -13,8 +13,8 @@ namespace geeWiz.Utilities
         #region Constants
 
         // Mathematical constants
-        public static readonly double MATH_PI = Math.PI;
-        public static readonly double MATH_E = Math.E;
+        public const double MATH_PI = Math.PI;
+        public const double MATH_E = Math.E;
 
         #endregion
 
@@ -186,10 +186,10 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="integer">The integer value.</param>
         /// <returns>An ElementId.</returns>
-        public static ElementId IntToElementId(int integer)
+        public static ElementId IntToElementId(int integer, ElementId valueOnFailure = null)
         {
             // ElementId begins as null
-            ElementId elementId = null;
+            ElementId elementId = valueOnFailure;
 
             #if REVIT2024_OR_GREATER
             // Try to get ElementId using Int64
@@ -301,6 +301,30 @@ namespace geeWiz.Utilities
 
             // Return invalid
             return null;
+        }
+
+        #endregion
+
+        #region Coordinates
+
+        /// <summary>
+        /// Returns the transform to get from internal to actual coordinates.
+        /// </summary>
+        /// <param name="doc">The related document.</param>
+        /// <returns>A transform object.</returns>
+        public static Transform InternalToActualTransform(Document doc)
+        {
+            return doc.ActiveProjectLocation.GetTotalTransform();
+        }
+
+        /// <summary>
+        /// Returns the transform to get from actual to internal coordinates.
+        /// </summary>
+        /// <param name="doc">The related document.</param>
+        /// <returns>A transform object.</returns>
+        public static Transform ActualToInternalTransform(Document doc)
+        {
+            return doc.ActiveProjectLocation.GetTotalTransform().Inverse;
         }
 
         #endregion

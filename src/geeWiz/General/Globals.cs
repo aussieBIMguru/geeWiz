@@ -23,7 +23,7 @@ namespace geeWiz
         public static UIControlledApplication UiCtlApp { get; set; }
         public static ControlledApplication CtlApp { get; set; }
         public static UIApplication UiApp { get; set; }
-        public static Document CurrentDocument { get; set; }
+        public static Document FocalDocument { get; set; }
         public static bool Idling { get; set; }
         public static bool IsDarkMode { get; set; }
 
@@ -72,7 +72,7 @@ namespace geeWiz
             // Store all available global variable values (available anywhere, effectively)
             UiCtlApp = uiApp;
             CtlApp = uiApp.ControlledApplication;
-            CurrentDocument = null;
+            FocalDocument = null;
             // (uiApp set by idling event)
             Idling = true;
             IsDarkMode = false;
@@ -104,6 +104,21 @@ namespace geeWiz
             VersionName = "WIP";
             AddinGuid = "8FFC127F-9CD7-46E2-8506-C5F36D057B4B";
             AddinName = "geeWiz";
+        }
+
+        #endregion
+
+        #region Misc
+
+        /// <summary>
+        /// Gets the active document, if any.
+        /// </summary>
+        /// <param name="doc">If not null, return this instead.</param>
+        /// <returns>A Document.</returns>
+        public static Document CurrentDocument(Document doc = null)
+        {
+            doc ??= Globals.UiApp?.ActiveUIDocument?.Document;
+            return doc;
         }
 
         #endregion

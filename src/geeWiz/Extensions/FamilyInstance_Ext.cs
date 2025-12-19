@@ -1,5 +1,7 @@
 ﻿// The class belongs to the extensions namespace
 // FamilyInstance familyInstance.ExtensionMethod()
+using Autodesk.Revit.DB;
+
 namespace geeWiz.Extensions
 {
     /// <summary>
@@ -17,8 +19,9 @@ namespace geeWiz.Extensions
         /// <returns>A string.</returns>
         public static string Ext_ToFamilyInstanceKey(this FamilyInstance familyInstance, bool includeId = false)
         {
-            // Return its key using the FamilySymbol key
-            return familyInstance.Symbol.Ext_ToFamilySymbolKey(includeId, instanceId: familyInstance.Id);
+            // Return the name key
+            var nameKey = familyInstance.Symbol.Ext_ToFamilySymbolKey();
+            return familyInstance.Ext_FinalizeKey(nameKey, includeId);
         }
 
         #endregion

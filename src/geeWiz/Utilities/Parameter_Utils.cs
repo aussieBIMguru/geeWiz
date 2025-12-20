@@ -1,11 +1,257 @@
 ﻿// Revit API
 using Autodesk.Revit.UI;
-using geeWiz.Extensions;
 
 // The class belongs to the utilities namespace
 // gPar = geeWiz.Utilities.Parameter_Utils
 namespace geeWiz.Utilities
 {
+    /// <summary>
+    /// A class to get/set parameter values.
+    /// </summary>
+    public class ParameterHelper
+    {
+        #region Class Properties
+
+        public Element Element { get; set; }
+        public Parameter Parameter { get; set; }
+        public StorageType StorageType { get; set; }
+        public ForgeTypeId UnitTypeId { get; set; }
+        public DataConverter ParameterValue { get; set; }
+        public DataConverter StoredValue { get; set; }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructs a ParameterHelper object.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="parameterName"></param>
+        public ParameterHelper(Element element, string parameterName)
+        {
+            // Store the element
+            this.Element = element;
+            var doc = Element.Document;
+
+            // Store the parameter
+            var parameter = element.LookupParameter(parameterName);
+            this.Parameter = parameter;
+
+            // Default values to return (assume nothing found)
+            this.StorageType = StorageType.None;
+            this.UnitTypeId = null;
+
+            // Return default value if parameter is none
+            if (parameter is null) { return; }
+            this.StorageType = parameter.StorageType;
+            this.UnitTypeId = parameter.GetUnitTypeId();
+
+            // Work through the various storage types, storing what we can
+            switch (this.StorageType)
+            {
+                case StorageType.String: this.ParameterValue = new DataConverter(parameter.AsString(), parameter, doc, givenAsProjectValue: false); break;
+                case StorageType.Integer: this.ParameterValue = new DataConverter(parameter.AsInteger(), parameter, doc, givenAsProjectValue: false); break;
+                case StorageType.Double: this.ParameterValue = new DataConverter(parameter.AsDouble(), parameter, doc, givenAsProjectValue: false); break;
+                case StorageType.ElementId: this.ParameterValue = new DataConverter(parameter.AsElementId(), parameter); break;
+                default: this.ParameterValue = null; break;
+            }
+        }
+
+        #endregion
+
+        #region Get parameter value
+
+        /// <summary>
+        /// Checks if the parameter stores a valid representation for the given type.
+        /// </summary>
+        /// <typeparam name="T">The type of format to check for.</typeparam>
+        /// <returns>A boolean.</returns>
+        public bool HasValueAs<T>()
+        {
+            if (typeof(T) == typeof(string))
+            {
+                return this.ParameterValue.CanBeString;
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                return this.ParameterValue.CanBeInt;
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                return this.ParameterValue.CanBeDouble;
+            }
+
+            if (typeof(T) == typeof(ElementId))
+            {
+                return this.ParameterValue.CanBeElementId;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the internally stored parameter value.
+        /// </summary>
+        /// <typeparam name="T">The type of format to return.</typeparam>
+        /// <returns>A value.</returns>
+        public T GetInternalValueAs<T>()
+        {
+            if (typeof(T) == typeof(string))
+            {
+                return (T)(object)this.ParameterValue.StringValue;
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                return (T)(object)this.ParameterValue.IntegerValue;
+            }
+                
+            if (typeof(T) == typeof(double))
+            {
+                return (T)(object)this.ParameterValue.DoubleValue;
+            }
+                
+            if (typeof(T) == typeof(ElementId))
+            {
+                return (T)(object)this.ParameterValue.ElementIdValue;
+            } 
+
+            return default;
+        }
+
+        /// <summary>
+        /// Gets the project stored parameter value.
+        /// </summary>
+        /// <typeparam name="T">The type of format to return.</typeparam>
+        /// <returns>A value.</returns>
+        public T GetProjectValueAs<T>()
+        {
+            if (typeof(T) == typeof(string))
+            {
+                return (T)(object)this.ParameterValue.ProjectStringValue;
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                return (T)(object)this.ParameterValue.ProjectIntegerValue;
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                return (T)(object)this.ParameterValue.ProjectDoubleValue;
+            }
+
+            if (typeof(T) == typeof(ElementId))
+            {
+                return (T)(object)this.ParameterValue.ElementIdValue;
+            }
+
+            return default;
+        }
+
+        #endregion
+
+        #region Store new values
+
+        /// <summary>
+        /// Stores a value to the parameter helper.
+        /// </summary>
+        /// <param name="value">The value to store.</param>
+        /// <param name="givenAsProjectValue">Is it provided in project values vs internal.</param>
+        public void Store(string value, bool givenAsProjectValue = true)
+        {
+            this.StoredValue = new DataConverter(value, this.Parameter, this.Element.Document, givenAsProjectValue: givenAsProjectValue);
+        }
+
+        /// <summary>
+        /// Stores a value to the parameter helper.
+        /// </summary>
+        /// <param name="value">The value to store.</param>
+        /// <param name="givenAsProjectValue">Is it provided in project values vs internal.</param>
+        public void Store(int value, bool givenAsProjectValue = true)
+        {
+            this.StoredValue = new DataConverter(value, this.Parameter, this.Element.Document, givenAsProjectValue: givenAsProjectValue);
+        }
+
+        /// <summary>
+        /// Stores a value to the parameter helper.
+        /// </summary>
+        /// <param name="value">The value to store.</param>
+        /// <param name="givenAsProjectValue">Is it provided in project values vs internal.</param>
+        public void Store(double value, bool givenAsProjectValue = true)
+        {
+            this.StoredValue = new DataConverter(value, this.Parameter, this.Element.Document, givenAsProjectValue: givenAsProjectValue);
+        }
+
+        /// <summary>
+        /// Stores a value to the parameter helper.
+        /// </summary>
+        /// <param name="value">The value to store.</param>
+        /// <param name="givenAsProjectValue">Is it provided in project values vs internal.</param>
+        public void Store(ElementId value, bool givenAsProjectValue = true)
+        {
+            this.StoredValue = new DataConverter(value, this.Parameter);
+        }
+
+        #endregion
+
+        #region Set new values
+
+        /// <summary>
+        /// Verifies if the stored value is different from the current one.
+        /// </summary>
+        /// <returns></returns>
+        public bool ValuesAreTheSame()
+        {
+            // Null check
+            if (this.StoredValue is null || this.ParameterValue is null)
+            {
+                return false;
+            }
+
+            // Check each data type and the values they contain
+            switch (this.StorageType)
+            {
+                case StorageType.String: return this.ParameterValue.StringValue == this.StoredValue.StringValue;
+                case StorageType.Integer: return this.ParameterValue.IntegerValue == this.StoredValue.IntegerValue;
+                case StorageType.Double: return Math.Abs(this.ParameterValue.DoubleValue - this.StoredValue.DoubleValue) < 1e-6;
+                case StorageType.ElementId: return this.ParameterValue.ElementIdValue == this.StoredValue.ElementIdValue;
+                default: return false;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to set the parameter value to the stored value.
+        /// </summary>
+        /// <returns></returns>
+        public Result Set()
+        {
+            try
+            {
+                // Try to set the value based on the parameter storage type
+                switch (this.StorageType)
+                {
+                    case StorageType.String: this.Parameter.Set(this.StoredValue.StringValue); break;
+                    case StorageType.Integer: this.Parameter.Set(this.StoredValue.IntegerValue); break;
+                    case StorageType.Double: this.Parameter.Set(this.StoredValue.DoubleValue); break;
+                    case StorageType.ElementId: this.Parameter.Set(this.StoredValue.ElementIdValue); break;
+                    default: return Result.Cancelled;
+                }
+
+                return Result.Succeeded;
+            }
+            catch
+            {
+                return Result.Cancelled;
+            }
+        }
+
+        #endregion
+    }
+
     /// <summary>
     /// Methods of this class generally relate to string based operations.
     /// </summary>
@@ -59,264 +305,6 @@ namespace geeWiz.Utilities
             {
                 return specTypeIds;
             }
-        }
-
-        #endregion
-
-        #region Set parameter by name
-
-        /// <summary>
-        /// Try to set a parameter using a ParameterHelper object.
-        /// </summary>
-        /// <param name="helper">A ParameterHelper object.</param>
-        /// <returns>A Result.</returns>
-        public static Result Ext_SetParameterValueByName(ParameterHelper helper)
-        {
-            // Check if we should not proceed
-            if (helper.Parameter is null || helper.Element is null)
-            {
-                return Result.Failed;
-            }
-
-            // Set depending on stored value
-            if (helper.StorageType == StorageType.String)
-            {
-                return ParameterHelper.SetString(helper);
-            }
-            else if (helper.StorageType == StorageType.Integer)
-            {
-                return ParameterHelper.SetInteger(helper);
-            }
-            else if (helper.StorageType == StorageType.Double)
-            {
-                return ParameterHelper.SetDouble(helper);
-            }
-            else if (helper.StorageType == StorageType.ElementId)
-            {
-                return ParameterHelper.SetElementId(helper);
-            }
-
-            // Otherwise return failed result
-            return Result.Failed;
-        }
-
-        #endregion
-
-        #region ParameterHelper class
-
-        /// <summary>
-        /// A class to assess parameter values in various representations.
-        /// </summary>
-        public class ParameterHelper
-        {
-            #region Class Properties
-
-            // Representations of the parameter
-            public Element Element { get; set; }
-            public Parameter Parameter { get; set; }
-            public StorageType StorageType { get; set; }
-            public int AsInteger { get; set; }
-            public double AsDouble { get; set; }
-            public string AsString { get; set; }
-            public ElementId AsElementId { get; set; }
-
-            #endregion
-
-            #region Constructor - Get Value
-
-            // Constructor for get value
-            public ParameterHelper(Element element, string parameterName)
-            {
-                // Store the element
-                this.Element = element;
-
-                // Store the parameter
-                var parameter = element.LookupParameter(parameterName);
-                this.Parameter = parameter;
-
-                // Default values to return (assume nothing found)
-                this.AsString = null;
-                this.AsInteger = 0;
-                this.AsDouble = 0.0;
-                this.AsElementId = ElementId.InvalidElementId;
-                this.StorageType = StorageType.None;
-
-                // Return default value if parameter is none
-                if (parameter is null) { return; }
-                this.StorageType = parameter.StorageType;
-
-                // Work through the various storage types, storing what we can
-                if (this.StorageType == StorageType.String)
-                {
-                    if (parameter.AsString() is string value)
-                    {
-                        this.AsString = value;
-                    }
-                }
-                else if (this.StorageType == StorageType.Integer)
-                {
-                    if (parameter.AsInteger() is int value)
-                    {
-                        this.AsInteger = value;
-                        this.AsDouble = (double)value;
-                        this.AsString = value.ToString();
-                    }
-                }
-                else if (this.StorageType == StorageType.Double)
-                {
-                    if (parameter.AsDouble() is double value)
-                    {
-                        this.AsDouble = value;
-                        this.AsInteger = (int)value;
-                        this.AsString = value.ToString();
-                    }
-                }
-                else if (this.StorageType == StorageType.ElementId)
-                {
-                    if (parameter.AsElementId() is ElementId value)
-                    {
-                        this.AsElementId = value;
-                        this.AsInteger = value.Ext_AsInteger();
-                        this.AsString = value.ToString();
-                        this.AsDouble = (double)AsInteger;
-
-                    }
-                }
-            }
-
-            #endregion
-
-            #region Constructor - Set String value
-
-            // Constructor to set as string
-            public ParameterHelper(Element element, string parameterName, string value)
-            {
-                // Store the element
-                this.Element = element;
-
-                // Store the parameter
-                var parameter = element.LookupParameter(parameterName);
-                this.Parameter = parameter;
-
-                // Store the type and value
-                this.StorageType = StorageType.String;
-                this.AsString = value;
-            }
-
-            // Method to set string value
-            public static Result SetString(ParameterHelper helper)
-            {
-                try
-                {
-                    helper.Parameter.Set(helper.AsString);
-                    return Result.Succeeded;
-                }
-                catch
-                {
-                    return Result.Failed;
-                }
-            }
-
-            #endregion
-
-            #region Constructor - Set Integer value
-
-            // Constructor to set as integer
-            public ParameterHelper(Element element, string parameterName, int value)
-            {
-                // Store the element
-                this.Element = element;
-
-                // Store the parameter
-                var parameter = element.LookupParameter(parameterName);
-                this.Parameter = parameter;
-
-                // Store the type and value
-                this.StorageType = StorageType.Integer;
-                this.AsInteger = value;
-            }
-
-            // Method to set integer value
-            public static Result SetInteger(ParameterHelper helper)
-            {
-                try
-                {
-                    helper.Parameter.Set(helper.AsInteger);
-                    return Result.Succeeded;
-                }
-                catch
-                {
-                    return Result.Failed;
-                }
-            }
-
-            #endregion
-
-            #region Constructor - Set Double value
-
-            // Constructor to set as double
-            public ParameterHelper(Element element, string parameterName, double value)
-            {
-                // Store the element
-                this.Element = element;
-
-                // Store the parameter
-                var parameter = element.LookupParameter(parameterName);
-                this.Parameter = parameter;
-
-                // Store the type and value
-                this.StorageType = StorageType.Double;
-                this.AsDouble = value;
-            }
-
-            // Method to set double value
-            public static Result SetDouble(ParameterHelper helper)
-            {
-                try
-                {
-                    helper.Parameter.Set(helper.AsDouble);
-                    return Result.Succeeded;
-                }
-                catch
-                {
-                    return Result.Failed;
-                }
-            }
-
-            #endregion
-
-            #region Constructor - Set ElementId value
-
-            // Constructor to set as element Id
-            public ParameterHelper(Element element, string parameterName, ElementId value)
-            {
-                // Store the element
-                this.Element = element;
-
-                // Store the parameter
-                var parameter = element.LookupParameter(parameterName);
-                this.Parameter = parameter;
-
-                // Store the type and value
-                this.StorageType = StorageType.ElementId;
-                this.AsElementId = value;
-            }
-
-            // Method to set ElementId
-            public static Result SetElementId(ParameterHelper helper)
-            {
-                try
-                {
-                    helper.Parameter.Set(helper.AsElementId);
-                    return Result.Succeeded;
-                }
-                catch
-                {
-                    return Result.Failed;
-                }
-            }
-
-            #endregion
         }
 
         #endregion

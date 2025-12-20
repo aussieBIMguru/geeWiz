@@ -1,11 +1,200 @@
 ﻿// geeWiz
 using geeWiz.Extensions;
+using gCnv = geeWiz.Utilities.Convert_Utils;
 using gPar = geeWiz.Utilities.Parameter_Utils;
 
 // The class belongs to the utility namespace
 // using gCnv = geeWiz.Utilities.Convert_Utils
 namespace geeWiz.Utilities
 {
+    /// <summary>
+    /// A class to attempt parseing the typical Revit parameter value inputs.
+    /// </summary>
+    public class DataConverter
+    {
+        public string StringValue { get; set; } = string.Empty;
+        public int IntegerValue { get; set; } = 0;
+        public double DoubleValue { get; set; } = 0.0;
+        public string ProjectStringValue { get; set; } = string.Empty;
+        public int ProjectIntegerValue { get; set; } = 0;
+        public double ProjectDoubleValue { get; set; } = 0.0;
+        public ElementId ElementIdValue { get; set; } = ElementId.InvalidElementId;
+        public bool CanBeString { get; set; } = false;
+        public bool CanBeInt { get; set; } = false;
+        public bool CanBeDouble { get; set; } = false;
+        public bool CanBeElementId { get; set; } = false;
+        public ForgeTypeId UnitTypeId { get; set; } = null;
+        public Document Document { get; set; } = null;
+        
+        /// <summary>
+        /// Converts a string to all possible representations.
+        /// </summary>
+        /// <param name="str"></param>
+        public DataConverter(string str, Parameter parameter = null, Document doc = null, bool givenAsProjectValue = false)
+        {
+            // Store core values
+            doc ??= Globals.CurrentDocument();
+            this.Document = doc;
+
+            // Check we have a valid string
+            if (str is null) { return; }
+            this.CanBeString = true;
+
+            // Try to convert to double, process if we do
+            var tryDouble = gCnv.StringToDouble(str);
+
+            if (tryDouble.HasValue)
+            {
+                this.CanBeDouble = true;
+                this.CanBeInt = true;
+
+                // Routine if we need no parameter checking or we have 0
+                if (tryDouble == 0 || parameter is null || !parameter.Ext_HasUnitType())
+                {
+                    SimpleDoubleRoutine(tryDouble.Value);
+                }
+                // Otherwise check it against the parameter
+                else
+                {
+                    ComplexDoubleRoutine(tryDouble.Value, str, parameter, givenAsProjectValue);
+                }  
+            }
+
+            // Attempt to get the ElementId
+            this.ElementIdValue = str.Ext_StringToElementId(valueOnFailure: ElementId.InvalidElementId);
+            this.CanBeElementId = this.ElementIdValue.Ext_IsValid();
+        }
+
+        /// <summary>
+        /// Converts an integer to all possible representations.
+        /// </summary>
+        /// <param name="integer"></param>
+        public DataConverter(int integer, Parameter parameter = null, Document doc = null, bool givenAsProjectValue = false)
+        {
+            // Store core values
+            doc ??= Globals.CurrentDocument();
+            this.Document = doc;
+
+            // Routine if we need no parameter checking or we have 0
+            if (integer == 0 || parameter is null || !parameter.Ext_HasUnitType())
+            {
+                SimpleDoubleRoutine(integer);
+            }
+            // Otherwise check it against the parameter
+            else
+            {
+                ComplexDoubleRoutine(integer, integer.ToString(), parameter, givenAsProjectValue);
+            }
+
+            this.ElementIdValue = gCnv.IntToElementId(integer, ElementId.InvalidElementId);
+            this.CanBeElementId = this.ElementIdValue.Ext_IsValid();
+        }
+
+        /// <summary>
+        /// Converts a double to all possible representations.
+        /// </summary>
+        /// <param name="dbl"></param>
+        /// <param name="floor"></param>
+        public DataConverter(double dbl, Parameter parameter = null, Document doc = null, bool givenAsProjectValue = false)
+        {
+            // Store core values
+            doc ??= Globals.CurrentDocument();
+            this.Document = doc;
+
+            // Routine if we need no parameter checking or we have 0
+            if (dbl == 0.0 || parameter is null || !parameter.Ext_HasUnitType())
+            {
+                SimpleDoubleRoutine(dbl);
+            }
+            // Otherwise check it against the parameter
+            else
+            {
+                ComplexDoubleRoutine(dbl, dbl.ToString(), parameter, givenAsProjectValue);
+            }
+
+            this.ElementIdValue = gCnv.IntToElementId(RoundToInt(dbl), ElementId.InvalidElementId);
+            this.CanBeElementId = this.ElementIdValue.Ext_IsValid();
+        }
+
+        /// <summary>
+        /// Converts an ElementId to all possible representations.
+        /// </summary>
+        /// <param name="elementId"></param>
+        public DataConverter(ElementId elementId, Parameter parameter = null)
+        {
+            this.UnitTypeId = parameter?.GetUnitTypeId();
+            elementId ??= ElementId.InvalidElementId;
+            
+            this.CanBeString = true;
+            this.StringValue = elementId.ToString();
+
+            this.IntegerValue = elementId.Ext_AsInteger();
+            this.CanBeInt = true;
+
+            this.DoubleValue = (double)this.IntegerValue;
+            this.CanBeDouble = true;
+
+            this.ElementIdValue = elementId;
+            this.CanBeElementId = elementId.Ext_IsValid();
+        }
+
+        public void ComplexDoubleRoutine(double value, string str, Parameter parameter, bool givenAsProjectValue)
+        {
+            // Get the spec type of the parameter
+            var specTypeId = parameter.GetUnitTypeId();
+            this.UnitTypeId = specTypeId;
+
+            // If we provided in project units...
+            if (givenAsProjectValue)
+            {
+                // Set project values as they are
+                this.ProjectDoubleValue = value;
+                this.ProjectIntegerValue = RoundToInt(value);
+                this.ProjectStringValue = str;
+
+                // Convert the remainder to internal
+                this.DoubleValue = gCnv.ValueToInternal(value, this.Document, this.UnitTypeId);
+                this.IntegerValue = RoundToInt(this.DoubleValue);
+                this.StringValue = FormatDoubleAsString(this.DoubleValue);
+            }
+            // Otherwise handle it as internal units
+            else
+            {
+                // Set internal values as they are
+                this.DoubleValue = value;
+                this.IntegerValue = RoundToInt(value);
+                this.StringValue = str;
+
+                // Convert the remainder
+                this.ProjectDoubleValue = gCnv.ValueToProject(value, this.Document, this.UnitTypeId);
+                this.ProjectIntegerValue = RoundToInt(this.ProjectDoubleValue);
+                this.ProjectStringValue = FormatDoubleAsString(this.ProjectDoubleValue);
+            }
+        }
+
+        private void SimpleDoubleRoutine(double value)
+        {
+            this.DoubleValue = this.ProjectDoubleValue = value;
+            this.IntegerValue = this.ProjectIntegerValue = RoundToInt(value);
+            this.StringValue = this.ProjectStringValue = FormatDoubleAsString(value);
+        }
+
+        /// <summary>
+        /// Converts the double value to an integer.
+        /// </summary>
+        /// <returns></returns>
+        private int RoundToInt(double value)
+        {
+            return (int)Math.Round(value, 0);
+        }
+
+        private string FormatDoubleAsString(double value)
+        {
+            int intVal = (int)Math.Round(value);
+            return Math.Abs(value - intVal) < 1e-6 ? intVal.ToString() : value.ToString();
+        }
+    }
+    
     /// Methods of this class generally relate to converting units
     /// </summary>
     public static class Convert_Utils

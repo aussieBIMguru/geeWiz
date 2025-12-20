@@ -3,7 +3,7 @@ using Autodesk.Revit.UI;
 using View = Autodesk.Revit.DB.View;
 using Category = Autodesk.Revit.DB.Category;
 // geeWiz
-using gPar = geeWiz.Utilities.Parameter_Utils;
+using ParameterHelper = geeWiz.Utilities.ParameterHelper;
 
 // The class belongs to the extensions namespace
 // Element element.ExtensionMethod()
@@ -312,9 +312,9 @@ namespace geeWiz.Extensions
         /// <param name="element">A Revit Element (extended).</param>
         /// <param name="parameterName">The parameter name to get.</param>
         /// <returns>A ParameterHelper object.</returns>
-        public static gPar.ParameterHelper Ext_GetParameterHelper(this Element element, string parameterName)
+        public static ParameterHelper Ext_GetParameterHelper(this Element element, string parameterName)
         {
-            return new gPar.ParameterHelper(element, parameterName);
+            return new ParameterHelper(element, parameterName);
         }
 
         /// <summary>

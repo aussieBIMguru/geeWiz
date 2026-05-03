@@ -164,10 +164,10 @@ namespace geeWiz.Forms.Mvvm.Models
 
             // Set form properties
             this.StrBind_Element = element.Name;
-            this.StrBind_Category = element.Category.Name;
+            this.StrBind_Category = element.Category?.Name ?? "No category";
 
             // Set status if valid
-            if (status.Ext_HasChars())
+            if (status is not null)
             {
                 this.StrBind_Status = status;
             }
@@ -194,14 +194,9 @@ namespace geeWiz.Forms.Mvvm.Models
                 // Select the element
                 var uiDoc = app.ActiveUIDocument;
                 var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
-                if (element == null) return;
 
-                // Update the element/category fields
-                if (element is not null)
-                {
-                    this._vm.StrBind_Element = element.Name;
-                    this._vm.StrBind_Category = element.Category?.Name ?? "N/A";
-                }
+                // Update properties
+                this._vm.UpdateElementProperties(element);
             }
 
             public string GetName() => nameof(ShowSummaryHandler);
@@ -271,18 +266,11 @@ namespace geeWiz.Forms.Mvvm.Models
                 var uiDoc = app.ActiveUIDocument;
                 var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
 
-                // Update the element/category fields
-                if (element != null)
-                {
-                    this._vm.StrBind_Element = element.Name;
-                    this._vm.StrBind_Category = element.Category?.Name ?? "N/A";
-                }
+                // Update properties
+                this._vm.UpdateElementProperties(element, string.Empty);
 
                 // Show the view
                 gWin.Show<Mvvm.Views.ViewSample>();
-
-                // Reset the status
-                this._vm.StrBind_Status = string.Empty;
 
                 // Task completed
                 return Task.CompletedTask;

@@ -1,4 +1,4 @@
-﻿// Autodesk
+﻿// Revit API
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using gStr = geeWiz.Utilities.String_Utils;

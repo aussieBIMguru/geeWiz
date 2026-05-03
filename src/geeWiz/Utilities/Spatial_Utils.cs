@@ -1,6 +1,8 @@
-﻿// The class belongs to the utility namespace
-// using gSpa = geeWiz.Utilities.Spatial_Utils
+﻿// Revit API
+using Autodesk.Revit.DB;
 
+// The class belongs to the utility namespace
+// using gSpa = geeWiz.Utilities.Spatial_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>

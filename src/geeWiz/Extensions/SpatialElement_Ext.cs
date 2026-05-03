@@ -1,5 +1,5 @@
-﻿// geeWiz
-using Parameter = Autodesk.Revit.DB.Parameter;
+﻿// Revit API
+using Autodesk.Revit.DB;
 
 // The class belongs to the extensions namespace
 // Room room.ExtensionMethod()

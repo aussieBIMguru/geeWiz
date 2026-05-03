@@ -1,4 +1,5 @@
 ﻿// geeWiz
+using geeWiz.Extensions;
 using gDat = geeWiz.Utilities.Data_Utils;
 
 // The base form will belong to the forms namespace
@@ -140,7 +141,7 @@ namespace geeWiz.Forms.Bases
         private bool PassesTextFilter(string text)
         {
             // True if filter is empty
-            if (this.FilterString.IsNullOrEmpty())
+            if (this.FilterString.Ext_HasNoChars())
             {
                 return true;
             }

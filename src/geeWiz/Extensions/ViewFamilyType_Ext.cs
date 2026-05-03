@@ -1,9 +1,10 @@
-﻿// The class belongs to the extensions namespace
-// ViewFamilyType viewFamilyType.ExtensionMethod()
+﻿// Revit API
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using DocumentFormat.OpenXml.Spreadsheet;
 using View = Autodesk.Revit.DB.View;
 
+// The class belongs to the extensions namespace
+// ViewFamilyType viewFamilyType.ExtensionMethod()
 namespace geeWiz.Extensions
 {
     /// <summary>

@@ -1,8 +1,11 @@
 ﻿// System
+using System.Windows.Threading;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 using MessageBox = System.Windows.MessageBox;
 using MessageBoxButton = System.Windows.MessageBoxButton;
 using MessageBoxImage = System.Windows.MessageBoxImage;
+// Revit API
+using Autodesk.Revit.DB;
 // geeWiz
 using geeWiz.Extensions;
 
@@ -33,6 +36,12 @@ namespace geeWiz.Forms
         // Check for cancellation
         public bool CancelledByUser { get; set; }
 
+        // Thread safety
+        private Dispatcher _dispatcher { get; set; }
+        private bool _shutdownRequested { get; set; } = false;
+        private readonly ManualResetEventSlim _initialised = new ManualResetEventSlim(false);
+        private bool _isCompleted { get; set; } = false;
+
         #endregion
 
         #region Constructor
@@ -61,17 +70,20 @@ namespace geeWiz.Forms
             this._totalSteps = total;
             this.SetStepDelay(desiredSeconds);
 
-            // Establish the model
-            this._model = new Mvvm.Models.ModelProgress();
-
             // Start the viewmodel on a new thread
             // We need to do this as Revit uses its own thread for UI updates
             // The thread dispatcher keeps running the Mvvm on a separate thread to Revit
             this._thread = new Thread(() =>
             {
-                // Establish the Mvvm pairing
+                // Store the dispatcher/thread
+                this._dispatcher = Dispatcher.CurrentDispatcher;
                 this._thread.Name = "ProgressControllerThread";
+
+                // Establish the model/view and management
+                this._model = new Mvvm.Models.ModelProgress();
                 this._view = new Mvvm.Views.ViewProgress(this._model, total, title, taskName, cancelMessage);
+                this._view.FunctionIfCompleted = () => _isCompleted;
+                this._initialised.Set();
 
                 // Only show the form if we have at least 2 steps to take
                 // (Technically the Mvvm is still functioning BTS)
@@ -83,6 +95,8 @@ namespace geeWiz.Forms
                 // When the model is completed...
                 this._model.ModelCompleted += (s, e) =>
                 {
+                    this._isCompleted = true;
+
                     // Ensuring we use the UI thread...
                     this._view.ThreadSafeAction(() =>
                     {
@@ -99,14 +113,32 @@ namespace geeWiz.Forms
                         // Close the view via the UI thread
                         this._view.CloseThreadSafe();
                     });
+
+                    // Shutdown the dispatcher for thread safety
+                    if (this._dispatcher != null &&
+                    !this._dispatcher.HasShutdownStarted &&
+                    !this._dispatcher.HasShutdownFinished &&
+                    !this._shutdownRequested)
+                    {
+                        this._shutdownRequested = true;
+                        this._dispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
+                    }
                 };
 
                 // Start the dispatcher loop
                 Dispatcher.Run();
             });
 
+            // Start the dispatcher/thread
             this._thread.SetApartmentState(ApartmentState.STA);
+            this._thread.IsBackground = true;
             this._thread.Start();
+        }
+
+        // Helper to ensure initialization has occured
+        private void WaitUntilReady()
+        {
+            this._initialised.Wait();
         }
 
         #endregion
@@ -163,11 +195,19 @@ namespace geeWiz.Forms
         /// <param name="delay">A custom delay to apply.</param>
         public void Increment(int stepSize = 1, bool delay = true)
         {
+            // Ensure we have valid state
+            if (this._isCompleted) { return; }
+            this.WaitUntilReady();
+            if (this._isCompleted) { return; }
+
             // Optional delay
             if (delay)
             {
                 this.DelayProgress();
             }
+
+            // Ensure view and model are available
+            if (this._model is null || this._view is null) { return; }
 
             // Ensuring we use the UI thread...
             this._view.ThreadSafeAction(() =>
@@ -177,6 +217,7 @@ namespace geeWiz.Forms
 
                 // Ensure we do not over or under flow
                 newValue = Math.Max(0, Math.Min(newValue, this._totalSteps));
+                if (newValue < 0) { newValue = 0; }
 
                 // Set the models progress value
                 this._model.ProgressValue = newValue;
@@ -190,6 +231,11 @@ namespace geeWiz.Forms
         /// <param name="tg">Related transaction group.</param>
         public void Commit(Transaction t = null, TransactionGroup tg = null)
         {
+            // Ensure we have valid state
+            if (this._isCompleted) { return; }
+            this.WaitUntilReady();
+            if (this._isCompleted) { return; }
+
             // If we closed already, we should not commit
             if (this._model.IsClosed || this._model.IsCancelled)
             {
@@ -212,6 +258,14 @@ namespace geeWiz.Forms
         /// <returns></returns>
         public bool CancelCheckOrUpdate(bool delay = true, int stepsTaken = 1, Transaction t = null, TransactionGroup tg = null)
         {
+            // Ensure we have valid state
+            if (this._isCompleted) { return true; }
+            this.WaitUntilReady();
+            if (this._isCompleted) { return true; }
+
+            // Ensure view and model are available
+            if (this._model is null || this._view is null) { return false; }
+
             // If the model has been cancelled by the user...
             if (this._model.IsCancelled)
             {
@@ -240,16 +294,11 @@ namespace geeWiz.Forms
                 return true;
             }
 
-            // Otherwise, we can proceed to delay and increment
-            if (delay)
-            {
-                this.DelayProgress();
-            }
-            if (stepsTaken > 0)
-            {
-                this.Increment(stepsTaken);
-            }
+            // Proceed to increment and/or delay
+            if (stepsTaken > 0) { this.Increment(stepsTaken, delay); }
+            else { this.DelayProgress(); }
 
+            // Return that we are not completed
             return false;
         }
 
@@ -266,7 +315,7 @@ namespace geeWiz.Forms
             this.CancelledByUser = true;
 
             // If the model isn't closed, close it
-            if (!this._model.IsClosed)
+            if (this._model is not null && !this._model.IsClosed)
             {
                 this._model.CloseWindow(cancelledByUser: cancelledByUser);
             }

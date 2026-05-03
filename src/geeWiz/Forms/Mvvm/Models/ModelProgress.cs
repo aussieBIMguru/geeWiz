@@ -1,4 +1,7 @@
-﻿// Using the Mvvm Models namespace
+﻿// Mvvm toolkit
+using CommunityToolkit.Mvvm.ComponentModel;
+
+// Using the Mvvm Models namespace
 namespace geeWiz.Forms.Mvvm.Models
 {
     /// <summary>

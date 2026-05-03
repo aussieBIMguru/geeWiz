@@ -1,46 +1,130 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <UseWPF>true</UseWPF>
+	<!-- Main property group -->
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
-        <LangVersion>latest</LangVersion>
-        <PlatformTarget>x64</PlatformTarget>
-        <ImplicitUsings>true</ImplicitUsings>
-        <DeployRevitAddin>true</DeployRevitAddin>
-        <EnableDynamicLoading>true</EnableDynamicLoading>
-        <Configurations>Debug R23;Debug R24;Debug R25;Debug R26;Release R23;Release R24;Release R25;Release R26</Configurations>
-    </PropertyGroup>
+		<ImplicitUsings>true</ImplicitUsings>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
-    <PropertyGroup Condition="$(Configuration.Contains('R23'))">
-        <RevitVersion>2023</RevitVersion>
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R24'))">
-        <RevitVersion>2024</RevitVersion>
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R25'))">
-        <RevitVersion>2025</RevitVersion>
-        <TargetFramework>net8.0-windows</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R26'))">
-        <RevitVersion>2026</RevitVersion>
-        <TargetFramework>net8.0-windows</TargetFramework>
-    </PropertyGroup>
+		<!-- Debug/Release configurations per Revit version -->
+		<Configurations>
+			Debug R20;Debug R21;Debug R22;Debug R23;Debug R24;Debug R25;Debug R26;Debug R27;
+			Release R20;Release R21;Release R22;Release R23;Release R24;Release R25;Release R26;Release R27
+		</Configurations>
 
-    <PropertyGroup>
-        <StartAction>Program</StartAction>
-        <StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
-        <StartArguments>/language ENG</StartArguments>
-        <AssemblyVersion>25.05.01.00</AssemblyVersion>
-        <FileVersion>25.05.01.00</FileVersion>
-    </PropertyGroup>
+		<!-- Common addin metadata -->
+		<AssemblyVersion>26.05.01.00</AssemblyVersion>
+		<FileVersion>26.05.01.00</FileVersion>
+		<Company>Aussie BIM Guru</Company>
+		<RootNamespace>geeWiz</RootNamespace>
+		<AssemblyName>geeWiz</AssemblyName>
+		<AddinName>$(AssemblyName)</AddinName>
+		<BinRoot>bin</BinRoot>
+		<RevitAddinsRoot>$(AppData)\Autodesk\Revit\Addins</RevitAddinsRoot>
+	</PropertyGroup>
 
-    <ItemGroup>
+	<!-- Per-Revit settings and constants -->
+	<PropertyGroup Condition="$(Configuration.Contains('20'))">
+		<RevitVersion>2020</RevitVersion>
+		<TargetFramework>net48</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2020</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('21'))">
+		<RevitVersion>2021</RevitVersion>
+		<TargetFramework>net48</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2021</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('22'))">
+		<RevitVersion>2022</RevitVersion>
+		<TargetFramework>net48</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2022</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('23'))">
+		<RevitVersion>2023</RevitVersion>
+		<TargetFramework>net48</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2023</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('24'))">
+		<DefineConstants>$(DefineConstants);REVIT2024</DefineConstants>
+		<RevitVersion>2024</RevitVersion>
+		<TargetFramework>net48</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('25'))">
+		<RevitVersion>2025</RevitVersion>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2025</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('26'))">
+		<RevitVersion>2026</RevitVersion>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2026</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('27'))">
+		<RevitVersion>2027</RevitVersion>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<DefineConstants>$(DefineConstants);REVIT2027</DefineConstants>
+	</PropertyGroup>
+
+	<!-- Debug/Release specific flags -->
+	<PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
+		<DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+		<Optimize>false</Optimize>
+		<OutputPath>$(BinRoot)\Debug\$(RevitVersion)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
+		<DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+		<Optimize>true</Optimize>
+		<OutputPath>$(BinRoot)\Release\$(RevitVersion)\</OutputPath>
+	</PropertyGroup>
+
+	<!-- Revit debug launcher -->
+	<PropertyGroup>
+		<StartAction>Program</StartAction>
+		<StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
+		<StartArguments>/language ENG</StartArguments>
+	</PropertyGroup>
+
+	<!-- Revit specific dll references -->
+	<ItemGroup>
+		<Reference Include="RevitAPI">
+			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="RevitAPIUI">
+			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="AdWindows">
+			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\AdWindows.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="AdWindows">
+			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\Xceed.Wpf.AvalonDock.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="UIFramework">
+			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\UIFramework.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+	</ItemGroup>
+
+	<!-- Third party package references -->
+	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+		<PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+	</ItemGroup>
+
+	<!-- Resourcr management -->
+	<ItemGroup>
 		<None Remove="Resources\Icons16\*.ico" />
 		<None Remove="Resources\Icons16\*.png" />
 		<None Remove="Resources\Icons32\*.png" />
-    </ItemGroup>
+	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\Icons16\*.ico" />
@@ -48,38 +132,61 @@
 		<EmbeddedResource Include="Resources\Icons32\*.png" />
 	</ItemGroup>
 
-    <ItemGroup>
-		<PackageReference Include="ClosedXML" Version="0.105.0" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
-		<PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
-        <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
-        <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
-    </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Resources\Files\Tooltips.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Tooltips.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="Xceed.Wpf.AvalonDock">
-        <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\Xceed.Wpf.AvalonDock.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\Files\Tooltips.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Tooltips.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="Resources\Files\Tooltips.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Tooltips.resx</DependentUpon>
-      </Compile>
-    </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Update="Resources\Files\Tooltips.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Tooltips.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
+	<!-- Building process -->
+	<Target Name="CopyToRevitAddins" AfterTargets="Build" Condition="'$(RevitVersion)' != ''">
+
+		<!-- Building directories for bin/addin -->
+		<PropertyGroup>
+			<BinRoot>$(TargetDir)</BinRoot>
+			<BinAddinDir>$(TargetDir)$(AddinName)\</BinAddinDir>
+			<RevitAddinDir>$(RevitAddinsRoot)\$(RevitVersion)\$(AddinName)</RevitAddinDir>
+			<RevitAddinFile>$(RevitAddinsRoot)\$(RevitVersion)\$(AddinName).addin</RevitAddinFile>
+		</PropertyGroup>
+
+		<!-- Create folders if not created yet -->
+		<MakeDir Directories="$(BinAddinDir)" />
+		<MakeDir Directories="$(RevitAddinDir)" />
+
+		<!-- Move bin items to version/add-in sub-folder -->
+		<ItemGroup>
+			<BinRootFiles Include="$(BinRoot)*.*" Exclude="$(BinRoot)*.pdb;$(BinRoot)$(AddinName).addin" />
+		</ItemGroup>
+		<Copy SourceFiles="@(BinRootFiles)" DestinationFiles="@(BinRootFiles->'$(BinAddinDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<Delete Files="@(BinRootFiles)" />
+
+		<!-- If any PDBs ended up in bin\[AddinName] by default, delete them too -->
+		<ItemGroup>
+			<BinPdbFiles Include="$(BinRoot)*.pdb;$(BinAddinDir)**\*.pdb" />
+		</ItemGroup>
+		<Delete Files="@(BinPdbFiles)" />
+
+		<!-- [AddinName].addin into bin root only -->
+		<Copy SourceFiles="$(AddinName).addin" DestinationFiles="$(BinRoot)$(AddinName).addin" SkipUnchangedFiles="true" />
+
+		<!-- Copy bin files to addin folder -->
+		<ItemGroup>
+			<DeployFiles Include="$(BinAddinDir)**\*.*" Exclude="$(BinAddinDir)**\*.pdb" />
+		</ItemGroup>
+		<Copy SourceFiles="@(DeployFiles)" DestinationFolder="$(RevitAddinDir)" SkipUnchangedFiles="true" />
+
+		<!-- Copy .addin file to addin folder -->
+		<Copy SourceFiles="$(AddinName).addin" DestinationFiles="$(RevitAddinFile)" SkipUnchangedFiles="true" />
+	</Target>
 
 </Project>

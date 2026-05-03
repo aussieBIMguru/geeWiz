@@ -84,20 +84,20 @@
             <Button Grid.Column="0"
                     Height="30" Margin="0 0 4 0"
                     Content="SUMMARY"
-                    Command="{Binding CmdBind_ShowSummaryCommand}" />
+                    Command="{Binding ShowSummaryCommand}" />
 
             <!-- DELETE BUTTON -->
             <Button Grid.Column="1"
                     Height="30" Margin="4 0 4 0"
                     Content="DELETE"
-                    Command="{Binding CmdBind_DeleteElementCommand}" />
+                    Command="{Binding DeleteElementCommand}" />
 
             <!-- SELECTION BUTTON -->
             <Button Grid.Column="2"
                     Height="30"
                     Margin="4 0 0 0"
                     Content="SELECT"
-                    Command="{Binding CmdBind_SelectDelayedElementCommand}" />
+                    Command="{Binding SelectDelayedElementCommand}" />
         </Grid>
     </Grid>
 </Window>

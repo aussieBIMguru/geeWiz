@@ -1,149 +1,163 @@
-﻿// Nic3Point event handlers
-using Nice3point.Revit.Toolkit.External.Handlers;
-// Autodesk
+﻿// Revit API
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 // geeWiz
-using geeWiz.Utilities;
-using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
+using geeWiz.Extensions;
 using gSel = geeWiz.Utilities.Select_Utils;
+using gWin = geeWiz.Utilities.WindowController;
+// Mvvm toolkit
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 // Using the Mvvm Models namespace
 namespace geeWiz.Forms.Mvvm.Models
 {
-    // Example implementation
+    #region Example implementation
 
     /*
  
-    if (WindowController.Focus<View>())
+    if (gWin.Focus<View>())
     {
         return Result.Succeeded;
     }
     
     var viewModel = new Model();
-    var view = new TestView(viewModel);
+    viewModel.WireExternalEvents(uiApp); < IMPORTANT, DO NOT MISS!
 
-    WindowController.Show(view, Globals.UiApp.MainWindowHandle);
+    var view = new TestView(viewModel);
+    gWin.Show(view, Globals.UiApp.MainWindowHandle);
 
     return Result.Succeeded;
 
     */
+
+    #endregion
 
     /// <summary>
     /// The code to manage the Wpf model
     /// </summary>
     public sealed partial class ModelSample : ObservableObject
     {
-        // Event handlers (from Nic3Point)
-        private readonly ActionEventHandler _externalHandler = new();
-        private readonly AsyncEventHandler _asyncExternalHandler = new();
-        private readonly AsyncEventHandler<ElementId> _asyncIdExternalHandler = new();
+        #region Event wiring
+
+        // Track if events are wired
+        private bool _eventsWired;
+        private readonly object _eventLock = new object();
+
+        // Events to handle
+        public IExternalEventAdapter ShowSummaryEvent { get; private set; }
+        public IExternalEventAdapterAsync<ElementId> DeleteElementEvent { get; private set; }
+        public IExternalEventAdapterAsync SelectDelayedEvent { get; private set; }
+
+        /// <summary>
+        /// Wires the events to the buttons. Call from Command so it's wired on Revit thread.
+        /// </summary>
+        /// <param name="uiApp">Revit UIApplication.</param>
+        public void WireExternalEvents(UIApplication uiApp)
+        {
+            // Finish if already wired
+            if (this._eventsWired)
+            {
+                return;
+            }
+
+            // Lock to ensure this only gets called once
+            lock (this._eventLock)
+            {
+                // Finish if already wired
+                if (this._eventsWired)
+                {
+                    return;
+                }
+
+                // Handlers belong logically to the model
+                var showSummaryHandler = new ShowSummaryHandler(this);
+                var deleteElementHandler = new DeleteElementHandler();
+                var delayedSelectHandler = new SelectDelayedElementHandler(this);
+
+                // ExternalEvents must be created here (inside Revit API context)
+                var showSummaryEvent = ExternalEvent.Create(showSummaryHandler);
+                // Async handlers create their own ExternalEvent via factory
+
+                // Adapters stored on the ViewModel
+                this.ShowSummaryEvent = new ExternalEventAdapter(showSummaryEvent);
+                this.DeleteElementEvent = new ExternalEventAdapterAsync<ElementId>(deleteElementHandler);
+                this.SelectDelayedEvent = new ExternalEventAdapterAsync(delayedSelectHandler);
+
+                // Events are now wired
+                this._eventsWired = true;
+            }
+        }
+
+        #endregion
+
+        #region Observable properties
 
         // Generate properties for bound strings
-        [ObservableProperty] private string _strBind_Element;
-        [ObservableProperty] private string _strBind_Category;
-        [ObservableProperty] private string _strBind_Status;
+        [ObservableProperty]
+        private string _strBind_Element;
+
+        [ObservableProperty]
+        private string _strBind_Category;
+
+        [ObservableProperty]
+        private string _strBind_Status;
+
+        #endregion
+
+        #region Command bindings
 
         // Bound command to the Wpf form - summarize
         [RelayCommand]
-        private void CmdBind_ShowSummary()
+        private void ShowSummary()
         {
-            // Raise event handler
-            _externalHandler.Raise(application =>
-            {
-                // Get active UI Document
-                var uiDoc = Globals.UiApp.ActiveUIDocument;
-
-                // Select an element
-                var selectedElement = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
-
-                // Update element properties
-                UpdateElementProperties(selectedElement, "Element selected.");
-            });
+            // Raise the handled event
+            this.ShowSummaryEvent?.Raise();
         }
 
         // Bound command to the Wpf form - delete
         [RelayCommand]
-        private async Task CmdBind_DeleteElementAsync()
+        private async Task DeleteElementAsync()
         {
-            // Raise event handler
-            ElementId deletedId = await _asyncIdExternalHandler.RaiseAsync(application =>
+            // Raise the handled event
+            var deletedId = await DeleteElementEvent?.RaiseAsync();
+
+            // If the Id is valid...
+            if (deletedId.Ext_IsValid())
             {
-                // Get active UI Document
-                var uiDoc = Globals.UiApp.ActiveUIDocument;
-
-                // Select an element
-                var selectedElement = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
-
-                // Catch no element
-                if (selectedElement is null)
-                {
-                    return ElementId.InvalidElementId;
-                }
-
-                // Get element Id and document
-                ElementId id = selectedElement.Id;
-                var doc = selectedElement.Document;
-
-                // If editable, try to delete the element
-                if (selectedElement.Ext_IsEditable(doc))
-                {
-                    using (var t = new Transaction(selectedElement.Document, "geeWiz: Delete element"))
-                    {
-
-                        t.Start();
-
-                        this.StrBind_Status = doc.Ext_DeleteElementId(id) == Result.Succeeded ? "Element deleted" : "Element could not be deleted.";
-
-                        t.Commit();
-                    }
-                }
-
-                // Return the element Id
-                return id;
-            });
-
-            // Message to user
-            gFrm.Custom.BubbleMessage(title: "Element deleted", message: $"Element Id: {deletedId}");
+                // Report the outcome to the user
+                gFrm.Custom.BubbleMessage(
+                    "Element deleted",
+                    $"Element Id: {deletedId}");
+            }
         }
 
         // Bound command to the Wpf form - delayed selection
         [RelayCommand]
-        private async Task CmdBind_SelectDelayedElementAsync()
+        private async Task SelectDelayedElementAsync()
         {
-            // Delay for 2 seconds
-            this.StrBind_Status = "Simulated delay...";
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            // Ensure we have an event to run
+            if (this.SelectDelayedEvent == null) { return; }
 
-            // Raise event handler
-            await _asyncExternalHandler.RaiseAsync(application =>
-            {
-                // Hide the form
-                WindowController.Hide<Views.ViewSample>();
+            // Report delay to user
+            this.StrBind_Status = "Waiting 2 seconds...";
+            await Task.Delay(2000);
 
-                // Get active UI Document
-                var uiDoc = Globals.UiApp.ActiveUIDocument;
-
-                // Select an element
-                var selectedElement = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
-
-                // Show the form
-                WindowController.Show<Views.ViewSample>();
-
-                // Update element properties
-                UpdateElementProperties(selectedElement, "Element selected.");
-            });
-
-            // Clear the status
-            this.StrBind_Status = string.Empty;
+            // Raise the handled event
+            await SelectDelayedEvent?.RaiseAsync();
         }
+
+        #endregion
+
+        #region Helper methods
 
         /// <summary>
         /// Updates the element properties in the form.
         /// </summary>
         /// <param name="element">The element.</param>
         /// <param name="status">Status message (optional).</param>
-        private void UpdateElementProperties(Element element, string status = null)
+        public void UpdateElementProperties(Element element, string status = null)
         {
             // Catch no element
             if (element is null) { return; }
@@ -158,5 +172,125 @@ namespace geeWiz.Forms.Mvvm.Models
                 this.StrBind_Status = status;
             }
         }
+
+        #endregion
+
+        #region Event handlers
+
+        /// <summary>
+        /// Handler for event.
+        /// </summary>
+        public sealed class ShowSummaryHandler : IExternalEventHandler
+        {
+            private readonly ModelSample _vm;
+
+            public ShowSummaryHandler(ModelSample vm)
+            {
+                this._vm = vm;
+            }
+
+            public void Execute(UIApplication app)
+            {
+                // Select the element
+                var uiDoc = app.ActiveUIDocument;
+                var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
+                if (element == null) return;
+
+                // Update the element/category fields
+                if (element is not null)
+                {
+                    this._vm.StrBind_Element = element.Name;
+                    this._vm.StrBind_Category = element.Category?.Name ?? "N/A";
+                }
+            }
+
+            public string GetName() => nameof(ShowSummaryHandler);
+        }
+
+        /// <summary>
+        /// Handler for event.
+        /// </summary>
+        public sealed class DeleteElementHandler : AsyncExternalEventHandler<ElementId>
+        {
+            protected override Task<ElementId> ExecuteAsyncCore(UIApplication app)
+            {
+                // Select the element
+                var uiDoc = app.ActiveUIDocument;
+                var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
+
+                // Return invalid Id if no selection
+                if (element == null)
+                {
+                    return Task.FromResult(ElementId.InvalidElementId);
+                }
+
+                // Get the element document and Id
+                var doc = element.Document;
+                var id = element.Id;
+
+                // If element is editable...
+                if (element.Ext_IsEditable(doc))
+                {
+                    // Using a transaction...
+                    using (Transaction t = new Transaction(doc, "Mvvm test"))
+                    {
+                        t.Start();
+
+                        // Try to delete the element
+                        doc.Ext_DeleteElementId(id);
+
+                        t.Ext_SafeCommit();
+                    }
+                }
+
+                // Return the elementId
+                return Task.FromResult(id);
+            }
+
+            public override string GetName() => nameof(DeleteElementHandler);
+        }
+
+        /// <summary>
+        /// Handler for event.
+        /// </summary>
+        public sealed class SelectDelayedElementHandler : AsyncExternalEventHandler
+        {
+            private readonly ModelSample _vm;
+
+            public SelectDelayedElementHandler(ModelSample vm)
+            {
+                this._vm = vm;
+            }
+
+            protected override Task ExecuteAsyncCore(UIApplication app)
+            {
+                // Hide the view
+                gWin.Hide<Mvvm.Views.ViewSample>();
+
+                // Select the element
+                var uiDoc = app.ActiveUIDocument;
+                var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
+
+                // Update the element/category fields
+                if (element != null)
+                {
+                    this._vm.StrBind_Element = element.Name;
+                    this._vm.StrBind_Category = element.Category?.Name ?? "N/A";
+                }
+
+                // Show the view
+                gWin.Show<Mvvm.Views.ViewSample>();
+
+                // Reset the status
+                this._vm.StrBind_Status = string.Empty;
+
+                // Task completed
+                return Task.CompletedTask;
+            }
+
+            public override string GetName() => nameof(SelectDelayedElementHandler);
+        }
     }
+
+    #endregion
 }

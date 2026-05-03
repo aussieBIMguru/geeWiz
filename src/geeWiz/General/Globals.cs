@@ -1,12 +1,13 @@
 ﻿// System
 using System.IO;
-using Assembly = System.Reflection.Assembly;
-// Revit API
-using Autodesk.Revit.UI;
-using Autodesk.Revit.ApplicationServices;
 using System.Collections;
 using System.Globalization;
 using System.Resources;
+using Assembly = System.Reflection.Assembly;
+// Revit API
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.ApplicationServices;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz

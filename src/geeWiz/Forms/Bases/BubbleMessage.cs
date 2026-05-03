@@ -1,4 +1,4 @@
-﻿// Autodesk specific (Adwindows)
+﻿// Revit API
 using ResultClickEventArgs = Autodesk.Internal.InfoCenter.ResultClickEventArgs;
 // geeWiz specific
 using gFil = geeWiz.Utilities.File_Utils;

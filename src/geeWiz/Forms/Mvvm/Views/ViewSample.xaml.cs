@@ -13,6 +13,8 @@ namespace geeWiz.Forms.Mvvm.Views
         public ViewSample(Models.ModelSample viewModel)
         {
             InitializeComponent();
+            this.Topmost = true;
+            this.ShowInTaskbar = true;
             DataContext = viewModel;
         }
     }

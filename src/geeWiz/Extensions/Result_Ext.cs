@@ -1,4 +1,4 @@
-﻿// Autodesk
+﻿// Revit API
 using Autodesk.Revit.UI;
 
 // The class belongs to the extensions namespace

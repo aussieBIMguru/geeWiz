@@ -17,6 +17,7 @@ namespace geeWiz.Forms.Mvvm.Views
         public string CancelMessage { get; set; }
         public string TaskName { get; set; }
         public bool CancelledByUser { get; set; }
+        public Func<bool> FunctionIfCompleted { get; set; }
 
         #endregion
 
@@ -76,6 +77,8 @@ namespace geeWiz.Forms.Mvvm.Views
 
             // Initialize the form
             InitializeComponent();
+            this.Topmost = true;
+            this.ShowInTaskbar = true;
 
             // Handle the removal of the default controls
             this.Loaded += OnLoaded;
@@ -131,6 +134,26 @@ namespace geeWiz.Forms.Mvvm.Views
         /// <param name="action"></param>
         public void ThreadSafeAction(Action action)
         {
+            // Null check
+            if (action == null)
+            {
+                return;
+            }
+
+            // Ensure dispatcher is not shut(ting) down
+            if (this.Dispatcher.HasShutdownStarted
+                || this.Dispatcher.HasShutdownFinished)
+            {
+                return;
+            }
+
+            // Check if the completion has been registered yet
+            if (this.FunctionIfCompleted is not null
+                && this.FunctionIfCompleted())
+            {
+                return;
+            }
+
             // If we are on the UI thread, run the action
             if (this.Dispatcher.CheckAccess())
             {
@@ -139,7 +162,16 @@ namespace geeWiz.Forms.Mvvm.Views
             // If not, queue the action to run on the UI thread when available
             else if (!this.Dispatcher.HasShutdownStarted && !this.Dispatcher.HasShutdownFinished)
             {
-                this.Dispatcher.BeginInvoke(action);
+                this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (this.FunctionIfCompleted is not null
+                    && this.FunctionIfCompleted())
+                    {
+                        return;
+                    }
+
+                    action();
+                }));
             }
         }
 
@@ -148,23 +180,27 @@ namespace geeWiz.Forms.Mvvm.Views
         /// </summary>
         public void CloseThreadSafe()
         {
-            // If the dispatcher is shutting down, do nothing
-            if (this.Dispatcher.HasShutdownStarted || this.Dispatcher.HasShutdownFinished)
+            // Ensure on UI thread
+            ThreadSafeAction(() =>
             {
-                return;
-            }
+                // If the dispatcher is shutting down, do nothing
+                if (this.Dispatcher.HasShutdownStarted || this.Dispatcher.HasShutdownFinished)
+                {
+                    return;
+                }
 
-            // If the view is visible, close it
-            if (this.IsVisible)
-            {
-                this.Close();
-            }
+                // If the view is visible, close it
+                if (this.IsVisible)
+                {
+                    this.Close();
+                }
 
-            // If the dispatcher is still available and running, shut it down
-            if (!this.Dispatcher.HasShutdownStarted && !this.Dispatcher.HasShutdownFinished)
-            {
-                this.Dispatcher.InvokeShutdown();
-            }
+                // If the dispatcher is still available and running, shut it down
+                if (!this.Dispatcher.HasShutdownStarted && !this.Dispatcher.HasShutdownFinished)
+                {
+                    this.Dispatcher.InvokeShutdown();
+                }
+            });
         }
 
         #endregion

@@ -39,6 +39,8 @@ namespace geeWiz.Forms.Bases
         {
             // Initialize the form
             InitializeComponent();
+            this.Topmost = true;
+            this.ShowInTaskbar = true;
 
             // Set the objects and behaviors
             this._objects = objects;

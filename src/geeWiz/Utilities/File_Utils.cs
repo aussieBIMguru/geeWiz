@@ -4,10 +4,12 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Form = System.Windows.Forms.Form;
 // Revit API
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 // geeWiz
 using gStr = geeWiz.Utilities.String_Utils;
 using DocumentFormat.OpenXml.Spreadsheet;
+using geeWiz.Extensions;
 
 // The class belongs to the utility namespace
 // using gFil = geeWiz.Utilities.File_Utils
@@ -140,10 +142,11 @@ namespace geeWiz.Utilities
                         var line = reader.ReadLine();
                         
                         // If the row is not empty, add it
-                        if (!line.IsNullOrEmpty())
+                        if (line.Ext_HasChars())
                         {
                             rows.Add(line);
                         }
+
                         // If it isn't, and we don't skip, add empty
                         else if (!skipEmpty)
                         {
@@ -216,10 +219,11 @@ namespace geeWiz.Utilities
                                 var line = reader.ReadLine();
 
                                 // If the row is not empty, add it
-                                if (!line.IsNullOrEmpty())
+                                if (line.Ext_HasChars())
                                 {
                                     rows.Add(line);
                                 }
+
                                 // If it isn't, and we don't skip, add empty
                                 else if (!skipEmpty)
                                 {

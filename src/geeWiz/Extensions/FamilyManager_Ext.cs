@@ -1,4 +1,6 @@
-﻿// geeWiz
+﻿// Revit API
+using Autodesk.Revit.DB;
+// geeWiz
 using gDat = geeWiz.Utilities.Data_Utils;
 using gFam = geeWiz.Utilities.Family_Utils;
 
@@ -73,8 +75,7 @@ namespace geeWiz.Extensions
             // Get family types
             var familyTypes = familyManager.Types
                 .Cast<FamilyType>()
-                .Where(t => t is not null)
-                .Where(t => !t.Name.IsNullOrEmpty())
+                .Where(t => t is not null && t.Name.Ext_HasChars())
                 .ToList();
 
             // Return successful outcome

@@ -1,4 +1,7 @@
-﻿// The class belongs to the extensions namespace
+﻿// Revit API
+using Autodesk.Revit.DB;
+
+// The class belongs to the extensions namespace
 // RevitLinkInstance revitLinkInstance.ExtensionMethod()
 namespace geeWiz.Extensions
 {

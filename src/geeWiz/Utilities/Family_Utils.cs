@@ -1,4 +1,7 @@
-﻿// The class belongs to the geeWiz namespace
+﻿// Revit API
+using Autodesk.Revit.DB;
+
+// The class belongs to the geeWiz namespace
 // using gFam = geeWiz.Utilities.Family_Utils
 namespace geeWiz.Utilities
 {

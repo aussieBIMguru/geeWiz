@@ -1,4 +1,5 @@
-﻿// geeWiz
+﻿// Revit API
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 // The class belongs to the extensions namespace

@@ -1,7 +1,7 @@
 ﻿// System
 using System.Windows;
-using Window = System.Windows.Window;
 using Visibility = System.Windows.Visibility;
+using Window = System.Windows.Window;
 
 // Note: WindowController class lifted from Nice3point approach
 // Reference: https://github.com/Nice3point/RevitTemplates/blob/1be110f421801339e54bf3403306443245212221/samples/SingleProjectWpfModelessApplication/RevitAddIn/Utils/WindowController.cs#L12
@@ -91,14 +91,17 @@ namespace geeWiz.Utilities
         /// Opens a window and registers it to the controller.
         /// </summary>
         /// <param name="window">The window to show.</param>
-        /// <param name="handle">Child/parent pointer.</param>
-        public static void Show(Window window, IntPtr handle)
+        /// <param name="handle">The window handle pointer (obsolete).</param> 
+        public static void ShowWindow(Window window, IntPtr handle = default)
         {
             // Register the window if it isn't controlled yet
             RegisterWindow(window);
 
             // Show the window, set pointer
-            window.Show(handle);
+            // window.Show(handle);
+            
+            // No pointer in NET10+
+            window.Show();
         }
 
         /// <summary>

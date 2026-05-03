@@ -1,7 +1,8 @@
-﻿// The class belongs to the extensions namespace
-// FamilySymbol familySymbol.ExtensionMethod()
+﻿// Revit API
 using Autodesk.Revit.DB;
 
+// The class belongs to the extensions namespace
+// FamilySymbol familySymbol.ExtensionMethod()
 namespace geeWiz.Extensions
 {
     /// <summary>

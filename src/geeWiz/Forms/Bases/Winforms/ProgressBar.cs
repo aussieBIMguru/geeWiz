@@ -1,6 +1,8 @@
 ﻿// System
 using Form = System.Windows.Forms.Form;
 using FormsApplication = System.Windows.Forms.Application;
+// Revit API
+using Autodesk.Revit.DB;
 
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases

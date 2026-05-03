@@ -3,14 +3,14 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using System.Text.RegularExpressions;
 using Brush = System.Windows.Media.Brush;
-// Autodesk
+// Revit API
+using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 // UI Libraries
 using UIFramework;
 using Xceed.Wpf.AvalonDock.Controls;
 using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.UI;
 
 // This class belongs to the root namespace
 namespace geeWiz

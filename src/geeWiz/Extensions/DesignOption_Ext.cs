@@ -25,7 +25,7 @@ namespace geeWiz.Extensions
             if (designOption is null) { return "???"; }
 
             // Construct the key without Id
-            string nameKey = $"{designOption.Ext_GetDesignOptionSetName()}: {designOption.Name}";
+            string nameKey = $"{designOption.Ext_GetDesignOptionSet().Name}: {designOption.Name}";
 
             // Return key with Id
             if (includeId)
@@ -49,12 +49,12 @@ namespace geeWiz.Extensions
         /// <param name="designOption">A DesignOption (extended).</param>
         /// <param name="view">An optional view.</param>
         /// <returns>A list of Elements.</returns>
-        public static List<Element> Ext_GetOptionElements(this DesignOption designOption, View view = null)
+        public static IList<Element> Ext_GetOptionElements(this DesignOption designOption, View view = null)
         {
             // Collect all elements on the design option
             return designOption.Document.Ext_Collector(view)
                 .WherePasses(new ElementDesignOptionFilter(designOption.Id))
-                .ToList();
+                .ToElements();
         }
 
         #endregion
@@ -72,28 +72,11 @@ namespace geeWiz.Extensions
             if (designOption is null) { return null; }
             
             // Get the option set Id parameter
-            var parameter = designOption.Ext_GetBuiltInParameter(BuiltInParameter.OPTION_SET_ID);
+            Parameter parameter = designOption.Ext_GetBuiltInParameter(BuiltInParameter.OPTION_SET_ID);
             if (parameter is null) { return null; }
 
             // Return the design option set as an element
             return parameter.AsElementId().Ext_GetElement(designOption.Document);
-        }
-
-        /// <summary>
-        /// Returns a design options set name.
-        /// </summary>
-        /// <param name="designOption">The design option (extended).</param>
-        /// <returns>A string.</returns>
-        public static string Ext_GetDesignOptionSetName(this DesignOption designOption)
-        {
-            // Get the design option set
-            var optionSet = designOption.Ext_GetDesignOptionSet();
-
-            // Null check
-            if (optionSet is null) { return null; }
-
-            // Return the design option set name
-            return optionSet.Name;
         }
 
         #endregion

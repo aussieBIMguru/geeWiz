@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 // geeWiz
 using geeWiz.Extensions;
+using System.Xaml;
 using gFil = geeWiz.Utilities.File_Utils;
 
 // The class belongs to the geeWiz namespace
@@ -14,6 +15,8 @@ namespace geeWiz.Utilities
     /// </summary>
     public static class Ribbon_Utils
     {
+        public static bool DARKMODE = false;
+        
         #region Command class to base name
 
         /// <summary>
@@ -23,10 +26,10 @@ namespace geeWiz.Utilities
         /// <returns>A string.</returns>
         public static string CommandClassToBaseName(string commandClass)
         {
-            // Example: geeWiz.Cmds_Settings.Cmd_UiToggle
+            // Example: geeWiz.Commands.Cmds_Settings.Cmd_UiToggle
             // Step 1: Settings.Cmd_UiToggle
             // Step 2: Settings_UiToggle
-            return commandClass.Replace($"{Globals.AddinName}.Cmds_", "").Replace(".Cmd", "");
+            return commandClass.Replace($"{Globals.AddinName}.Commands.Cmds_", "").Replace(".Cmd", "");
         }
 
         #endregion
@@ -42,16 +45,16 @@ namespace geeWiz.Utilities
         public static PushButtonData NewPushButtonData<CommandClass>(string buttonName)
         {
             // Strip the command class name to basics
-            var commandClass = typeof(CommandClass).FullName;
-            var baseName = CommandClassToBaseName(commandClass);
+            string commandClass = typeof(CommandClass).FullName;
+            string baseName = CommandClassToBaseName(commandClass);
 
             // Make pushbuttondata
-            var pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass);
-
-            // Set tooltip and icons
-            pushButtonData.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
-            pushButtonData.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
-            pushButtonData.Image = gFil.GetImageSource(baseName, resolution: 16);
+            var pushButtonData = new PushButtonData(baseName, buttonName, Globals.AssemblyPath, commandClass)
+            {
+                ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName),
+                LargeImage = gFil.GetImageSource(baseName, resolution: 32),
+                Image = gFil.GetImageSource(baseName, resolution: 16)
+            };
 
             // Return the data
             return pushButtonData;
@@ -69,12 +72,12 @@ namespace geeWiz.Utilities
             string baseName = CommandClassToBaseName(nameSpace);
 
             // Make pushbuttondata
-            var pulldownButtonData = new PulldownButtonData(baseName, buttonName);
-
-            // Set tooltip and icons
-            pulldownButtonData.ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName);
-            pulldownButtonData.LargeImage = gFil.GetImageSource(baseName, resolution: 32);
-            pulldownButtonData.Image = gFil.GetImageSource(baseName, resolution: 16);
+            var pulldownButtonData = new PulldownButtonData(baseName, buttonName)
+            {
+                ToolTip = gFil.GetDictValue(Globals.Tooltips, baseName),
+                LargeImage = gFil.GetImageSource(baseName, resolution: 32),
+                Image = gFil.GetImageSource(baseName, resolution: 16)
+            };
 
             // Return the data
             return pulldownButtonData;
@@ -94,19 +97,18 @@ namespace geeWiz.Utilities
         public static void AddButton_UiToggle<T>(PulldownButton pulldownButton, string availability)
         {
             // Add Dark/Light mode if in 2024 or higher
-            #if REVIT2024_OR_GREATER
-
+#if REVIT2020 || REVIT2021 || REVIT2022 || REVIT2023
+#else
             // Set dark mode global variable
-            Globals.IsDarkMode = UIThemeManager.CurrentTheme == UITheme.Dark;
+            DARKMODE = UIThemeManager.CurrentTheme == UITheme.Dark;
 
             // Add UiToggle button
             pulldownButton.Ext_AddPushButton<T>(
-                buttonName: Globals.IsDarkMode ? "Light mode" : "Dark mode",
+                buttonName: DARKMODE ? "Light mode" : "Dark mode",
                 availability: availability,
-                suffix: Globals.IsDarkMode ? "" : "_Dark");
+                suffix: DARKMODE ? "" : "_Dark");
+#endif
 
-            #endif
-            
             // Return either way
             return;
         }

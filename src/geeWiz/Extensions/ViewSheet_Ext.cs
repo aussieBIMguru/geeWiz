@@ -28,7 +28,7 @@ namespace geeWiz.Extensions
             if (sheet is null) { return "???"; }
 
             // Return the name key
-            var nameKey = $"{sheet.SheetNumber}: {sheet.Name}";
+            string nameKey = $"{sheet.SheetNumber}: {sheet.Name}";
             return sheet.Ext_FinalizeKey(nameKey, includeId);
         }
 
@@ -55,7 +55,7 @@ namespace geeWiz.Extensions
             }
 
             // Return sheet key
-            var sheetKey = $"{sheet.SheetNumber} ({revisionNumber}) - {sheet.Name}";
+            string sheetKey = $"{sheet.SheetNumber} ({revisionNumber}) - {sheet.Name}";
             return gStr.MakeStringValid(sheetKey);
         }
 
@@ -72,7 +72,7 @@ namespace geeWiz.Extensions
         public static Result Ext_AddRevision(this ViewSheet sheet, Revision revision)
         {
             // Get revisions on sheet
-            var revisionIds = sheet.GetAdditionalRevisionIds();
+            ICollection<ElementId> revisionIds = sheet.GetAdditionalRevisionIds();
 
             // If the revision is in the list
             if (revisionIds.Contains(revision.Id))
@@ -98,7 +98,7 @@ namespace geeWiz.Extensions
         public static Result Ext_RemoveRevision(this ViewSheet sheet, Revision revision)
         {
             // Get revisions on sheet
-            var revisionIds = sheet.GetAdditionalRevisionIds();
+            ICollection<ElementId> revisionIds = sheet.GetAdditionalRevisionIds();
 
             // If the revision is in the list
             if (revisionIds.Contains(revision.Id))

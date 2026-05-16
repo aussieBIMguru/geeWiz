@@ -1,6 +1,5 @@
-﻿// System
-using System;
-using System.Windows.Forms;
+﻿// geeWiz
+using gFil = geeWiz.Utilities.File_Utils;
 
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
@@ -32,7 +31,7 @@ namespace geeWiz.Forms.Bases
         {
             // Initialize the form, set the icon
             InitializeComponent();
-            geeWiz.Utilities.File_Utils.SetFormIcon(this);
+            gFil.SetFormIcon(this);
 
             // Set default values and outcomes
             this.textBox.Text = defaultValue;

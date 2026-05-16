@@ -19,7 +19,7 @@ namespace geeWiz.Extensions
         public static void Ext_SafeCommit(this Transaction t)
         {
             // Null catch
-            if (t == null)
+            if (t is null)
             {
                 return;
             }
@@ -38,7 +38,7 @@ namespace geeWiz.Extensions
         public static void Ext_SafeRollBack(this Transaction t)
         {
             // Null catch
-            if (t == null)
+            if (t is null)
             {
                 return;
             }

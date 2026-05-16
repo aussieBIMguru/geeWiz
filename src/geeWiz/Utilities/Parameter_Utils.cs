@@ -33,10 +33,10 @@ namespace geeWiz.Utilities
         {
             // Store the element
             this.Element = element;
-            var doc = Element.Document;
+            Document doc = Element.Document;
 
             // Store the parameter
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             this.Parameter = parameter;
 
             // Default values to return (assume nothing found)
@@ -70,27 +70,14 @@ namespace geeWiz.Utilities
         /// <returns>A boolean.</returns>
         public bool HasValueAs<T>()
         {
-            if (typeof(T) == typeof(string))
+            return typeof(T) switch
             {
-                return this.ParameterValue.CanBeString;
-            }
-
-            if (typeof(T) == typeof(int))
-            {
-                return this.ParameterValue.CanBeInt;
-            }
-
-            if (typeof(T) == typeof(double))
-            {
-                return this.ParameterValue.CanBeDouble;
-            }
-
-            if (typeof(T) == typeof(ElementId))
-            {
-                return this.ParameterValue.CanBeElementId;
-            }
-
-            return false;
+                Type t when t == typeof(string) => this.ParameterValue.CanBeString,
+                Type t when t == typeof(int) => this.ParameterValue.CanBeInt,
+                Type t when t == typeof(double) => this.ParameterValue.CanBeDouble,
+                Type t when t == typeof(ElementId) => this.ParameterValue.CanBeElementId,
+                _ => false
+            };
         }
 
         /// <summary>
@@ -100,27 +87,22 @@ namespace geeWiz.Utilities
         /// <returns>A value.</returns>
         public T GetInternalValueAs<T>()
         {
-            if (typeof(T) == typeof(string))
+            return typeof(T) switch
             {
-                return (T)(object)this.ParameterValue.StringValue;
-            }
+                Type t when t == typeof(string)
+                    => (T)(object)this.ParameterValue.StringValue,
 
-            if (typeof(T) == typeof(int))
-            {
-                return (T)(object)this.ParameterValue.IntegerValue;
-            }
-                
-            if (typeof(T) == typeof(double))
-            {
-                return (T)(object)this.ParameterValue.DoubleValue;
-            }
-                
-            if (typeof(T) == typeof(ElementId))
-            {
-                return (T)(object)this.ParameterValue.ElementIdValue;
-            } 
+                Type t when t == typeof(int)
+                    => (T)(object)this.ParameterValue.IntegerValue,
 
-            return default;
+                Type t when t == typeof(double)
+                    => (T)(object)this.ParameterValue.DoubleValue,
+
+                Type t when t == typeof(ElementId)
+                    => (T)(object)this.ParameterValue.ElementIdValue,
+
+                _ => default
+            };
         }
 
         /// <summary>
@@ -130,27 +112,22 @@ namespace geeWiz.Utilities
         /// <returns>A value.</returns>
         public T GetProjectValueAs<T>()
         {
-            if (typeof(T) == typeof(string))
+            return typeof(T) switch
             {
-                return (T)(object)this.ParameterValue.ProjectStringValue;
-            }
+                Type t when t == typeof(string)
+                    => (T)(object)this.ParameterValue.ProjectStringValue,
 
-            if (typeof(T) == typeof(int))
-            {
-                return (T)(object)this.ParameterValue.ProjectIntegerValue;
-            }
+                Type t when t == typeof(int)
+                    => (T)(object)this.ParameterValue.ProjectIntegerValue,
 
-            if (typeof(T) == typeof(double))
-            {
-                return (T)(object)this.ParameterValue.ProjectDoubleValue;
-            }
+                Type t when t == typeof(double)
+                    => (T)(object)this.ParameterValue.ProjectDoubleValue,
 
-            if (typeof(T) == typeof(ElementId))
-            {
-                return (T)(object)this.ParameterValue.ElementIdValue;
-            }
+                Type t when t == typeof(ElementId)
+                    => (T)(object)this.ParameterValue.ElementIdValue,
 
-            return default;
+                _ => default
+            };
         }
 
         #endregion
@@ -268,9 +245,7 @@ namespace geeWiz.Utilities
         public static List<ForgeTypeId> GetGroupTypeIds(bool sorted = false)
         {
             // Get all groupTypes
-            var groupTypeIds = ParameterUtils
-                .GetAllBuiltInGroups()
-                .ToList();
+            List<ForgeTypeId> groupTypeIds = ParameterUtils.GetAllBuiltInGroups().ToList();
 
             // Return sorted
             if (sorted)
@@ -293,7 +268,7 @@ namespace geeWiz.Utilities
         public static List<ForgeTypeId> GetSpecTypeIds(bool sorted = false)
         {
             // Get all spectypes
-            var specTypeIds = SpecUtils.GetAllSpecs().ToList();
+            List<ForgeTypeId> specTypeIds = SpecUtils.GetAllSpecs().ToList();
 
             // Return sorted
             if (sorted)

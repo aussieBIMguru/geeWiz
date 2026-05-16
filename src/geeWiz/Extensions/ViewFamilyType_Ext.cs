@@ -26,7 +26,7 @@ namespace geeWiz.Extensions
             if (viewFamilyType is null) { return "???"; }
 
             // Return the name key
-            var nameKey = $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name}";
+            string nameKey = $"{viewFamilyType.ViewFamily.ToString()}: {viewFamilyType.Name}";
             return viewFamilyType.Ext_FinalizeKey(nameKey, includeId);
         }
 
@@ -137,14 +137,11 @@ namespace geeWiz.Extensions
             if (viewFamilyType is null) { return new List<View>(); }
             
             // Get current document
-            doc ??= Globals.UiApp.ActiveUIDocument.Document;
-
-            // View family type Id
-            var viewFamilyTypeId = viewFamilyType.Id;
+            doc ??= Globals.CurrentDocument();
 
             // Get all views of given view type
             return doc.Ext_GetViews(sorted: sorted)
-                .Where(v => v.GetTypeId() == viewFamilyTypeId)
+                .Where(v => v.GetTypeId() == viewFamilyType.Id)
                 .ToList();
         }
 

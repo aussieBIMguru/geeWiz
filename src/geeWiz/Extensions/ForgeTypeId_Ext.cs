@@ -20,7 +20,7 @@ namespace geeWiz.Extensions
         {
             try
             {
-                var name = LabelUtils.GetLabelForGroup(forgeTypeId);
+                string name = LabelUtils.GetLabelForGroup(forgeTypeId);
                 if (catchOther) { name ??= "Other"; }
                 return name;
             }

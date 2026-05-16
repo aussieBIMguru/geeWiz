@@ -37,7 +37,7 @@ namespace geeWiz.Extensions
             }
 
             // Make pushbuttondata
-            var pushButtonData = gRib.NewPushButtonData<CommandClass>(buttonName);
+            PushButtonData pushButtonData = gRib.NewPushButtonData<CommandClass>(buttonName);
 
             // Make pushbutton, add to panel
             if (pulldownButton.AddPushButton(pushButtonData) is PushButton pushButton)

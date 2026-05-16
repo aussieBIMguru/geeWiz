@@ -7,14 +7,10 @@ using Autodesk.Revit.DB;
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
-    #region Class summary
     /// <summary>
     /// Standard class for present a progress bar to the user.
-    /// 
     /// Control with a using statement wrapped around your task.
     /// </summary>
-    #endregion
-
     public partial class ProgressBar : Form
     {
         #region Class properties

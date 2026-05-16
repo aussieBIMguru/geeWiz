@@ -1,6 +1,7 @@
 ﻿// geeWiz
 using geeWiz.Extensions;
 using gDat = geeWiz.Utilities.Data_Utils;
+using gFil = geeWiz.Utilities.File_Utils;
 
 // The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
@@ -38,7 +39,7 @@ namespace geeWiz.Forms.Bases
         {
             // Initialize the form, set the icon
             InitializeComponent();
-            geeWiz.Utilities.File_Utils.SetFormIcon(this);
+            gFil.SetFormIcon(this);
 
             // Set title
             this.Text = title;
@@ -122,7 +123,7 @@ namespace geeWiz.Forms.Bases
             foreach (var pair in this.FormPairs)
             {
                 // Check if it passes the filter, set visibility
-                var passesFilter = PassesTextFilter(pair.ItemKey);
+                bool passesFilter = PassesTextFilter(pair.ItemKey);
                 pair.Visible = passesFilter;
 
                 // Add its index if it passes the filter
@@ -159,8 +160,8 @@ namespace geeWiz.Forms.Bases
             for (int i = 0; i < this.listView.Items.Count; i++)
             {
                 // Get the pair index and listviewitem
-                var pairIndex = this.VisibleIndices[i];
-                var listViewItem = this.listView.Items[i];
+                int pairIndex = this.VisibleIndices[i];
+                ListViewItem listViewItem = this.listView.Items[i];
 
                 // Set the corresponding formpair check
                 this.FormPairs[pairIndex].Checked = listViewItem.Checked;
@@ -224,7 +225,7 @@ namespace geeWiz.Forms.Bases
             if (this.MultiSelect)
             {
                 // Store the checked items
-                var checkedValues = FormPairs
+                List<T> checkedValues = FormPairs
                     .Where(f => f.Checked)
                     .Select(f => f.ItemValue)
                     .ToList();

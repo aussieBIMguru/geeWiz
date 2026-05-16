@@ -6,10 +6,8 @@ using Autodesk.Revit.Attributes;
 using gFil = geeWiz.Utilities.File_Utils;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_General
+namespace geeWiz.Commands.Cmds_General
 {
-    #region Cmd_About
-
     /// <summary>
     /// Opens the project Github page.
     /// </summary>
@@ -23,6 +21,4 @@ namespace geeWiz.Cmds_General
             return gFil.OpenLinkPath(linkPath);
         }
     }
-
-    #endregion
 }

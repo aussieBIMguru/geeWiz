@@ -5,13 +5,28 @@ using Autodesk.Revit.UI.Events;
 using gFrm = geeWiz.Forms;
 
 // The class belongs to the root namespace
-namespace geeWiz
+namespace geeWiz.General
 {
     /// <summary>
     /// Warden will intercept and cross check command use.
     /// </summary>
     public static class Warden
     {
+        #region Properties
+
+        private static readonly List<string> COMMANDS_LIST = new List<string>()
+        {
+            "ID_INPLACE_COMPONENT",
+            "ID_FILE_IMPORT",
+            "ID_EDIT_PAINT"
+        };
+
+        public static bool ACTIVE = true;
+        public static string LASTCOMMANDNAME = null;
+        public static bool IDLING = false;
+
+        #endregion
+
         #region Register/deregister commands
 
         /// <summary>
@@ -22,9 +37,11 @@ namespace geeWiz
         public static void Register(UIControlledApplication uiCtlApp = null)
         {
             uiCtlApp ??= Globals.UiCtlApp;
-            WatchCommand(uiCtlApp, commandName: "ID_INPLACE_COMPONENT");
-            WatchCommand(uiCtlApp, commandName: "ID_FILE_IMPORT");
-            WatchCommand(uiCtlApp, commandName: "ID_EDIT_PAINT");
+
+            foreach (string command in COMMANDS_LIST)
+            {
+                WatchCommand(uiCtlApp, commandName: command);
+            }
         }
 
         /// <summary>
@@ -35,9 +52,11 @@ namespace geeWiz
         public static void DeRegister(UIControlledApplication uiCtlApp = null)
         {
             uiCtlApp ??= Globals.UiCtlApp;
-            IgnoreCommand(uiCtlApp, commandName: "ID_INPLACE_COMPONENT");
-            IgnoreCommand(uiCtlApp, commandName: "ID_FILE_IMPORT");
-            IgnoreCommand(uiCtlApp, commandName: "ID_EDIT_PAINT");
+
+            foreach (string command in COMMANDS_LIST)
+            {
+                IgnoreCommand(uiCtlApp, commandName: command);
+            }
         }
 
         #endregion
@@ -50,10 +69,10 @@ namespace geeWiz
         /// <param name="uiApp">The UIApplication.</param>
         /// <param name="commandName">The internal name of the Command to watch.</param>
         /// <returns>Void (nothing).</returns>
-        public static void WatchCommand(UIControlledApplication uiApp, string commandName)
+        private static void WatchCommand(UIControlledApplication uiApp, string commandName)
         {
             // Look up the command Id by name
-            var commandId = RevitCommandId.LookupCommandId(commandName);
+            RevitCommandId commandId = RevitCommandId.LookupCommandId(commandName);
 
             // Check if we can bind to the command
             if (commandId.CanHaveBinding && !commandId.HasBinding)
@@ -69,10 +88,10 @@ namespace geeWiz
         /// <param name="uiApp">The UIApplication.</param>
         /// <param name="commandName">The internal name of the Command to watch.</param>
         /// <returns>Void (nothing).</returns>
-        public static void IgnoreCommand(UIControlledApplication uiApp, string commandName)
+        private static void IgnoreCommand(UIControlledApplication uiApp, string commandName)
         {
             // Look up the command Id by name
-            var commandId = RevitCommandId.LookupCommandId(commandName);
+            RevitCommandId commandId = RevitCommandId.LookupCommandId(commandName);
 
             // Check if we can bind to the command
             if (commandId.CanHaveBinding && commandId.HasBinding)
@@ -92,13 +111,13 @@ namespace geeWiz
         /// <param name="sender">The event sender (command).</param>
         /// <param name="args">The event arguments.</param>
         /// <returns>Void (nothing).</returns>
-        public static void CatchCommand(object sender, ExecutedEventArgs args)
+        private static void CatchCommand(object sender, ExecutedEventArgs args)
         {
             // A variable as to whether we will let the command execute
             bool permit = true;
 
             // If Warden is active
-            if (Globals.WardenActive)
+            if (ACTIVE)
             {
                 // Ask the user if we want to permit the command
                 var formResult = gFrm.Custom.Message(title: "Warden",
@@ -113,8 +132,8 @@ namespace geeWiz
             if (permit)
             {
                 // Store idling and command Id
-                Globals.LastCommandId = args.CommandId.Name;
-                Globals.Idling = false;
+                LASTCOMMANDNAME = args.CommandId.Name;
+                IDLING = false;
 
                 // Remove the binding, add the rebind to the idling event
                 Globals.UiApp.RemoveAddInCommandBinding(args.CommandId);
@@ -138,10 +157,10 @@ namespace geeWiz
         private static void RebindCommand(object sender, IdlingEventArgs args)
         {
             // If we are idling
-            if (Globals.Idling)
+            if (IDLING)
             {
                 // Watch the command again
-                WatchCommand(Globals.UiCtlApp, Globals.LastCommandId);
+                WatchCommand(Globals.UiCtlApp, LASTCOMMANDNAME);
 
                 // Remove this from the idling event
                 Globals.UiApp.Idling -= RebindCommand;
@@ -151,7 +170,7 @@ namespace geeWiz
             }
 
             // Tell the app it is idling as soon as this runs
-            Globals.Idling = true;
+            IDLING = true;
         }
 
         #endregion

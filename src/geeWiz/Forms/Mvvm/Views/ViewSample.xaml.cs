@@ -15,7 +15,7 @@ namespace geeWiz.Forms.Mvvm.Views
             InitializeComponent();
             this.Topmost = true;
             this.ShowInTaskbar = true;
-            DataContext = viewModel;
+            this.DataContext = viewModel;
         }
     }
 }

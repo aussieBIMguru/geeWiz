@@ -4,7 +4,7 @@ using Autodesk.Revit.DB.Events;
 
 // The class belongs to the root namespace
 // using gErr = geeWiz.ErrorSwallower
-namespace geeWiz
+namespace geeWiz.General
 {
     /// <summary>
     /// Methods of this class generally relate to error supression.
@@ -31,16 +31,16 @@ namespace geeWiz
         public ErrorSwallower(Transaction transaction = null)
         {
             // Set the failure swallower variable
-            _failureSwallower = new FailureSwallower();
+            this._failureSwallower = new FailureSwallower();
 
             // If a transaction is provided...
             if (transaction is not null)
             {
                 // Get failure handling options
-                var options = transaction.GetFailureHandlingOptions();
+                FailureHandlingOptions options = transaction.GetFailureHandlingOptions();
 
                 // Set the failure processor as the failureswallower
-                options.SetFailuresPreprocessor(_failureSwallower);
+                options.SetFailuresPreprocessor(this._failureSwallower);
 
                 // Set the failure handling options of the transaction
                 transaction.SetFailureHandlingOptions(options);
@@ -63,11 +63,11 @@ namespace geeWiz
             try
             {
                 // Get the failure accessor and processing result
-                var failureAccessor = args.GetFailuresAccessor();
-                var result = args.GetProcessingResult();
+                FailuresAccessor failureAccessor = args.GetFailuresAccessor();
+                FailureProcessingResult result = args.GetProcessingResult();
 
                 // Process the failures, set the result
-                result = _failureSwallower.PreprocessFailures(failureAccessor);
+                result = this._failureSwallower.PreprocessFailures(failureAccessor);
                 args.SetProcessingResult(result);
             }
             // If it fails, do nothing
@@ -87,7 +87,6 @@ namespace geeWiz
         /// <returns>Void (nothing)</returns>
         public void Start()
         {
-            // Subscribe to failure processing event
             Globals.CtlApp.FailuresProcessing += OnFailureProcessing;
         }
 
@@ -168,7 +167,7 @@ namespace geeWiz
         public FailureProcessingResult PreprocessFailures(FailuresAccessor failureAccessor)
         {
             // Get severity, no commit by default
-            var severity = failureAccessor.GetSeverity();
+            FailureSeverity severity = failureAccessor.GetSeverity();
             bool commitRequired = false;
 
             // If no severity, we can continue
@@ -178,10 +177,10 @@ namespace geeWiz
             }
 
             // For each failure in the messages...
-            foreach (var failure in failureAccessor.GetFailureMessages())
+            foreach (FailureMessageAccessor failure in failureAccessor.GetFailureMessages())
             {
                 // Get severity
-                var failureSeverity = failure.GetSeverity();
+                FailureSeverity failureSeverity = failure.GetSeverity();
 
                 // If it's a warning...
                 if (!failure.HasResolutions() && failureSeverity == FailureSeverity.Warning)
@@ -192,13 +191,13 @@ namespace geeWiz
                 }
 
                 // Otherwise, we get the default resolution type
-                var failureRegistry = Autodesk.Revit.ApplicationServices.Application.GetFailureDefinitionRegistry();
-                var fid = new FailureDefinitionId(failure.GetFailureDefinitionId().Guid);
-                var failureDefinitionId = failureRegistry.FindFailureDefinition(fid);
-                var defaultResolution = failureDefinitionId.GetDefaultResolutionType();
+                FailureDefinitionRegistry failureRegistry = Autodesk.Revit.ApplicationServices.Application.GetFailureDefinitionRegistry();
+                FailureDefinitionId fid = new FailureDefinitionId(failure.GetFailureDefinitionId().Guid);
+                FailureDefinitionAccessor failureDefinitionId = failureRegistry.FindFailureDefinition(fid);
+                FailureResolutionType defaultResolution = failureDefinitionId.GetDefaultResolutionType();
 
                 // For each type of typical resolution...
-                foreach (var resolutionType in RESOLUTIONS)
+                foreach (FailureResolutionType resolutionType in RESOLUTIONS)
                 {
                     // If it is the default resolution or has a resolution of this type...
                     if (defaultResolution == resolutionType || failure.HasResolutionOfType(resolutionType))

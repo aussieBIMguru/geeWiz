@@ -4,7 +4,6 @@ using Autodesk.Revit.UI;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using geeWiz.Extensions;
-using gSel = geeWiz.Utilities.Select_Utils;
 using gWin = geeWiz.Utilities.WindowController;
 // Mvvm toolkit
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -192,8 +191,8 @@ namespace geeWiz.Forms.Mvvm.Models
             public void Execute(UIApplication app)
             {
                 // Select the element
-                var uiDoc = app.ActiveUIDocument;
-                var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
+                UIDocument uiDoc = app.ActiveUIDocument;
+                Element element = uiDoc.Ext_PickWithFilter(new ISF.AnyElement(), "Select an element");
 
                 // Update properties
                 this._vm.UpdateElementProperties(element);
@@ -210,18 +209,18 @@ namespace geeWiz.Forms.Mvvm.Models
             protected override Task<ElementId> ExecuteAsyncCore(UIApplication app)
             {
                 // Select the element
-                var uiDoc = app.ActiveUIDocument;
-                var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
+                UIDocument uiDoc = app.ActiveUIDocument;
+                Element element = uiDoc.Ext_PickWithFilter(new ISF.AnyElement(), "Select an element");
 
                 // Return invalid Id if no selection
-                if (element == null)
+                if (element is null)
                 {
                     return Task.FromResult(ElementId.InvalidElementId);
                 }
 
                 // Get the element document and Id
-                var doc = element.Document;
-                var id = element.Id;
+                Document doc = element.Document;
+                ElementId id = element.Id;
 
                 // If element is editable...
                 if (element.Ext_IsEditable(doc))
@@ -263,8 +262,8 @@ namespace geeWiz.Forms.Mvvm.Models
                 gWin.Hide<Mvvm.Views.ViewSample>();
 
                 // Select the element
-                var uiDoc = app.ActiveUIDocument;
-                var element = uiDoc.Ext_PickWithFilter(new gSel.ISF_AnyElement(), "Select an element");
+                UIDocument uiDoc = app.ActiveUIDocument;
+                Element element = uiDoc.Ext_PickWithFilter(new ISF.AnyElement(), "Select an element");
 
                 // Update properties
                 this._vm.UpdateElementProperties(element, string.Empty);

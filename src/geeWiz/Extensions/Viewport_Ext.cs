@@ -60,11 +60,11 @@ namespace geeWiz.Extensions
             doc ??= viewport.Document;
 
             // Isolate all elements in viewports view
-            var viewportView = viewport.ViewId.Ext_GetElement<View>(doc);
+            View viewportView = viewport.ViewId.Ext_GetElement<View>(doc);
             viewportView.IsolateCategoryTemporary(CATEGORYID_BASEPOINT);
 
             // Get actual box centre
-            var vpBoxCenter = viewport.GetBoxCenter();
+            XYZ vpBoxCenter = viewport.GetBoxCenter();
 
             // Disable temporary view override
             viewportView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);

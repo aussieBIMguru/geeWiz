@@ -2,16 +2,14 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
+using View = Autodesk.Revit.DB.View;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
-using gSel = geeWiz.Utilities.Select_Utils;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Select
+namespace geeWiz.Commands.Cmds_Select
 {
-    #region Cmd_PickRooms
-
     /// <summary>
     /// Provides a filtered selection for rooms.
     /// </summary>
@@ -21,14 +19,14 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
 
             // Make the category filter
-            var selectionFilter = new gSel.ISF_ByBuiltInCategory(BuiltInCategory.OST_Rooms);
+            var selectionFilter = new ISF.ByBuiltInCategory(BuiltInCategory.OST_Rooms);
 
             // Select with filter applied
-            var selectedElements = uiDoc.Ext_SelectWithFilter(
+            List<Element> selectedElements = uiDoc.Ext_SelectWithFilter(
                 selectionFilter: selectionFilter,
                 selectionPrompt: "Select rooms, then press \'Finish\'");
 
@@ -36,10 +34,6 @@ namespace geeWiz.Cmds_Select
             return uiDoc.Ext_SelectElements(selectedElements);
         }
     }
-
-    #endregion
-
-    #region Cmd_PickWalls
 
     /// <summary>
     /// Provides a filtered selection for walls.
@@ -50,14 +44,14 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
 
             // Make the category filter
-            var selectionFilter = new gSel.ISF_ByBuiltInCategory(BuiltInCategory.OST_Walls);
+            var selectionFilter = new ISF.ByBuiltInCategory(BuiltInCategory.OST_Walls);
 
             // Select with filter applied
-            var selectedElements = uiDoc.Ext_SelectWithFilter(
+            List<Element> selectedElements = uiDoc.Ext_SelectWithFilter(
                 selectionFilter: selectionFilter,
                 selectionPrompt: "Select walls, then press \'Finish\'");
 
@@ -65,10 +59,6 @@ namespace geeWiz.Cmds_Select
             return uiDoc.Ext_SelectElements(selectedElements);
         }
     }
-
-    #endregion
-
-    #region Cmd_GetHidden
 
     /// <summary>
     /// Gets all hidden elements in view.
@@ -79,16 +69,16 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Active view and hidden elements
-            var activeView = uiDoc.ActiveGraphicalView;
+            View activeView = uiDoc.ActiveGraphicalView;
             var hiddenElements = new List<Element>();
 
             // Ensure active view is editable
-            if (!(activeView as Element).Ext_IsEditable(doc))
+            if (!activeView.Ext_IsEditable(doc))
             {
                 return gFrm.Custom.Cancelled("Active view is not editable.");
             }
@@ -117,10 +107,6 @@ namespace geeWiz.Cmds_Select
         }
     }
 
-    #endregion
-
-    #region Cmd_GetTtbs
-
     /// <summary>
     /// Gets all title blocks on selected sheets.
     /// </summary>
@@ -130,17 +116,17 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Get selected sheet Ids
-            var selectedSheetIds = uiDoc.Ext_SelectedElements<ViewSheet>()
+            HashSet<ElementId> selectedSheetIds = uiDoc.Ext_SelectedElements<ViewSheet>()
                 .Select(s => s.Id)
-                .ToList();
+                .ToHashSet();
 
             // Collect all title blocks who have owner sheet Ids
-            var titleBlocks = doc.Ext_GetElementsOfCategory(BuiltInCategory.OST_TitleBlocks)
+            List<Element> titleBlocks = doc.Ext_GetElementsOfCategory(BuiltInCategory.OST_TitleBlocks)
                 .Where(t => selectedSheetIds.Contains(t.OwnerViewId))
                 .ToList();
 
@@ -148,10 +134,6 @@ namespace geeWiz.Cmds_Select
             return uiDoc.Ext_SelectElements(titleBlocks);
         }
     }
-
-    #endregion
-
-    #region Cmd_RemoveGrouped
 
     /// <summary>
     /// Removes grouped elements from selection.
@@ -162,12 +144,12 @@ namespace geeWiz.Cmds_Select
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Get selected elements which are not grouped
-            var ungroupedElements = uiDoc.Ext_SelectedElements()
+            List<Element> ungroupedElements = uiDoc.Ext_SelectedElements()
                 .Where(e => e is not Group && e.GroupId == ElementId.InvalidElementId)
                 .ToList();
 
@@ -175,6 +157,4 @@ namespace geeWiz.Cmds_Select
             return uiDoc.Ext_SelectElements(ungroupedElements);
         }
     }
-
-    #endregion
 }

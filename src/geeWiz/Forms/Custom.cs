@@ -197,7 +197,7 @@ namespace geeWiz.Forms
             var formResult = new FormResult<string>(valid: false);
 
             // Using a dialog object
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            using (var openFileDialog = new OpenFileDialog())
             {
                 // Default title and filter
                 title ??= multiSelect ? "Select file(s)" : "Select a file";
@@ -211,7 +211,7 @@ namespace geeWiz.Forms
                 // Process the results
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    var filePaths = openFileDialog.FileNames.ToList();
+                    List<string> filePaths = openFileDialog.FileNames.ToList();
 
                     if (multiSelect) { formResult.Validate(filePaths); }
                     else { formResult.Validate(filePaths.First()); }
@@ -352,7 +352,7 @@ namespace geeWiz.Forms
             if (numberOnly)
             {
                 // Try to parse as double
-                var tryDouble = gCnv.StringToDouble(inputValue);
+                double? tryDouble = gCnv.StringToDouble(inputValue);
 
                 // Process the outcome
                 if (tryDouble.HasValue)
@@ -365,7 +365,7 @@ namespace geeWiz.Forms
                 }
 
                 // Set form object anyway
-                formResult.Object = resultDouble as object;
+                formResult.Object = resultDouble;
             }
             // Otherwise, process as text
             else
@@ -514,7 +514,7 @@ namespace geeWiz.Forms
             title ??= multiSelect ? "Select object(s) from list:" : "Select object from list:";
 
             // Keyed object process
-            var keyedObjects = gDat.CombineAsKeyedObjects<T>(keys, values, showMessages: true);
+            var keyedObjects = gDat.CombineAsKeyedObjects(keys, values, showMessages: true);
             if (keyedObjects is null) { return formResult; }
 
             // Run the Wpf form
@@ -523,7 +523,7 @@ namespace geeWiz.Forms
             // Process the outcome if affirmative
             if (dlg.ShowDialog() == true)
             {
-                var chosenItems = dlg.GetChosenItems()
+                List<T> chosenItems = dlg.GetChosenItems()
                     .Select(i => i.ItemValue)
                     .OfType<T>()
                     .ToList();
@@ -554,36 +554,6 @@ namespace geeWiz.Forms
     // These classes provide form utility
     public static class Utilities
     {
-        #region Progress bar delay
-
-        /// <summary>
-        /// Calculates ideal sleep delay for a progress form.
-        /// </summary>
-        /// <param name="steps">Steps to take.</param>
-        /// <param name="duration">The desired overall progress time (in ms).</param>
-        /// <param name="imposeLimit">Keep between realistic min/max of 1 and 200ms.</param>
-        /// <returns>The delay (in ms).</returns>
-        public static int ProgressDelay(int steps, int duration = 3000, bool imposeLimit = true)
-        {
-            // Catch one step or less
-            if (steps < 2) { return duration; }
-
-            // Calculate the step
-            int step = duration / steps;
-
-            // Catch limit imposed
-            if (imposeLimit)
-            {
-                if (step < 1) { step = 1; }
-                else if (step > 200) { step = 200; }
-            }
-
-            // Return the step
-            return step;
-        }
-
-        #endregion
-
         #region Wpf utilities
 
         /// <summary>

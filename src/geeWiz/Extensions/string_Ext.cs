@@ -61,7 +61,7 @@ namespace geeWiz.Extensions
             if (str.Ext_HasNoChars()) { return valueOnFailure; }
 
             // Try to convert to an integer
-            var stringAsInt = gCnv.StringToInt(str);
+            int? stringAsInt = gCnv.StringToInt(str);
             if (!stringAsInt.HasValue) { return valueOnFailure; }
 
             // Convert integer to elementId
@@ -82,7 +82,7 @@ namespace geeWiz.Extensions
             if (str.Ext_HasNoChars()) { return default; }
 
             // Try to convert to an integer
-            var stringAsInt = gCnv.StringToInt(str);
+            int? stringAsInt = gCnv.StringToInt(str);
             if (!stringAsInt.HasValue) { return default; }
 
             // Convert integer to ElementId, get that Element
@@ -104,7 +104,7 @@ namespace geeWiz.Extensions
             if (str.Ext_HasNoChars()) { return default; }
 
             // Base collector
-            var collector = new FilteredElementCollector(doc).OfClass(typeof(T));
+            FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(T));
 
             // Get element of element type
             if (isElementType)

@@ -29,7 +29,7 @@ namespace geeWiz.Utilities
             var nonEditable = new List<T>();
 
             // For each object...
-            foreach (var obj in objects)
+            foreach (T obj in objects)
             {
                 // If the object is an Element...
                 if (obj is Element element)

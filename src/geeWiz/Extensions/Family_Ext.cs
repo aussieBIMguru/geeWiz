@@ -1,6 +1,7 @@
 ﻿// Revit API
 using Autodesk.Revit.DB;
 // geeWiz
+using geeWiz.Utilities;
 using gFam = geeWiz.Utilities.Family_Utils;
 
 // The class belongs to the extensions namespace
@@ -26,7 +27,7 @@ namespace geeWiz.Extensions
             if (family is null) { return "???"; }
 
             // Return the name key
-            var nameKey = $"{family.FamilyCategory.Name}: {family.Name}";
+            string nameKey = $"{family.FamilyCategory.Name}: {family.Name}";
             return family.Ext_FinalizeKey(nameKey, includeId);
         }
 
@@ -60,10 +61,10 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="family">The family (extended).</param>
         /// <returns>A FamilyProccessingOutcome.</returns>
-        public static gFam.FamilyProccessingOutcome Ext_OpenFamilyAsDocument(this Family family)
+        public static FamilyProccessingOutcome Ext_OpenFamilyAsDocument(this Family family)
         {
             // Processing result
-            var processingOutcome = new gFam.FamilyProccessingOutcome(family.Document, processingResult: gFam.PROCESSING_RESULT.FAILURE_GENERAL_NULL);
+            var processingOutcome = new FamilyProccessingOutcome(family.Document, processingResult: PROCESSING_RESULT.FAILURE_GENERAL_NULL);
 
             // Null check
             if (family is null) { return processingOutcome; }
@@ -71,13 +72,13 @@ namespace geeWiz.Extensions
             // Try to edit the family
             try
             {
-                var editedFamily = family.Document.EditFamily(family);
+                Document editedFamily = family.Document.EditFamily(family);
                 processingOutcome.SetValues(editedFamily: editedFamily);
                 return processingOutcome;
             }
             catch
             {
-                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
+                processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
                 return processingOutcome;
             }
         }

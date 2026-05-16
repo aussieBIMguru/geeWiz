@@ -4,7 +4,7 @@ using Autodesk.Revit.UI;
 
 // The class belongs to the root namespace
 // using gAva = geeWiz.Availability.AvailabilityNames;
-namespace geeWiz
+namespace geeWiz.General
 {
     /// <summary>
     /// Methods of this class generally relate to availability/context.

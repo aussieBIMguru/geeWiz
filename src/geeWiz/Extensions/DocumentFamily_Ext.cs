@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 // System
 using System.IO;
 // geeWiz
+using geeWiz.Utilities;
 using gFam = geeWiz.Utilities.Family_Utils;
 using gFil = geeWiz.Utilities.File_Utils;
 
@@ -28,7 +29,7 @@ namespace geeWiz.Extensions
             if (doc is null) { return null; }
 
             // Set the global properties
-            Globals.FocalDocument = doc;
+            gFam.DOCUMENT_FOCUS = doc;
 
             // Return if document is family
             return doc.FamilyManager;
@@ -58,10 +59,10 @@ namespace geeWiz.Extensions
         /// <param name="doc">The Document (extended).</param>
         /// <param name="save">If the document is to be saved.</param>
         /// <returns>A FamilyProccessingOutcome.</returns>
-        public static gFam.FamilyProccessingOutcome Ext_CloseFamilyDocument(this Document doc, bool save = false)
+        public static FamilyProccessingOutcome Ext_CloseFamilyDocument(this Document doc, bool save = false)
         {
             // Processing result
-            var processingOutcome = new gFam.FamilyProccessingOutcome(doc);
+            var processingOutcome = new FamilyProccessingOutcome(doc);
 
             // Null and non-family document checks
             if (!doc.Ext_IsFamilyDocument()) { return processingOutcome; }
@@ -75,7 +76,7 @@ namespace geeWiz.Extensions
             }
             catch
             {
-                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_CLOSE;
+                processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_CLOSE;
                 return processingOutcome;
             }
         }
@@ -88,11 +89,11 @@ namespace geeWiz.Extensions
         /// <param name="options">SaveAsOptions (optional).</param>
         /// <param name="closeAfterSaving">Close afterwards (without saving).</param>
         /// <returns>A FamilyProccessingOutcome.</returns>
-        public static gFam.FamilyProccessingOutcome Ext_SaveAsFamilyFile(this Document doc, string filePath,
+        public static FamilyProccessingOutcome Ext_SaveAsFamilyFile(this Document doc, string filePath,
             SaveAsOptions options = null, bool closeAfterSaving = false)
         {
             // Processing result
-            var processingOutcome = new gFam.FamilyProccessingOutcome(doc);
+            var processingOutcome = new FamilyProccessingOutcome(doc);
 
             // Null and non-family document checks
             if (!doc.Ext_IsFamilyDocument()) { return processingOutcome; }
@@ -108,7 +109,7 @@ namespace geeWiz.Extensions
             }
             catch
             {
-                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_SAVEAS;
+                processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_SAVEAS;
             }
 
             // Optionally close the document
@@ -122,9 +123,9 @@ namespace geeWiz.Extensions
                 {
                     processingOutcome.Success = false;
                     processingOutcome.ProcessingResult =
-                        processingOutcome.ProcessingResult == gFam.PROCESSING_RESULT.FAILURE_DOC_SAVEAS
-                        ? gFam.PROCESSING_RESULT.FAILURE_DOC_SAVEASANDCLOSE
-                        : gFam.PROCESSING_RESULT.FAILURE_DOC_CLOSE;
+                        processingOutcome.ProcessingResult == PROCESSING_RESULT.FAILURE_DOC_SAVEAS
+                        ? PROCESSING_RESULT.FAILURE_DOC_SAVEASANDCLOSE
+                        : PROCESSING_RESULT.FAILURE_DOC_CLOSE;
                 }
             }
 
@@ -143,10 +144,10 @@ namespace geeWiz.Extensions
         /// <param name="familyDoc">The family document to load.</param>
         /// <param name="options">The IFamilyLoadOptions.</param>
         /// <returns>A FamilyProccessingOutcome.</returns>
-        public static gFam.FamilyProccessingOutcome Ext_LoadFamilyDocument(this Document doc, Document familyDoc, IFamilyLoadOptions options = null)
+        public static FamilyProccessingOutcome Ext_LoadFamilyDocument(this Document doc, Document familyDoc, IFamilyLoadOptions options = null)
         {
             // Processing result
-            var processingOutcome = new gFam.FamilyProccessingOutcome(doc);
+            var processingOutcome = new FamilyProccessingOutcome(doc);
 
             // Null check, ensure document is a family
             if (doc is null || !familyDoc.Ext_IsFamilyDocument()) { return processingOutcome; }
@@ -166,7 +167,7 @@ namespace geeWiz.Extensions
             }
             catch
             {
-                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_LOADFROMDOC;
+                processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_LOADFROMDOC;
                 return processingOutcome;
             }
         }
@@ -178,10 +179,10 @@ namespace geeWiz.Extensions
         /// <param name="filePath">The filepath to load from.</param>
         /// <param name="options">The IFamilyLoadOptions.</param>
         /// <returns>A FamilyProccessingOutcome.</returns>
-        public static gFam.FamilyProccessingOutcome Ext_LoadFamilyFromPath(this Document doc, string filePath, IFamilyLoadOptions options = null)
+        public static FamilyProccessingOutcome Ext_LoadFamilyFromPath(this Document doc, string filePath, IFamilyLoadOptions options = null)
         {
             // Processing result
-            var processingOutcome = new gFam.FamilyProccessingOutcome(doc);
+            var processingOutcome = new FamilyProccessingOutcome(doc);
 
             // Null check, ensure file exists
             if (doc is null || !File.Exists(filePath)) { return processingOutcome; }
@@ -207,7 +208,7 @@ namespace geeWiz.Extensions
             }
 
             // If we got here, we failed to load
-            processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_LOADFROMFILE;
+            processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_LOADFROMFILE;
             return processingOutcome;
         }
 
@@ -221,10 +222,10 @@ namespace geeWiz.Extensions
         /// <param name="doc">The Document (extended).</param>
         /// <param name="family">The family to edit.</param>
         /// <returns>A FamilyProccessingOutcome.</returns>
-        public static gFam.FamilyProccessingOutcome Ext_OpenFamilyAsDocument(this Document doc, Family family)
+        public static FamilyProccessingOutcome Ext_OpenFamilyAsDocument(this Document doc, Family family)
         {
             // Processing result
-            var processingOutcome = new gFam.FamilyProccessingOutcome(doc, gFam.PROCESSING_RESULT.FAILURE_GENERAL_NULL);
+            var processingOutcome = new FamilyProccessingOutcome(doc, PROCESSING_RESULT.FAILURE_GENERAL_NULL);
 
             // Null checks
             if (doc is null || family is null) { return processingOutcome; }
@@ -232,7 +233,7 @@ namespace geeWiz.Extensions
             // Make sure the family is from that document
             if (doc != family.Document)
             {
-                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
+                processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
                 return processingOutcome;
             }
 
@@ -245,7 +246,7 @@ namespace geeWiz.Extensions
             }
             catch
             {
-                processingOutcome.ProcessingResult = gFam.PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
+                processingOutcome.ProcessingResult = PROCESSING_RESULT.FAILURE_DOC_EDITFAMILY;
                 return processingOutcome;
             }
         }

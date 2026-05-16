@@ -5,6 +5,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using View = Autodesk.Revit.DB.View;
+using Revision = Autodesk.Revit.DB.Revision;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
@@ -12,12 +13,12 @@ using gFil = geeWiz.Utilities.File_Utils;
 using gScr = geeWiz.Utilities.Script_Utils;
 using gWsh = geeWiz.Utilities.Workshare_Utils;
 using gXcl = geeWiz.Utilities.Excel_Utils;
+// ClosedXML
+using ClosedXML.Excel;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Revision
+namespace geeWiz.Commands.Cmds_Revision
 {
-    #region Cmd_BulkRev
-
     /// <summary>
     /// Adds or removes revisions from sheets.
     /// </summary>
@@ -27,12 +28,12 @@ namespace geeWiz.Cmds_Revision
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Detect alt fire
-            var altFired = gScr.KeyHeldShift();
+            bool altFired = gScr.KeyHeldShift();
 
             // Select a revision
             var formResultRevision = doc.Ext_SelectRevisionsWpf(
@@ -40,12 +41,12 @@ namespace geeWiz.Cmds_Revision
                 multiSelect: false,
                 sorted: true);
             if (formResultRevision.Cancelled) { return Result.Cancelled; }
-            var selectedRevision = formResultRevision.Object;
+            Revision selectedRevision = formResultRevision.Object;
 
             // Select sheets
             var formResultSheets = doc.Ext_SelectSheetsWpf(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
-            var sheets = formResultSheets.Objects;
+            List<ViewSheet> sheets = formResultSheets.Objects;
 
             //Filter out workshared sheets
             if (doc.IsWorkshared)
@@ -55,7 +56,7 @@ namespace geeWiz.Cmds_Revision
             }
 
             // Progress bar for the task
-            var taskName = altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...";
+            string taskName = altFired ? "Removing revision from sheet(s)..." : "Adding revision to sheet(s)...";
             var pb = new gFrm.ProgressCoordinator(total: sheets.Count, taskName: taskName);
             int updatedCount = 0;
 
@@ -96,10 +97,6 @@ namespace geeWiz.Cmds_Revision
         }
     }
 
-    #endregion
-
-    #region Cmd_RevSet
-
     /// <summary>
     /// Creates a sheet set with revised sheets.
     /// </summary>
@@ -109,17 +106,17 @@ namespace geeWiz.Cmds_Revision
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Select a revision
             var formResultRevision = doc.Ext_SelectRevisions(multiSelect: false, sorted: true);
             if (formResultRevision.Cancelled) { return Result.Cancelled; }
-            var selectedRevision = formResultRevision.Object as Revision;
+            Revision selectedRevision = formResultRevision.Object;
 
             // Get all revised sheets
-            var sheets = doc.Ext_GetSheets()
+            List<ViewSheet> sheets = doc.Ext_GetSheets()
                 .Where(s => s.GetAllRevisionIds().Contains(selectedRevision.Id))
                 .ToList();
 
@@ -130,16 +127,16 @@ namespace geeWiz.Cmds_Revision
             }
 
             // Collect sheet sets and names
-            var sheetSets = doc.Ext_Collector()
+            List<ViewSheetSet> sheetSets = doc.Ext_Collector()
                 .OfClass(typeof(ViewSheetSet))
                 .Cast<ViewSheetSet>()
                 .ToList();
-            var sheetSetNames = sheetSets
+            List<string> sheetSetNames = sheetSets
                 .Select(s => s.Name)
                 .ToList();
 
             // New set name
-            var sheetSetName = selectedRevision.Ext_ToRevisionKey();
+            string sheetSetName = selectedRevision.Ext_ToRevisionKey();
 
             // Using a transaction...
             using (var t = new Transaction(doc, "geeWiz: Delete sheetset"))
@@ -151,7 +148,7 @@ namespace geeWiz.Cmds_Revision
                 {
                     // Get the sheet set
                     int ind = sheetSetNames.IndexOf(sheetSetName);
-                    var sheetSetExisting = sheetSets[ind];
+                    ViewSheetSet sheetSetExisting = sheetSets[ind];
 
                     // If existing sheet set is editable
                     if ((sheetSetExisting as Element).Ext_IsEditable(doc))
@@ -171,9 +168,9 @@ namespace geeWiz.Cmds_Revision
                 foreach (var sheet in sheets) { viewSet.Insert(sheet as View); }
 
                 // Get current sheet setting
-                var printManager = doc.PrintManager;
+                PrintManager printManager = doc.PrintManager;
                 printManager.PrintRange = PrintRange.Select;
-                var viewSheetSetting = printManager.ViewSheetSetting;
+                ViewSheetSetting viewSheetSetting = printManager.ViewSheetSetting;
 
                 /// Save the sheet set
                 viewSheetSetting.CurrentViewSheetSet.Views = viewSet;
@@ -189,10 +186,6 @@ namespace geeWiz.Cmds_Revision
         }
     }
 
-    #endregion
-
-    #region Cmd_DocTrans
-
     /// <summary>
     /// Creates a document transmittal.
     /// </summary>
@@ -202,19 +195,19 @@ namespace geeWiz.Cmds_Revision
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Select a revision
             var formResultRevision = doc.Ext_SelectRevisions(sorted: true);
             if (formResultRevision.Cancelled) { return Result.Cancelled; }
-            var revisions = formResultRevision.Objects;
+            List<Revision> revisions = formResultRevision.Objects;
 
             // Select sheets
             var formResultSheets = doc.Ext_SelectSheets(sorted: true);
             if (formResultSheets.Cancelled) { return Result.Cancelled; }
-            var sheets = formResultSheets.Objects;
+            List<ViewSheet> sheets = formResultSheets.Objects;
 
             // Construct doctans, header row
             var matrix = new List<List<string>>();
@@ -254,7 +247,7 @@ namespace geeWiz.Cmds_Revision
                 foreach (var id in revisionIds)
                 {
                     // Add its number to the row for the sheet
-                    var revisionNumber = sheet.GetRevisionNumberOnSheet(id);
+                    string revisionNumber = sheet.GetRevisionNumberOnSheet(id);
                     revisionNumber ??= "";
                     row.Add(revisionNumber);
                 }
@@ -266,8 +259,8 @@ namespace geeWiz.Cmds_Revision
             // Select directory
             var directoryResult = gFrm.Custom.SelectFolder("Select where to save the transmittal");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object;
-            var filePath = Path.Combine(directoryPath, "Doctrans.xlsx");
+            string directoryPath = directoryResult.Object;
+            string filePath = Path.Combine(directoryPath, "Doctrans.xlsx");
 
             // Accessibility check if it exists
             if (File.Exists(filePath))
@@ -281,10 +274,10 @@ namespace geeWiz.Cmds_Revision
             }
 
             // Using a workbook object
-            using (var workbook = gXcl.CreateWorkbook(filePath))
+            using (XLWorkbook workbook = gXcl.CreateWorkbook(filePath))
             {
                 // Establish workbook variable
-                ClosedXML.Excel.IXLWorksheet worksheet = null;
+                IXLWorksheet worksheet = null;
 
                 // If the file exists, clear its contents
                 if (File.Exists(filePath))
@@ -339,6 +332,4 @@ namespace geeWiz.Cmds_Revision
             return gFrm.Custom.BubbleMessage(title: "Doctrans written", filePath: filePath);
         }
     }
-
-    #endregion
 }

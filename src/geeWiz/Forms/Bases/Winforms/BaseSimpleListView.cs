@@ -1,4 +1,7 @@
-﻿// The base form will belong to the forms namespace
+﻿// geeWiz
+using gFil = geeWiz.Utilities.File_Utils;
+
+// The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
     /// <summary>
@@ -31,7 +34,7 @@ namespace geeWiz.Forms.Bases
         {
             // Initialize the form, set the icon
             InitializeComponent();
-            geeWiz.Utilities.File_Utils.SetFormIcon(this);
+            gFil.SetFormIcon(this);
 
             // Set title
             this.Text = title;
@@ -70,10 +73,9 @@ namespace geeWiz.Forms.Bases
             listView.Columns.Add("Key", 380);
 
             // For each item in shown items
-            foreach (var key in this.Keys)
+            foreach (string key in this.Keys)
             {
-                var listViewItem = new ListViewItem(key);
-                listViewItem.Checked = false;
+                var listViewItem = new ListViewItem(key) { Checked = false };
                 this.listView.Items.Add(listViewItem);
             }
         }

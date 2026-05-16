@@ -4,6 +4,7 @@ using System.IO;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
+using View = Autodesk.Revit.DB.View;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
@@ -11,12 +12,12 @@ using gFil = geeWiz.Utilities.File_Utils;
 using gXcl = geeWiz.Utilities.Excel_Utils;
 using gView = geeWiz.Utilities.View_Utils;
 using gScr = geeWiz.Utilities.Script_Utils;
+// ClosedXML
+using ClosedXML.Excel;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Export
+namespace geeWiz.Commands.Cmds_Export
 {
-    #region Cmd_Schedule
-
     /// <summary>
     /// Exports active schedule to Excel.
     /// </summary>
@@ -26,10 +27,10 @@ namespace geeWiz.Cmds_Export
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
-            var activeView = uiDoc.ActiveView;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
+            View activeView = uiDoc.ActiveView;
 
             // Ensure we have a schedule
             if (activeView is not ViewSchedule)
@@ -41,25 +42,21 @@ namespace geeWiz.Cmds_Export
             var matrix = new List<List<string>>();
 
             // Get table data and section data
-            var viewSchedule = activeView as ViewSchedule;
-            var tableData = viewSchedule.GetTableData();
-            var tableSectionData = tableData.GetSectionData(SectionType.Body);
-
-            // Count rows and columns
-            var rowCount = tableSectionData.NumberOfRows;
-            var colCount = tableSectionData.NumberOfColumns;
+            ViewSchedule viewSchedule = activeView as ViewSchedule;
+            TableData tableData = viewSchedule.GetTableData();
+            TableSectionData tableSectionData = tableData.GetSectionData(SectionType.Body);
 
             // For each row...
-            for (int r = 0; r < rowCount; r++)
+            for (int r = 0; r < tableSectionData.NumberOfRows; r++)
             {
                 // New row to make
                 var row = new List<string>();
 
                 // For each column...
-                for (int c = 0; c < colCount; c++)
+                for (int c = 0; c < tableSectionData.NumberOfColumns; c++)
                 {
                     // Add text to row
-                    var cellText = viewSchedule.GetCellText(SectionType.Body, r, c);
+                    string cellText = viewSchedule.GetCellText(SectionType.Body, r, c);
                     row.Add(cellText);
                 }
 
@@ -74,25 +71,21 @@ namespace geeWiz.Cmds_Export
             // Select a directory, make file path
             var directoryResult = gFrm.Custom.SelectFolder("Choose where to save the file");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object;
+            string directoryPath = directoryResult.Object;
             var filePath = Path.Combine(directoryPath, "Export schedule.xlsx");
 
             // Accessibility check if it exists
-            if (File.Exists(filePath))
+            if (File.Exists(filePath) && !gFil.FileIsAccessible(filePath))
             {
-                if (!gFil.FileIsAccessible(filePath))
-                {
-                    return gFrm.Custom.Cancelled(
-                        "File exists and is not editable.\n\n" +
+                return gFrm.Custom.Cancelled("File exists and is not editable.\n\n" +
                         "Ensure it is closed and try again.");
-                }
             }
 
             // Using a workbook object
             using (var workbook = gXcl.CreateWorkbook(filePath))
             {
                 // Establish workbook variable
-                ClosedXML.Excel.IXLWorksheet worksheet = null;
+                IXLWorksheet worksheet = null;
 
                 // If the file exists, clear its contents
                 if (File.Exists(filePath))
@@ -134,10 +127,6 @@ namespace geeWiz.Cmds_Export
         }
     }
 
-    #endregion
-
-    #region Cmd_SheetsPdf
-
     /// <summary>
     /// Exports sheets to Pdf.
     /// </summary>
@@ -147,73 +136,60 @@ namespace geeWiz.Cmds_Export
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Check for alt fire
-            var altFire = gScr.KeyHeldShift();
+            bool altFire = gScr.KeyHeldShift();
 
             // Select sheets to export
             var formResults = doc.Ext_SelectSheets(title: "Select sheets to export", sorted: true);
             if (formResults.Cancelled) { return Result.Cancelled; }
-            var sheets = formResults.Objects;
+            List<ViewSheet> sheets = formResults.Objects;
 
             // Select directory to export to
             var directoryResult = gFrm.Custom.SelectFolder("Select where to export to");
             if (directoryResult.Cancelled) {  return Result.Cancelled; }
-            var directoryPath = directoryResult.Object;
+            string directoryPath = directoryResult.Object;
 
             // Pdf export options
-            var options = gView.DefaultPdfExportOptions(hideCrop: !altFire);
+            PDFExportOptions options = gView.DefaultPdfExportOptions(hideCrop: !altFire);
 
             // Progress bar properties
-            int pbTotal = sheets.Count;
-            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
+            var pb = new gFrm.ProgressCoordinator(total: sheets.Count, taskName: "Exporting sheets");
 
-            // Using a progress bar
-            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Exporting sheets", pbTotal: pbTotal))
+            // Using a transaction
+            using (var t = new Transaction(doc, "geeWiz: Export sheets"))
             {
-                // Using a transaction
-                using (var t = new Transaction(doc, "geeWiz: Export sheets"))
+                // Start the transaction
+                t.Start();
+
+                // For each sheet
+                foreach (var sheet in sheets)
                 {
-                    // Start the transaction
-                    t.Start();
-
-                    // For each sheet
-                    foreach (var sheet in sheets)
+                    // Check for cancellation
+                    if (pb.CancelCheckOrUpdate(t: t))
                     {
-                        // Check for cancellation
-                        if (pb.CancelCheck(t))
-                        {
-                            return Result.Cancelled;
-                        }
-
-                        // Export the sheet to Pdf
-                        sheet.Ext_ExportToPdf(
-                            fileName: sheet.Ext_ToExportKey(),
-                            directoryPath: directoryPath,
-                            doc: doc,
-                            options: options);
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pb.Increment();
+                        return Result.Cancelled;
                     }
 
-                    // Commit the transaction
-                    pb.Commit(t);
+                    // Export the sheet to Pdf
+                    sheet.Ext_ExportToPdf(
+                        fileName: sheet.Ext_ToExportKey(),
+                        directoryPath: directoryPath,
+                        doc: doc,
+                        options: options);
                 }
+
+                // Commit the transaction
+                pb.Commit(t: t);
             }
 
             // Finish by opening the directory path
             return gFil.OpenDirectory(directoryPath);
         }
     }
-
-    #endregion
-
-    #region Cmd_SheetsDwg
 
     /// <summary>
     /// Exports sheets to Dwg.
@@ -224,69 +200,58 @@ namespace geeWiz.Cmds_Export
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Check for alt fire
-            var altFire = gScr.KeyHeldShift();
+            bool altFire = gScr.KeyHeldShift();
 
             // Select sheets to export
             var formResults = doc.Ext_SelectSheets(title: "Select sheets to export", sorted: true);
             if (formResults.Cancelled) { return Result.Cancelled; }
-            var sheets = formResults.Objects;
+            List<ViewSheet> sheets = formResults.Objects;
 
             // Select directory to export to
             var directoryResult = gFrm.Custom.SelectFolder("Select where to export to");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object;
+            string directoryPath = directoryResult.Object;
 
             // Dwg export options
             var options = gView.DefaultDwgExportOptions(shared: altFire);
 
             // Progress bar properties
-            int pbTotal = sheets.Count;
-            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
+            var pb = new gFrm.ProgressCoordinator(total: sheets.Count, taskName: "Exporting sheets");
 
-            // Using a progress bar
-            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Exporting sheets...", pbTotal: pbTotal))
+            // Using a transaction
+            using (var t = new Transaction(doc, "geeWiz: Export sheets"))
             {
-                // Using a transaction
-                using (var t = new Transaction(doc, "geeWiz: Export sheets"))
+                // Start the transaction
+                t.Start();
+
+                // For each sheet
+                foreach (var sheet in sheets)
                 {
-                    // Start the transaction
-                    t.Start();
-
-                    // For each sheet
-                    foreach (var sheet in sheets)
+                    // Check for cancellation
+                    if (pb.CancelCheckOrUpdate(t: t))
                     {
-                        // Check for cancellation
-                        if (pb.CancelCheck(t))
-                        {
-                            return Result.Cancelled;
-                        }
-
-                        // Export the sheet to Dwg
-                        sheet.Ext_ExportToDwg(
-                            fileName: sheet.Ext_ToExportKey(),
-                            directoryPath: directoryPath,
-                            doc: doc,
-                            options: options);
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pb.Increment();
+                        return Result.Cancelled;
                     }
 
-                    // Commit the transaction
-                    pb.Commit(t);
+                    // Export the sheet to Dwg
+                    sheet.Ext_ExportToDwg(
+                        fileName: sheet.Ext_ToExportKey(),
+                        directoryPath: directoryPath,
+                        doc: doc,
+                        options: options);
                 }
+
+                // Commit the transaction
+                pb.Commit(t: t);
             }
 
             // Finish by opening the directory path
             return gFil.OpenDirectory(directoryPath);
         }
     }
-
-    #endregion
 }

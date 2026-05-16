@@ -19,7 +19,7 @@ namespace geeWiz.Extensions
         public static void Ext_SafeAssimilate(this TransactionGroup tg)
         {
             // Null catch
-            if (tg == null)
+            if (tg is null)
             {
                 return;
             }
@@ -38,7 +38,7 @@ namespace geeWiz.Extensions
         public static void Ext_SafeRollBack(this TransactionGroup tg)
         {
             // Null catch
-            if (tg == null)
+            if (tg is null)
             {
                 return;
             }

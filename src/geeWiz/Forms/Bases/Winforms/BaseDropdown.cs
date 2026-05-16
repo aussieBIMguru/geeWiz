@@ -1,4 +1,7 @@
-﻿// The base form will belong to the forms namespace
+﻿// geeWiz
+using gFil = geeWiz.Utilities.File_Utils;
+
+// The base form will belong to the forms namespace
 namespace geeWiz.Forms.Bases
 {
     /// <summary>
@@ -32,7 +35,7 @@ namespace geeWiz.Forms.Bases
         {
             // Initialize form, set the icon
             InitializeComponent();
-            geeWiz.Utilities.File_Utils.SetFormIcon(this);
+            gFil.SetFormIcon(this);
 
             // Set the key and value properties
             this.keys = keys;
@@ -66,7 +69,7 @@ namespace geeWiz.Forms.Bases
             comboBox.Items.Clear();
 
             // Add each key into the combobox
-            foreach (var key in keys)
+            foreach (string key in keys)
             {
                 comboBox.Items.Add(key);
             }

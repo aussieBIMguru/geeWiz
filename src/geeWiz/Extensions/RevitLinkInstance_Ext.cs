@@ -42,7 +42,7 @@ namespace geeWiz.Extensions
             if (linkInstance is null) { return null; }
 
             // Return the type
-            return (linkInstance as Element).Ext_GetElementType<RevitLinkType>();
+            return linkInstance.Ext_GetElementType<RevitLinkType>();
         }
     }
 }

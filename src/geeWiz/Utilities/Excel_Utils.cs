@@ -44,10 +44,10 @@ namespace geeWiz.Utilities
             if (worksheetName is not null)
             {
                 // Get workbook
-                var xclWorkbook = GetWorkbook(filePath);
+                XLWorkbook xclWorkbook = GetWorkbook(filePath);
 
                 // Get the worksheet, report an error if we could not
-                if (GetWorkSheet(xclWorkbook, worksheetName) is not null)
+                if (GetWorkSheet(xclWorkbook, worksheetName) is IXLWorksheet)
                 {
                     return gFrm.Custom.Cancelled($"Worksheet '{worksheetName}' not be found in workbook.");
                 }
@@ -204,7 +204,7 @@ namespace geeWiz.Utilities
             if (worksheet is null) { return matrix; }
 
             // Get range used, ensure we aren't reading more than what is available
-            var rangeUsed = worksheet.RangeUsed();
+            IXLRange rangeUsed = worksheet.RangeUsed();
             if (rangeUsed.RowCount() <= readRows) { readRows = 0; }
             if (rangeUsed.ColumnCount() <= readCols) { readCols = 0; }
 
@@ -212,7 +212,7 @@ namespace geeWiz.Utilities
             int rowsRead = 0;
 
             // For each row
-            foreach (var row in rangeUsed.RowsUsed())
+            foreach (IXLRangeRow row in rangeUsed.RowsUsed())
             {
                 var dataList = new List<string>();
                 
@@ -223,7 +223,7 @@ namespace geeWiz.Utilities
                     int colsRead = 0;
 
                     // For each cell in the row
-                    foreach (var cell in row.Cells())
+                    foreach (IXLCell cell in row.Cells())
                     {
                         // If we can still read, or if read all
                         if (colsRead < readCols || readCols == 0)
@@ -268,7 +268,7 @@ namespace geeWiz.Utilities
                 for (int c = 0; c < matrix[r].Count; c++)
                 {
                     // Get the matrix value
-                    var cellValue = matrix[r][c];
+                    string cellValue = matrix[r][c];
 
                     // Write to the cell if its value is not null
                     if (cellValue is not null)

@@ -26,7 +26,7 @@ namespace geeWiz.Extensions
         public static View Ext_GetStartView(this Document doc)
         {
             // Get start view settings
-            var startingViewSettings = StartingViewSettings.GetStartingViewSettings(doc);
+            StartingViewSettings startingViewSettings = StartingViewSettings.GetStartingViewSettings(doc);
             
             // Return the starting view if there is one
             if (startingViewSettings.ViewId is ElementId elementId)
@@ -178,7 +178,7 @@ namespace geeWiz.Extensions
                 t.Start();
 
                 // For each element
-                foreach (var obj in objects)
+                foreach (T obj in objects)
                 {
                     // Check for cancellation
                     if (pb.CancelCheckOrUpdate(t: t))
@@ -187,7 +187,7 @@ namespace geeWiz.Extensions
                     }
 
                     // Try to delete the element, uptick deletCount if we do
-                    if (doc.Ext_DeleteElement<T>(obj) == Result.Succeeded)
+                    if (doc.Ext_DeleteElement(obj) == Result.Succeeded)
                     {
                         deleteCount++;
                     }
@@ -314,7 +314,7 @@ namespace geeWiz.Extensions
         public static List<Phase> Ext_GetPhases(this Document doc, bool sorted = false)
         {
             // Get phases
-            var phases = doc.Phases
+            List<Phase> phases = doc.Phases
                 .Cast<Phase>()
                 .ToList();
 
@@ -340,13 +340,13 @@ namespace geeWiz.Extensions
         public static List<DesignOption> Ext_GetDesignOptions(this Document doc, bool sorted = false)
         {
             // Get options
-            var designOptions = doc.Ext_GetElementsOfClass<DesignOption>();
+            List<DesignOption> designOptions = doc.Ext_GetElementsOfClass<DesignOption>();
 
             // Return sorted or unsorted
             if (sorted)
             {
                 return designOptions
-                    .OrderBy(d => d.Ext_GetDesignOptionSetName())
+                    .OrderBy(d => d.Ext_GetDesignOptionSet().Name)
                     .ToList();
             }
             else
@@ -364,7 +364,7 @@ namespace geeWiz.Extensions
         public static List<Element> Ext_GetDesignOptionSets(this Document doc, bool sorted = false)
         {
             // Get option sets
-            var designOptionSets = doc.Ext_GetElementsOfClass<DesignOption>()
+            List<Element> designOptionSets = doc.Ext_GetElementsOfClass<DesignOption>()
                 .Select(d => d.Ext_GetDesignOptionSet())
                 .Distinct()
                 .ToList();
@@ -396,7 +396,7 @@ namespace geeWiz.Extensions
         public static List<ViewSheet> Ext_GetSheets(this Document doc, bool sorted = false, bool includePlaceholders = false)
         {
             // Collect all viewsheets in document
-            var sheets = doc.Ext_GetElementsOfClass<ViewSheet>();
+            List<ViewSheet> sheets = doc.Ext_GetElementsOfClass<ViewSheet>();
 
             // Filter our placeholders if not desired
             if (!includePlaceholders)
@@ -440,12 +440,12 @@ namespace geeWiz.Extensions
             sheets ??= doc.Ext_GetSheets(sorted: sorted, includePlaceholders: includePlaceholders);
 
             // Process into keys (to return)
-            var keys = sheets
+            List<string> keys = sheets
                 .Select(s => s.Ext_ToSheetKey(includeId))
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<ViewSheet>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: sheets,
                 title: title,
                 multiSelect: multiSelect);
@@ -472,12 +472,12 @@ namespace geeWiz.Extensions
             sheets ??= doc.Ext_GetSheets(sorted: sorted, includePlaceholders: includePlaceholders);
 
             // Process into keys (to return)
-            var keys = sheets
+            List<string> keys = sheets
                 .Select(s => s.Ext_ToSheetKey(includeId))
                 .ToList();
 
             // Run the selection from list
-            return gFrm.CustomWpf.SelectFromList<ViewSheet>(keys: keys,
+            return gFrm.CustomWpf.SelectFromList(keys: keys,
                 values: sheets,
                 title: title,
                 multiSelect: multiSelect);
@@ -500,7 +500,7 @@ namespace geeWiz.Extensions
             viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
             
             // Collect all views in document
-            var views = doc.Ext_GetElementsOfClass<View>()
+            List<View> views = doc.Ext_GetElementsOfClass<View>()
                 .Where(v => !v.IsTemplate && viewTypes.Contains(v.ViewType))
                 .ToList();
 
@@ -538,12 +538,12 @@ namespace geeWiz.Extensions
             views ??= doc.Ext_GetViews(viewTypes: viewTypes, sorted: sorted);
 
             // Process into keys (to return)
-            var keys = views
+            List<string> keys = views
                 .Select(v => v.Ext_ToViewKey(includeId))
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<View>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: views,
                 title: title,
                 multiSelect: multiSelect);
@@ -566,7 +566,7 @@ namespace geeWiz.Extensions
             viewTypes ??= gView.VIEWTYPES_GRAPHICAL;
 
             // Collect all view templates in document
-            var viewTemplates = doc.Ext_GetElementsOfClass<View>()
+            List<View> viewTemplates = doc.Ext_GetElementsOfClass<View>()
                 .Where(v => v.IsTemplate)
                 .ToList();
 
@@ -624,7 +624,7 @@ namespace geeWiz.Extensions
             viewFamilies ??= gView.VIEWFAMILIES_GRAPHICAL;
 
             // Collect all viewsfamilytypes in document
-            var viewFamilyTypes = doc.Ext_GetElementsOfClass<ViewFamilyType>()
+            List<ViewFamilyType> viewFamilyTypes = doc.Ext_GetElementsOfClass<ViewFamilyType>()
                 .Where(vft => viewFamilies.Contains(vft.ViewFamily))
                 .ToList();
 
@@ -658,15 +658,15 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select ViewFamilyType(s):" : "Select a ViewFamilyType:";
 
             // Get all ViewFamilyTypes in document
-            var viewFamilyTypes = doc.Ext_GetViewFamilyTypes(viewFamilies: viewFamilies, sorted: sorted);
+            List<ViewFamilyType> viewFamilyTypes = doc.Ext_GetViewFamilyTypes(viewFamilies: viewFamilies, sorted: sorted);
 
             // Process into keys (to return)
-            var keys = viewFamilyTypes
+            List<string> keys = viewFamilyTypes
                 .Select(v => v.Ext_ToViewFamilyTypeKey(includeId))
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<ViewFamilyType>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: viewFamilyTypes,
                 title: title,
                 multiSelect: multiSelect);
@@ -685,7 +685,7 @@ namespace geeWiz.Extensions
         public static List<Level> Ext_GetLevels(this Document doc, bool sorted = false)
         {
             // Collect all levels in document
-            var levels = doc.Ext_Collector()
+            List<Level> levels = doc.Ext_Collector()
                 .OfClass(typeof(Level))
                 .Cast<Level>()
                 .ToList();
@@ -717,15 +717,15 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Level(s):" : "Select a Level:";
 
             // Get all Levels in document
-            var levels = doc.Ext_GetLevels(sorted: sorted);
+            List<Level> levels = doc.Ext_GetLevels(sorted: sorted);
 
             // Process into keys (to return)
-            var keys = levels
+            List<string> keys = levels
                 .Select(l => l.Name)
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<Level>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: levels,
                 title: title,
                 multiSelect: multiSelect);
@@ -744,7 +744,7 @@ namespace geeWiz.Extensions
         public static List<FamilySymbol> Ext_GetTitleblockTypes(this Document doc, bool sorted = false)
         {
             // Collect all titleblock types in document
-            var titleblockTypes = doc.Ext_Collector()
+            List<FamilySymbol> titleblockTypes = doc.Ext_Collector()
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
@@ -777,15 +777,15 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Titleblock type(s):" : "Select a Titleblock type:";
 
             // Get all Titleblock types in document
-            var titleblockTypes = doc.Ext_GetTitleblockTypes(sorted: sorted);
+            List<FamilySymbol> titleblockTypes = doc.Ext_GetTitleblockTypes(sorted: sorted);
 
             // Process into keys (to return)
-            var keys = titleblockTypes
+            List<string> keys = titleblockTypes
                 .Select(t => t.Ext_ToFamilySymbolKey())
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<FamilySymbol>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: titleblockTypes,
                 title: title,
                 multiSelect: multiSelect);
@@ -804,7 +804,7 @@ namespace geeWiz.Extensions
         public static List<Revision> Ext_GetRevisions(this Document doc, bool sorted = false)
         {
             // Collect all revisions in document
-            var revisions = doc.Ext_Collector()
+            List<Revision> revisions = doc.Ext_Collector()
                 .OfClass(typeof(Revision))
                 .Cast<Revision>()
                 .ToList();
@@ -836,15 +836,15 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Revision(s):" : "Select a Revision:";
 
             // Get all revisions in document
-            var revisions = doc.Ext_GetRevisions(sorted: sorted);
+            List<Revision> revisions = doc.Ext_GetRevisions(sorted: sorted);
 
             // Process into keys (to return)
-            var keys = revisions
+            List<string> keys = revisions
                 .Select(r => r.Ext_ToRevisionKey())
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<Revision>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: revisions,
                 title: title,
                 multiSelect: multiSelect);
@@ -864,15 +864,15 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Revision(s):" : "Select a Revision:";
 
             // Get all revisions in document
-            var revisions = doc.Ext_GetRevisions(sorted: sorted);
+            List<Revision> revisions = doc.Ext_GetRevisions(sorted: sorted);
 
             // Process into keys (to return)
-            var keys = revisions
+            List<string> keys = revisions
                 .Select(r => r.Ext_ToRevisionKey())
                 .ToList();
 
             // Run the selection from list
-            return gFrm.CustomWpf.SelectFromList<Revision>(keys: keys,
+            return gFrm.CustomWpf.SelectFromList(keys: keys,
                 values: revisions,
                 title: title,
                 multiSelect: multiSelect);
@@ -893,15 +893,15 @@ namespace geeWiz.Extensions
             message ??= "Select a revision from below:";
 
             // Get all Revisions in document
-            var revisions = doc.Ext_GetRevisions(sorted: sorted);
+            List<Revision> revisions = doc.Ext_GetRevisions(sorted: sorted);
 
             // Process into keys (to return)
-            var keys = revisions
+            List<string> keys = revisions
                 .Select(r => r.Ext_ToRevisionKey())
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromDropdown<Revision>(keys: keys,
+            return gFrm.Custom.SelectFromDropdown(keys: keys,
                 values: revisions,
                 title: title,
                 message: message);
@@ -926,7 +926,7 @@ namespace geeWiz.Extensions
             bool includePlaced = true, bool includeRedundant = false, bool includeUnenclosed = false, bool includeUnplaced = false)
         {
             // Collect all rooms in document
-            var rooms = doc.Ext_GetElementsOfCategory(BuiltInCategory.OST_Rooms, view)
+            List<SpatialElement> rooms = doc.Ext_GetElementsOfCategory(BuiltInCategory.OST_Rooms, view)
                 .Cast<SpatialElement>()
                 .ToList();
 
@@ -934,7 +934,8 @@ namespace geeWiz.Extensions
             var roomsFinal = new List<SpatialElement>();
 
             // Filter the rooms, then rebuild the list by placement types
-            var roomMatrixByPlacement = gSpa.RoomsMatrixByPlacement(rooms, doc);
+            List<List<SpatialElement>> roomMatrixByPlacement = gSpa.RoomsMatrixByPlacement(rooms, doc);
+
             if (includePlaced) { roomsFinal.AddRange(roomMatrixByPlacement[0]); }
             if (includeRedundant) { roomsFinal.AddRange(roomMatrixByPlacement[1]); }
             if (includeUnenclosed) { roomsFinal.AddRange(roomMatrixByPlacement[2]); }
@@ -982,12 +983,12 @@ namespace geeWiz.Extensions
                 );
 
             // Process into keys (to return)
-            var keys = rooms
+            List<string> keys = rooms
                 .Select(r => r.Ext_ToRoomKey())
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<SpatialElement>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: rooms,
                 title: title,
                 multiSelect: multiSelect);
@@ -1009,7 +1010,7 @@ namespace geeWiz.Extensions
             if (!doc.IsWorkshared) { return new List<Workset>(); }
 
             // Collect all Worksets in the document
-            var worksets = new FilteredWorksetCollector(doc)
+            List<Workset> worksets = new FilteredWorksetCollector(doc)
                 .OfKind(WorksetKind.UserWorkset)
                 .ToWorksets()
                 .ToList();
@@ -1041,15 +1042,15 @@ namespace geeWiz.Extensions
             title ??= multiSelect ? "Select Workset(s):" : "Select a Workset:";
 
             // Get all worksets in document
-            var worksets = doc.Ext_GetWorksets(sorted: sorted);
+            List<Workset> worksets = doc.Ext_GetWorksets(sorted: sorted);
 
             // Process into keys (to return)
-            var keys = worksets
+            List<string> keys = worksets
                 .Select(w => $"{w.Name}")
                 .ToList();
 
             // Run the selection from list
-            return gFrm.Custom.SelectFromList<Workset>(keys: keys,
+            return gFrm.Custom.SelectFromList(keys: keys,
                 values: worksets,
                 title: title,
                 multiSelect: multiSelect);
@@ -1068,7 +1069,7 @@ namespace geeWiz.Extensions
         public static List<RevitLinkInstance> Ext_CollectRevitLinkInstances(this  Document doc, bool sorted = false)
         {
             // Collect all link instances in document
-            var revitLinkInstances = doc.Ext_GetElementsOfClass<RevitLinkInstance>();
+            List<RevitLinkInstance> revitLinkInstances = doc.Ext_GetElementsOfClass<RevitLinkInstance>();
 
             // Return the link instances sorted or unsorted
             if (sorted)
@@ -1095,7 +1096,7 @@ namespace geeWiz.Extensions
             bool includeImported = true, bool sorted = false)
         {
             // Collect all link instances in document
-            var cadLinkInstances = doc.Ext_GetElementsOfClass<ImportInstance>();
+            List<ImportInstance> cadLinkInstances = doc.Ext_GetElementsOfClass<ImportInstance>();
 
             // Filter out imported and/or linked
             if (!includeImported)
@@ -1133,7 +1134,7 @@ namespace geeWiz.Extensions
         public static List<RevitLinkType> Ext_CollectRevitLinkTypes(this Document doc, bool sorted = false)
         {
             // Collect all link types in document
-            var revitLinkTypes = doc.Ext_GetElementsOfClass<RevitLinkType>();
+            List<RevitLinkType> revitLinkTypes = doc.Ext_GetElementsOfClass<RevitLinkType>();
 
             // Return the link types sorted or unsorted
             if (sorted)
@@ -1157,7 +1158,7 @@ namespace geeWiz.Extensions
         public static List<CADLinkType> Ext_CollectCadLinkTypes(this Document doc, bool sorted = false)
         {
             // Collect all link types in document
-            var cadLinkTypes = doc.Ext_GetElementsOfClass<CADLinkType>();
+            List<CADLinkType> cadLinkTypes = doc.Ext_GetElementsOfClass<CADLinkType>();
 
             // Return the link types sorted or unsorted
             if (sorted)

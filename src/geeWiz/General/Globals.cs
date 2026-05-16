@@ -1,13 +1,15 @@
 ﻿// System
-using System.IO;
-using System.Collections;
-using System.Globalization;
-using System.Resources;
-using Assembly = System.Reflection.Assembly;
+using Autodesk.Revit.ApplicationServices;
 // Revit API
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.ApplicationServices;
+using DocumentFormat.OpenXml.Bibliography;
+using System.Collections;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Resources;
+using Assembly = System.Reflection.Assembly;
 
 // The class belongs to the geeWiz namespace
 namespace geeWiz
@@ -24,14 +26,6 @@ namespace geeWiz
         public static UIControlledApplication UiCtlApp { get; set; }
         public static ControlledApplication CtlApp { get; set; }
         public static UIApplication UiApp { get; set; }
-        public static Document FocalDocument { get; set; }
-        public static bool Idling { get; set; }
-        public static bool IsDarkMode { get; set; }
-
-        // General utilities
-        public static bool WardenActive { get; set; }
-        public static string LastCommandId { get; set; }
-        public static bool ColouringTabs { get; set; }
 
         // Key paths
         public static Assembly Assembly { get; set; }
@@ -49,15 +43,11 @@ namespace geeWiz
 
         // Guids and versioning
         public static string VersionNumber { get; set; }
-        public static string VersionName { get; set; }
         public static string AddinGuid { get; set; }
         public static string AddinName { get; set; }
 
         // Tooltips resource
         public static Dictionary<string, string> Tooltips { get; set; } = new Dictionary<string, string>();
-
-        // Namespaces
-        public static string Availability {get;set; }
 
         #endregion
 
@@ -71,40 +61,28 @@ namespace geeWiz
         public static void RegisterVariables(UIControlledApplication uiApp)
         {
             // Store all available global variable values (available anywhere, effectively)
-            UiCtlApp = uiApp;
-            CtlApp = uiApp.ControlledApplication;
-            FocalDocument = null;
+            Globals.UiCtlApp = uiApp;
+            Globals.CtlApp = uiApp.ControlledApplication;
             // (uiApp set by idling event)
-            Idling = true;
-            IsDarkMode = false;
-
-            // General utilities
-            WardenActive = true;
-            LastCommandId = null;
-            ColouringTabs = false;
 
             // Store all paths
-            Assembly = Assembly.GetExecutingAssembly();
-            AssemblyPath = Assembly.GetExecutingAssembly().Location;
-            SubAssemblyPath = Globals.AssemblyPath.Replace("\\geeWiz.dll", "");
-            ResourcesPath = Path.Combine(Path.GetDirectoryName(Globals.AssemblyPath), "Resources");
+            Globals.Assembly = Assembly.GetExecutingAssembly();
+            Globals.AssemblyPath = Assembly.GetExecutingAssembly().Location;
+            Globals.SubAssemblyPath = Globals.AssemblyPath.Replace("\\geeWiz.dll", "");
+            Globals.ResourcesPath = Path.Combine(Path.GetDirectoryName(Globals.AssemblyPath), "Resources");
 
             // Store Revit version
-            RevitVersion = uiApp.ControlledApplication.VersionNumber;
-            RevitVersionInt = Int32.Parse(Globals.RevitVersion);
+            Globals.RevitVersion = uiApp.ControlledApplication.VersionNumber;
+            Globals.RevitVersionInt = Int32.Parse(Globals.RevitVersion);
 
             // Store user names
-            UsernameWindows = Environment.UserName;
+            Globals.UsernameWindows = Environment.UserName;
             // (UsernameRevit stored by idling event)
 
-            // Other
-            Availability = "geeWiz.Availability";
-
             // Store versions and Ids
-            VersionNumber = "25.XX.XX.00";
-            VersionName = "WIP";
-            AddinGuid = "8FFC127F-9CD7-46E2-8506-C5F36D057B4B";
-            AddinName = "geeWiz";
+            Globals.VersionNumber = Assembly.GetName().Version?.ToString();
+            Globals.AddinGuid = "8FFC127F-9CD7-46E2-8506-C5F36D057B4B";
+            Globals.AddinName = nameof(geeWiz);
         }
 
         #endregion
@@ -135,13 +113,13 @@ namespace geeWiz
         {
             // Construct the assembly, resource and sub-assembly paths
             var resourceManager = new ResourceManager(resourcePath, Globals.Assembly);
-            var resourceSet = resourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
+            ResourceSet resourceSet = resourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
 
             // Get all tooltip entries, store globally
             foreach (DictionaryEntry entry in resourceSet)
             {
                 string key = entry.Key.ToString();
-                Tooltips[key] = entry.Value.ToString();
+                Globals.Tooltips[key] = entry.Value.ToString();
             }
         }
 

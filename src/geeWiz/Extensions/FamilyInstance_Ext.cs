@@ -21,7 +21,7 @@ namespace geeWiz.Extensions
         public static string Ext_ToFamilyInstanceKey(this FamilyInstance familyInstance, bool includeId = false)
         {
             // Return the name key
-            var nameKey = familyInstance.Symbol.Ext_ToFamilySymbolKey();
+            string nameKey = familyInstance.Symbol.Ext_ToFamilySymbolKey();
             return familyInstance.Ext_FinalizeKey(nameKey, includeId);
         }
 

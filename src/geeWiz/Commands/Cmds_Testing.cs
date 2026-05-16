@@ -7,10 +7,8 @@ using gWin = geeWiz.Utilities.WindowController;
 using Mvvm = geeWiz.Forms.Mvvm;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Testing
+namespace geeWiz.Commands.Cmds_Testing
 {
-    #region Cmd_Testing
-
     /// <summary>
     /// Testing.
     /// </summary>
@@ -20,9 +18,9 @@ namespace geeWiz.Cmds_Testing
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Return success
             return Result.Succeeded;
@@ -44,7 +42,7 @@ namespace geeWiz.Cmds_Testing
             }
 
             // Create and wire the view model
-            var uiApp = commandData.Application;
+            UIApplication uiApp = commandData.Application;
             var viewModel = new Mvvm.Models.ModelSample();
             viewModel.WireExternalEvents(commandData.Application);
 
@@ -56,6 +54,4 @@ namespace geeWiz.Cmds_Testing
             return Result.Succeeded;
         }
     }
-
-    #endregion
 }

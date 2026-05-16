@@ -7,7 +7,7 @@ using Autodesk.Revit.ApplicationServices;
 using gFrm = geeWiz.Forms;
 
 // The class belongs to the root namespace
-namespace geeWiz
+namespace geeWiz.General
 {
     /// <summary>
     /// The sync timer informs the user of total sync times.
@@ -30,6 +30,7 @@ namespace geeWiz
         public static void Register(ControlledApplication ctlApp = null)
         {
             ctlApp ??= Globals.CtlApp;
+
             ctlApp.DocumentSynchronizingWithCentral += new EventHandler<DocumentSynchronizingWithCentralEventArgs>(DocumentSynchronizingWithCentral_SyncStart);
             ctlApp.DocumentSynchronizedWithCentral += new EventHandler<DocumentSynchronizedWithCentralEventArgs>(DocumentSynchronizedWithCentral_SyncEnds);
         }
@@ -41,6 +42,7 @@ namespace geeWiz
         public static void DeRegister(ControlledApplication ctlApp = null)
         {
             ctlApp ??= Globals.CtlApp;
+
             ctlApp.DocumentSynchronizingWithCentral -= new EventHandler<DocumentSynchronizingWithCentralEventArgs>(DocumentSynchronizingWithCentral_SyncStart);
             ctlApp.DocumentSynchronizedWithCentral -= new EventHandler<DocumentSynchronizedWithCentralEventArgs>(DocumentSynchronizedWithCentral_SyncEnds);
         }
@@ -99,13 +101,13 @@ namespace geeWiz
         private static void SyncAssess()
         {
             // Get the elapsed time and seconds
-            var elapsedTime = DateTime.Now - SYNC_START;
-            var elapsedSeconds = elapsedTime.TotalSeconds;
+            TimeSpan elapsedTime = DateTime.Now - SYNC_START;
+            double elapsedSeconds = elapsedTime.TotalSeconds;
 
             // Get components for time message
-            var syncRating = RateSync(elapsedSeconds);
-            var elapsedMinutes = (int)Math.Floor(elapsedTime.TotalMinutes);
-            var excessSeconds = (int)Math.Ceiling(elapsedSeconds % 60);
+            string syncRating = RateSync(elapsedSeconds);
+            int elapsedMinutes = (int)Math.Floor(elapsedTime.TotalMinutes);
+            int excessSeconds = (int)Math.Ceiling(elapsedSeconds % 60);
 
             // Construct the message
             string syncTime;
@@ -131,12 +133,15 @@ namespace geeWiz
         /// <returns>A string.</returns>
         private static string RateSync(double totalSeconds)
         {
-            if (totalSeconds < 60) { return "A"; } // < 1 minute
-            else if (totalSeconds < 180) { return "B"; } // < 3 minutes
-            else if (totalSeconds < 300) { return "C"; } // < 5 minutes
-            else if (totalSeconds < 600) { return "D"; } // < 10 minutes
-            else if (totalSeconds < 900) { return "E"; } // < 15 minutes
-            else { return "F"; } // > 15 minutes
+            return totalSeconds switch
+            {
+                < 60 => "A", // < 1 minute
+                < 180 => "B", // < 3 minutes
+                < 300 => "C", // < 5 minutes
+                < 600 => "D", // < 10 minutes
+                < 900 => "E", // < 15 minutes
+                _ => "F" // >= 15 minutes
+            };
         }
 
         #endregion

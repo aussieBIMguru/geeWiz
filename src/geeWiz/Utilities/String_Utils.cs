@@ -67,7 +67,7 @@ namespace geeWiz.Utilities
             var rows = new List<string>();
 
             // For each row, join and add to the list
-            foreach (var row in matrix)
+            foreach (List<string> row in matrix)
             {
                 rows.Add(string.Join(separator, row.ToArray()));
             }
@@ -91,10 +91,10 @@ namespace geeWiz.Utilities
             var separators = new[] { separator };
 
             // For each row, split and add the list to the matrix
-            foreach (var row in dataRows)
+            foreach (string row in dataRows)
             {
                 var values = row.Split(separators, StringSplitOptions.None);
-                matrix.Add(new List<string>(values));
+                matrix.Add(values.ToList());
             }
 
             // Return the list of list of strings
@@ -130,20 +130,19 @@ namespace geeWiz.Utilities
             int maxLength = matrix.Select(l => l.Count).Max();
 
             // For each row in the old matrix
-            foreach (var oldRow in matrix)
+            foreach (List<string> oldRow in matrix)
             {
                 // New row, old row length
                 var newRow = new List<string>();
-                var rowLength = oldRow.Count;
+                int rowLength = oldRow.Count;
 
                 // We store the pad string, and make sure it isn't null
-                var safePadString = padString;
-                safePadString ??= "";
+                padString ??= "";
 
                 // Check if we should pad with last string in list
                 if (rowLength > 0 && padString is null)
                 {
-                    safePadString = oldRow.Last();
+                    padString = oldRow.Last();
                 }
 
                 // For each object to max length
@@ -157,7 +156,7 @@ namespace geeWiz.Utilities
                     // If we don't, we pad
                     else
                     {
-                        newRow.Add(safePadString);
+                        newRow.Add(padString);
                     }
                 }
 
@@ -225,7 +224,7 @@ namespace geeWiz.Utilities
             var newRow = new List<string>();
 
             // For each cell in row...
-            foreach (var cell in dataRow)
+            foreach (string cell in dataRow)
             {
                 // Add either the cell or replacement if null
                 if (cell is null)
@@ -285,7 +284,7 @@ namespace geeWiz.Utilities
             this.ContainsNulls = false;
 
             // Check each row for nulls
-            foreach (var row in matrix)
+            foreach (List<string> row in matrix)
             {
                 if (row.Contains(null))
                 {

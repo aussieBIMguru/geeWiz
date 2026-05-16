@@ -56,28 +56,25 @@ namespace geeWiz.Utilities
         public static PDFExportOptions DefaultPdfExportOptions(bool hideCrop = true)
         {
             // New options
-            var options = new PDFExportOptions();
-
-            // Configure the settings
-            options.AlwaysUseRaster = false;
-            options.ColorDepth = ColorDepthType.Color;
-            options.ExportQuality = PDFExportQualityType.DPI300;
-            options.HideCropBoundaries = hideCrop;
-            options.HideReferencePlane = true;
-            options.HideScopeBoxes = true;
-            options.HideUnreferencedViewTags = true;
-            options.MaskCoincidentLines = true;
-            options.PaperFormat = ExportPaperFormat.Default;
-            options.PaperOrientation = PageOrientationType.Auto;
-            options.RasterQuality = RasterQualityType.High;
-            options.ReplaceHalftoneWithThinLines = true;
-            options.StopOnError = false;
-            options.ViewLinksInBlue = false;
-            options.ZoomPercentage = 100;
-            options.ZoomType = ZoomType.Zoom;
-
-            // Return the options
-            return options;
+            return new PDFExportOptions()
+            {
+                AlwaysUseRaster = false,
+                ColorDepth = ColorDepthType.Color,
+                ExportQuality = PDFExportQualityType.DPI300,
+                HideCropBoundaries = hideCrop,
+                HideReferencePlane = true,
+                HideScopeBoxes = true,
+                HideUnreferencedViewTags = true,
+                MaskCoincidentLines = true,
+                PaperFormat = ExportPaperFormat.Default,
+                PaperOrientation = PageOrientationType.Auto,
+                RasterQuality = RasterQualityType.High,
+                ReplaceHalftoneWithThinLines = true,
+                StopOnError = false,
+                ViewLinksInBlue = false,
+                ZoomPercentage = 100,
+                ZoomType = ZoomType.Zoom
+            };
         }
 
         /// <summary>
@@ -88,15 +85,12 @@ namespace geeWiz.Utilities
         public static DWGExportOptions DefaultDwgExportOptions(bool shared = false)
         {
             // New options
-            var options = new DWGExportOptions();
-
-            // Configure the settings
-            options.SharedCoords = shared;
-            options.MergedViews = true;
-            options.FileVersion = ACADVersion.R2013;
-            
-            // Return the options
-            return options;
+            return new DWGExportOptions()
+            {
+                SharedCoords = shared,
+                MergedViews = true,
+                FileVersion = ACADVersion.R2013
+            };
         }
 
         #endregion

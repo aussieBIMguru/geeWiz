@@ -45,8 +45,8 @@ namespace geeWiz.Extensions
             if (startPoint is null || direction is null) { return null; }
 
             // Normalize the direction, project the point
-            var normalizedDirection = direction.Normalize();
-            var endPoint = startPoint + normalizedDirection * length;
+            XYZ normalizedDirection = direction.Normalize();
+            XYZ endPoint = startPoint + normalizedDirection * length;
 
             // Return the resultant line
             return Line.CreateBound(startPoint, endPoint);
@@ -135,7 +135,7 @@ namespace geeWiz.Extensions
             if (startPoint is null || direction is null || intersector is null) { return null; }
 
             // Create the ray intersection test
-            var bounceResult = intersector.FindNearest(startPoint, direction);
+            ReferenceWithContext bounceResult = intersector.FindNearest(startPoint, direction);
 
             // If we have a valid result, return its point
             if (bounceResult is ReferenceWithContext)
@@ -171,7 +171,7 @@ namespace geeWiz.Extensions
             if (inputInDegrees) { angle = gCnv.DegreesToRadians(angle); }
 
             // Rotate the vector by a transform
-            var transform = Transform.CreateRotationAtPoint(axis, angle, rotatationPoint);
+            Transform transform = Transform.CreateRotationAtPoint(axis, angle, rotatationPoint);
             return transform.OfVector(vector);
         }
 

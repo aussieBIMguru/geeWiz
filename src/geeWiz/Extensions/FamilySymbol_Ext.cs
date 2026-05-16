@@ -24,7 +24,7 @@ namespace geeWiz.Extensions
             if (familySymbol is null) { return "???"; }
 
             // Return the name key
-            var nameKey = $"{familySymbol.Family.FamilyCategory.Name}: {familySymbol.Family.Name} - {familySymbol.Name}";
+            string nameKey = $"{familySymbol.Family.FamilyCategory.Name}: {familySymbol.Family.Name} - {familySymbol.Name}";
             return familySymbol.Ext_FinalizeKey(nameKey, includeId);
         }
 

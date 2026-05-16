@@ -46,7 +46,7 @@ namespace geeWiz.Forms.Mvvm.Views
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             // AI Written - removes the close button in principle
-            var hwnd = new WindowInteropHelper(this).Handle;
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
             int style = GetWindowLong(hwnd, GWL_STYLE);
             SetWindowLong(hwnd, GWL_STYLE, (style & ~WS_SYSMENU) | WS_MINIMIZEBOX);
         }

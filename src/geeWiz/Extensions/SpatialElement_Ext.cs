@@ -23,10 +23,7 @@ namespace geeWiz.Extensions
             if (room is null) { return "???"; }
 
             // Get Room name parameter
-            var parameter = (room as Element).Ext_GetBuiltInParameter(BuiltInParameter.ROOM_NAME);
-
-            // Return the name
-            return parameter.AsString();
+            return room.Ext_GetBuiltInParameter(BuiltInParameter.ROOM_NAME).AsString();
         }
 
         #endregion

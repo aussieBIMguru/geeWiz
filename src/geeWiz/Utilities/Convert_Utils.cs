@@ -382,21 +382,20 @@ namespace geeWiz.Utilities
             // ElementId begins as null
             ElementId elementId = valueOnFailure;
 
-            #if REVIT2024_OR_GREATER
-            // Try to get ElementId using Int64
-            try
-            {
-                elementId = new ElementId((Int64)integer);
-            }
-            catch {; }
-            #else
+#if REVIT2020 || REVIT2021 || REVIT2022 || REVIT2023
             // Try to get ElementId using Int
             try
             {
                 return new ElementId(integer);
             }
             catch{; }
-            #endif
+#else
+            try
+            {
+                elementId = new ElementId((Int64)integer);
+            }
+            catch {; }
+#endif
 
             // Return the elementId
             return elementId;
@@ -409,13 +408,13 @@ namespace geeWiz.Utilities
         /// <returns>An integer.</returns>
         public static int ElementIdToInt(ElementId elementId)
         {
-            #if REVIT2024_OR_GREATER
-            // Return the Value
-            return (int)elementId.Value;
-            #else
+#if REVIT2020 || REVIT2021 || REVIT2022 || REVIT2023
             // Return the IntegerValue
             return elementId.IntegerValue;
-            #endif
+#else
+            // Return the Value
+            return (int)elementId.Value;
+#endif
         }
 
         #endregion
@@ -437,7 +436,7 @@ namespace geeWiz.Utilities
             forgeTypeIds ??= gPar.GetGroupTypeIds();
 
             // For each forgetypeId...
-            foreach (var forgeTypeId in forgeTypeIds)
+            foreach (ForgeTypeId forgeTypeId in forgeTypeIds)
             {
                 // Given it might be a non group type Id, try
                 try
@@ -473,7 +472,7 @@ namespace geeWiz.Utilities
             forgeTypeIds ??= gPar.GetSpecTypeIds();
 
             // For each forgetypeId...
-            foreach (var forgeTypeId in forgeTypeIds)
+            foreach (ForgeTypeId forgeTypeId in forgeTypeIds)
             {
                 // Given it might be a non group type Id, try
                 try

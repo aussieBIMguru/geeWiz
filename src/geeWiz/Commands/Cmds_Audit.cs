@@ -9,10 +9,8 @@ using gFrm = geeWiz.Forms;
 using gWsh = geeWiz.Utilities.Workshare_Utils;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Audit
+namespace geeWiz.Commands.Cmds_Audit
 {
-    #region Cmd_DeletePatterns
-
     /// <summary>
     /// Deletes an Fill/Line Patterns beginning with the word IMPORT.
     /// </summary>
@@ -22,12 +20,12 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Collect fill and line patterns
-            var deletePatterns = doc.Ext_Collector()
+            List<Element> deletePatterns = doc.Ext_Collector()
                 .OfClass(typeof(FillPatternElement))
                 .Concat(
                     doc.Ext_Collector()
@@ -49,10 +47,6 @@ namespace geeWiz.Cmds_Audit
         }
     }
 
-    #endregion
-
-    #region Cmd_PurgeRooms
-
     /// <summary>
     /// Purges unplaced rooms based on user selection.
     /// </summary>
@@ -62,12 +56,12 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Collect unplaced rooms
-            var rooms = doc.Ext_GetRooms(
+            List<SpatialElement> rooms = doc.Ext_GetRooms(
                 includePlaced: false,
                 includeUnplaced: true,
                 sorted: true);
@@ -81,7 +75,7 @@ namespace geeWiz.Cmds_Audit
             // Select rooms from a list
             var formResult = doc.Ext_SelectRooms(rooms: rooms, title: "Select rooms to delete");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var deleteRooms = formResult.Objects;
+            List<SpatialElement> deleteRooms = formResult.Objects;
 
             // Keep editable elements only
             if (doc.IsWorkshared)
@@ -95,10 +89,6 @@ namespace geeWiz.Cmds_Audit
         }
     }
 
-    #endregion
-
-    #region Cmd_PurgeTemplates
-
     /// <summary>
     /// Purges unused View Templates from the model.
     /// </summary>
@@ -108,12 +98,12 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Get used view templates Id strings
-            var usedIdStrings = doc.Ext_GetViewFamilyTypes()
+            List<string> usedIdStrings = doc.Ext_GetViewFamilyTypes()
                 .Select(vft => vft.DefaultTemplateId.ToString())
                 .Concat(
                     doc.Ext_GetViews()
@@ -123,7 +113,7 @@ namespace geeWiz.Cmds_Audit
                 .ToList();
 
             // Get unused view templates
-            var unusedTemplates = doc.Ext_GetViewTemplates(sorted: true)
+            List<View> unusedTemplates = doc.Ext_GetViewTemplates(sorted: true)
                 .Where(vt => !usedIdStrings.Contains(vt.Id.ToString()))
                 .ToList();
 
@@ -136,7 +126,7 @@ namespace geeWiz.Cmds_Audit
             // Select view templates from a list
             var formResult = doc.Ext_SelectViewTemplates(unusedTemplates, title: "Select templates to delete");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var deleteTemplates = formResult.Objects;
+            List<View> deleteTemplates = formResult.Objects;
 
             // Keep editable elements only
             if (doc.IsWorkshared)
@@ -150,10 +140,6 @@ namespace geeWiz.Cmds_Audit
         }
     }
 
-    #endregion
-
-    #region Cmd_PurgeFilters
-
     /// <summary>
     /// Purges unused View Templates from the model.
     /// </summary>
@@ -163,20 +149,20 @@ namespace geeWiz.Cmds_Audit
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Get used view filter Id strings
-            var usedIdStrings = doc.Ext_GetViews()
+            HashSet<string> usedIdStrings = doc.Ext_GetViews()
                 .Concat(doc.Ext_GetViewTemplates())
                 .SelectMany(v => v.GetFilters())
                 .Select(i => i.ToString())
                 .Distinct()
-                .ToList();
+                .ToHashSet<string>();
 
             // Get unused view filters
-            var unusedFilters = doc.Ext_Collector()
+            List<Element> unusedFilters = doc.Ext_Collector()
                 .OfClass(typeof(ParameterFilterElement))
                 .Where(f => !usedIdStrings.Contains(f.Id.ToString()))
                 .OrderBy(f => f.Name)
@@ -189,24 +175,22 @@ namespace geeWiz.Cmds_Audit
             }
 
             // Construct keys
-            var keys = unusedFilters.Select(f => f.Name).ToList();
+            List<string> keys = unusedFilters.Select(f => f.Name).ToList();
 
             // Select view filters from a list
-            var formResult = gFrm.Custom.SelectFromList<Element>(keys, unusedFilters, "Select view filters to delete");
+            var formResult = gFrm.Custom.SelectFromList(keys, unusedFilters, "Select view filters to delete");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var deleteFilters = formResult.Objects;
+            List<Element> deleteFilters = formResult.Objects;
 
             // Keep editable elements only
             if (doc.IsWorkshared)
             {
-                var worksharingResults = gWsh.ProcessElements<Element>(deleteFilters, doc);
+                var worksharingResults = gWsh.ProcessElements(deleteFilters, doc);
                 deleteFilters = worksharingResults.Editable;
             }
 
             // Deletion routine
-            return doc.Ext_DeleteElementsRoutine<Element>(deleteFilters, typeName: "View Filter");
+            return doc.Ext_DeleteElementsRoutine(deleteFilters, typeName: "View Filter");
         }
     }
-
-    #endregion
 }

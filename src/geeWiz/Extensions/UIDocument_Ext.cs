@@ -65,12 +65,9 @@ namespace geeWiz.Extensions
             // Return empty list if no uiDoc
             if (uiDoc is null) { return new List<View>(); }
 
-            // Get document
-            var doc = uiDoc.Document;
-
             // Return opened UIViews as Views
             return uiDoc.GetOpenUIViews()
-                .Select(u => u.ViewId.Ext_GetElement<View>(doc))
+                .Select(u => u.ViewId.Ext_GetElement<View>(uiDoc.Document))
                 .Cast<View>()
                 .ToList();
         }
@@ -91,7 +88,7 @@ namespace geeWiz.Extensions
             if (uiDoc is null) { return Result.Failed; }
 
             // Get element Ids to select
-            var elementIds = elements
+            List<ElementId> elementIds = elements
                 .Select(e => e.Id)
                 .Where(i => i is not null)
                 .Distinct()

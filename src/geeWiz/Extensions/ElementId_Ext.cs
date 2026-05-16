@@ -1,5 +1,7 @@
 ﻿// Revit API
 using Autodesk.Revit.DB;
+// geeWiz
+using gCnv = geeWiz.Utilities.Convert_Utils;
 
 // The class belongs to the extensions namespace
 // ElementId elementId.ExtensionMethod()
@@ -62,11 +64,11 @@ namespace geeWiz.Extensions
             // Catch invalid elementId or null
             if (elementId.Ext_IsNullOrInvalid() || doc is null)
             {
-                return default(T);
+                return default;
             }
 
             // Get element
-            var element = doc.GetElement(elementId);
+            Element element = doc.GetElement(elementId);
 
             // Try to return as that type
             if (element is T elementAsType)
@@ -75,7 +77,7 @@ namespace geeWiz.Extensions
             }
             else
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -90,18 +92,7 @@ namespace geeWiz.Extensions
         /// <returns>An integer.</returns>
         public static int Ext_AsInteger(this ElementId elementId)
         {
-            // Null catch = invalid
-            if (elementId is null) { return -1; }
-
-            #if REVIT2024_OR_GREATER
-            // Return the Value
-            return (int)elementId.Value;
-
-            #else
-            // Return the IntegerValue
-            return elementId.IntegerValue;
-
-            #endif
+            return gCnv.ElementIdToInt(elementId);
         }
 
         #endregion

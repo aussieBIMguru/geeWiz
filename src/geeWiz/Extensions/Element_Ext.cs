@@ -28,16 +28,29 @@ namespace geeWiz.Extensions
             // Catch null element
             if (element is null) { return "???"; }
 
-            // Check typical inheritances in order
-            if (element is ViewSheet sheet) { return sheet.Ext_ToSheetKey(includeId); }
-            if (element is ViewFamilyType viewFamilyType) { return viewFamilyType.Ext_ToViewFamilyTypeKey(includeId); }
-            if (element is View view) { return view.Ext_ToViewKey(includeId); }
-            if (element is Family family) { return family.Ext_ToFamilyKey(includeId); }
-            if (element is FamilySymbol familySymbol) { return familySymbol.Ext_ToFamilySymbolKey(includeId); }
-            if (element is FamilyInstance familyInstance) { return familyInstance.Ext_ToFamilyInstanceKey(includeId); }
+            return element switch
+            {
+                ViewSheet sheet =>
+                    sheet.Ext_ToSheetKey(includeId),
 
-            // Return the element key if it did not inherit before
-            return element.Ext_ToElementKey(includeId);
+                ViewFamilyType viewFamilyType =>
+                    viewFamilyType.Ext_ToViewFamilyTypeKey(includeId),
+
+                View view =>
+                    view.Ext_ToViewKey(includeId),
+
+                Family family =>
+                    family.Ext_ToFamilyKey(includeId),
+
+                FamilySymbol familySymbol =>
+                    familySymbol.Ext_ToFamilySymbolKey(includeId),
+
+                FamilyInstance familyInstance =>
+                    familyInstance.Ext_ToFamilyInstanceKey(includeId),
+
+                _ =>
+                    element.Ext_ToElementKey(includeId)
+            };
         }
 
         /// <summary>
@@ -77,7 +90,7 @@ namespace geeWiz.Extensions
             catch {; }
 
             // Return the name key
-            var nameKey = $"{categoryName}: {typeName} - {elementName}";
+            string nameKey = $"{categoryName}: {typeName} - {elementName}";
             return element.Ext_FinalizeKey(nameKey, includeId);
         }
 
@@ -124,8 +137,8 @@ namespace geeWiz.Extensions
             if (!doc.IsWorkshared) { return true; }
 
             // Get the checkout and model updates status
-            var checkoutStatus = WorksharingUtils.GetCheckoutStatus(doc, element.Id);
-            var updatesStatus = WorksharingUtils.GetModelUpdatesStatus(doc, element.Id);
+            CheckoutStatus checkoutStatus = WorksharingUtils.GetCheckoutStatus(doc, element.Id);
+            ModelUpdatesStatus updatesStatus = WorksharingUtils.GetModelUpdatesStatus(doc, element.Id);
 
             // Check if owned by another user
             if (checkoutStatus == CheckoutStatus.OwnedByOtherUser) { return false; }
@@ -178,10 +191,10 @@ namespace geeWiz.Extensions
         public static T Ext_GetElementType<T>(this Element element)
         {
             // Null check
-            if (!element.Ext_HasElementType()) { return default(T); }
+            if (!element.Ext_HasElementType()) { return default; }
 
             // Get the element's type
-            var elementType = element.GetTypeId().Ext_GetElement(element.Document);
+            Element elementType = element.GetTypeId().Ext_GetElement(element.Document);
 
             // If the element is of the type...
             if (elementType is T elementAsType)
@@ -192,7 +205,7 @@ namespace geeWiz.Extensions
             else
             {
                 // Otherwise, return default of T
-                return default(T);
+                return default;
             }
         }
 
@@ -207,7 +220,7 @@ namespace geeWiz.Extensions
             if (element is null) { return new List<Element>(); }
 
             // Get element type Id
-            var elementTypeId = element.Id;
+            ElementId elementTypeId = element.Id;
 
             // Return all elements of type
             return element.Document.Ext_Collector()
@@ -232,8 +245,8 @@ namespace geeWiz.Extensions
             if (element is null) { return null; }
             
             // Get the parameter by its forgetypeid
-            var forgeTypeId = ParameterUtils.GetParameterTypeId(builtInParameter);
-            return element.GetParameter(forgeTypeId);
+            ForgeTypeId ftid = ParameterUtils.GetParameterTypeId(builtInParameter);
+            return element.GetParameter(ftid);
         }
 
         /// <summary>
@@ -276,7 +289,7 @@ namespace geeWiz.Extensions
             if (element is null) { return default; }
 
             // Get element type
-            var elementType = element.Ext_GetElementType();
+            Element elementType = element.Ext_GetElementType();
 
             // Return type parameter value
             return elementType.Ext_GetParameterValue<T>(parameterName);
@@ -330,7 +343,7 @@ namespace geeWiz.Extensions
             if (element is null) { return null; }
 
             // Try to get parameter
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return null; }
 
             // Return the value based on storage type
@@ -357,7 +370,7 @@ namespace geeWiz.Extensions
             if (element is null || value is null) { return Result.Failed; }
             
             // Try to get parameter, cancel if we can not set it
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return Result.Failed; }
             if (parameter.StorageType != StorageType.String) { return Result.Failed; }
 
@@ -379,7 +392,7 @@ namespace geeWiz.Extensions
             if (element is null) { return Result.Failed; }
 
             // Try to get parameter, cancel if we can not set it
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return Result.Failed; }
             if (parameter.StorageType != StorageType.Integer) { return Result.Failed; }
 
@@ -401,7 +414,7 @@ namespace geeWiz.Extensions
             if (element is null) { return Result.Failed; }
 
             // Try to get parameter, cancel if we can not set it
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return Result.Failed; }
             if (parameter.StorageType != StorageType.Double) { return Result.Failed; }
 
@@ -423,7 +436,7 @@ namespace geeWiz.Extensions
             if (element is null || value is null) { return Result.Failed; }
 
             // Try to get parameter, cancel if we can not set it
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return Result.Failed; }
             if (parameter.StorageType != StorageType.ElementId) { return Result.Failed; }
 
@@ -445,7 +458,7 @@ namespace geeWiz.Extensions
             if (element is null || value is null) { return Result.Failed; }
 
             // Try to get parameter, cancel if we can not set it
-            var parameter = element.LookupParameter(parameterName);
+            Parameter parameter = element.LookupParameter(parameterName);
             if (parameter is null) { return Result.Failed; }
             if (parameter.StorageType != StorageType.ElementId) { return Result.Failed; }
 
@@ -469,7 +482,7 @@ namespace geeWiz.Extensions
             if (element is null) { return null; }
 
             // Get design option parameter, null check it
-            var parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.DESIGN_OPTION_ID);
+            Parameter parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.DESIGN_OPTION_ID);
             if (parameter is null) { return null; }
 
             // Return the design option
@@ -526,10 +539,10 @@ namespace geeWiz.Extensions
             if (element is null) { return null; }
 
             // Get parameter
-            var parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.PHASE_CREATED);
+            Parameter parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.PHASE_CREATED);
 
             // Return null if it has no value or is invalid
-            if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
+            if (!parameter.HasValue || parameter.AsElementId().Ext_IsNullOrInvalid()) { return null; }
 
             // Return the element
             return parameter.AsElementId().Ext_GetElement<Phase>(element.Document);
@@ -549,7 +562,7 @@ namespace geeWiz.Extensions
             var parameter = element.Ext_GetBuiltInParameter(BuiltInParameter.PHASE_DEMOLISHED);
 
             // Return null if it has no value or is invalid
-            if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
+            if (!parameter.HasValue || parameter.AsElementId().Ext_IsNullOrInvalid()) { return null; }
 
             // Return the element
             return parameter.AsElementId().Ext_GetElement<Phase>(element.Document);

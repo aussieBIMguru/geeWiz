@@ -438,10 +438,10 @@ namespace geeWiz.Utilities
         /// <param name="comparer">An optional string comparer.</param>
         /// <returns>A dictionary.</returns>
         public static Dictionary<TKey, TValue> QuickDictionary<TSource, TKey, TValue>(
-        this IEnumerable<TSource> source,
-        Func<TSource, TKey> keySelector,
-        Func<TSource, TValue> valueSelector,
-        IEqualityComparer<TKey> comparer = null)
+            this IEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            Func<TSource, TValue> valueSelector,
+            IEqualityComparer<TKey> comparer = null)
         {
             // Produce the base dictionary
             var dict = (comparer != null)

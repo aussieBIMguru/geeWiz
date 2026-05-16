@@ -26,10 +26,7 @@ namespace geeWiz.Extensions
             if (room is null) { return "???"; }
 
             // Get the parameter
-            var parameter = room.Ext_GetBuiltInParameter(BuiltInParameter.ROOM_NAME);
-
-            // Return the name
-            return parameter.AsString();
+            return room.Ext_GetBuiltInParameter(BuiltInParameter.ROOM_NAME).AsString();
         }
 
         /// <summary>
@@ -74,13 +71,13 @@ namespace geeWiz.Extensions
             var curveLoops = new List<CurveLoop>();
 
             // For each boundary...
-            foreach (var boundary in room.GetBoundarySegments(options))
+            foreach (IList<BoundarySegment> boundary in room.GetBoundarySegments(options))
             {
                 // Make a new curveloop
                 var curveLoop = new CurveLoop();
 
                 // For each edge in the boundary, add its curve
-                foreach (var edge in boundary)
+                foreach (BoundarySegment edge in boundary)
                 {
                     curveLoop.Append(edge.GetCurve());
                 }
@@ -108,10 +105,10 @@ namespace geeWiz.Extensions
             var curves = new List<Curve>();
 
             // For each boundary...
-            foreach (var boundary in room.GetBoundarySegments(options))
+            foreach (IList<BoundarySegment> boundary in room.GetBoundarySegments(options))
             {
                 // Add each curve
-                foreach (var edge in boundary)
+                foreach (BoundarySegment edge in boundary)
                 {
                     curves.Add(edge.GetCurve());
                 }
@@ -135,10 +132,7 @@ namespace geeWiz.Extensions
 
             // Calculate the room solid
             var geometryCalculator = new SpatialElementGeometryCalculator(doc, options);
-            var spatialGeometry = geometryCalculator.CalculateSpatialElementGeometry(room);
-
-            // Return the geometry
-            return spatialGeometry.GetGeometry();
+            return geometryCalculator.CalculateSpatialElementGeometry(room).GetGeometry();
         }
 
         #endregion

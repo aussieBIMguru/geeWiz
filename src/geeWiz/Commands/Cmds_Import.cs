@@ -11,12 +11,12 @@ using gFrm = geeWiz.Forms;
 using gFil = geeWiz.Utilities.File_Utils;
 using gXcl = geeWiz.Utilities.Excel_Utils;
 using gScr = geeWiz.Utilities.Script_Utils;
+// ClosedXML
+using ClosedXML.Excel;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Import
+namespace geeWiz.Commands.Cmds_Import
 {
-    #region Cmd_SheetsExcel
-
     /// <summary>
     /// Creates an Excel template.
     /// </summary>
@@ -26,28 +26,25 @@ namespace geeWiz.Cmds_Import
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Check for alt firing
-            var altFired = gScr.KeyHeldShift();
+            bool altFired = gScr.KeyHeldShift();
 
             // Select a directory, make file path
             var directoryResult = gFrm.Custom.SelectFolder("Choose where to save template");
             if (directoryResult.Cancelled) { return Result.Cancelled; }
-            var directoryPath = directoryResult.Object;
-            var filePath = Path.Combine(directoryPath, "Import sheets.xlsx");
+            string directoryPath = directoryResult.Object;
+            string filePath = Path.Combine(directoryPath, "Import sheets.xlsx");
 
             // Accessibility check if it exists
-            if (File.Exists(filePath))
+            if (File.Exists(filePath) && !gFil.FileIsAccessible(filePath))
             {
-                if (!gFil.FileIsAccessible(filePath))
-                {
-                    return gFrm.Custom.Cancelled(
+                return gFrm.Custom.Cancelled(
                         "File exists and is not editable.\n\n" +
                         "Ensure it is closed and try again.");
-                }
             }
 
             // Default matrix to write
@@ -68,10 +65,10 @@ namespace geeWiz.Cmds_Import
             }
 
             // Using a workbook object
-            using (var workbook = gXcl.CreateWorkbook(filePath))
+            using (XLWorkbook workbook = gXcl.CreateWorkbook(filePath))
             {
                 // Establish workbook variable
-                ClosedXML.Excel.IXLWorksheet worksheet = null;
+                IXLWorksheet worksheet = null;
 
                 // If the file exists, clear its contents
                 if (File.Exists(filePath))
@@ -112,10 +109,6 @@ namespace geeWiz.Cmds_Import
         }
     }
 
-    #endregion
-
-    #region Cmd_CreateSheets
-
     /// <summary>
     /// Creates/updates sheets from Excel.
     /// </summary>
@@ -125,9 +118,9 @@ namespace geeWiz.Cmds_Import
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Select file path
             var formResult = gFrm.Custom.SelectFilePaths(
@@ -135,7 +128,7 @@ namespace geeWiz.Cmds_Import
                 filter: gFrm.Custom.FILTER_EXCEL,
                 multiSelect: false);
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var filePath = formResult.Object;
+            string filePath = formResult.Object;
 
             // Accessible check
             if (!gFil.FileIsAccessible(filePath))
@@ -146,9 +139,9 @@ namespace geeWiz.Cmds_Import
             }
 
             // Get Excel data
-            var workbook = gXcl.GetWorkbook(filePath);
-            var worksheet = gXcl.GetWorkSheet(workbook, "Sheets", getFirstOtherwise: true);
-            var matrix = gXcl.ReadFromWorksheet(worksheet);
+            XLWorkbook workbook = gXcl.GetWorkbook(filePath);
+            IXLWorksheet worksheet = gXcl.GetWorkSheet(workbook, "Sheets", getFirstOtherwise: true);
+            List<List<string>> matrix = gXcl.ReadFromWorksheet(worksheet);
 
             // Validate file structure
             if (matrix.Count < 2 || matrix[0][0] != "Number" || matrix[0][1] != "Name")
@@ -164,74 +157,61 @@ namespace geeWiz.Cmds_Import
             // Select titleblock type
             var formResultTtb = doc.Ext_SelectTitleblockTypes(multiSelect: false, sorted: true);
             if (formResultTtb.Cancelled) { return Result.Cancelled; }
-            var titleblockTypeId = formResultTtb.Object.Id;
+            ElementId titleblockTypeId = formResultTtb.Object.Id;
 
             // Collect sheets and numbers
-            var sheets = doc.Ext_GetSheets(includePlaceholders: true);
-            // var sheetDictionar = sheets.ToDictionary(s => s.SheetNumber); easier, but not assured in 2026+
-            var sheetDictionary = sheets.QuickDictionary(s => s.SheetNumber.ToLower(), s => s);
+            List<ViewSheet> sheets = doc.Ext_GetSheets(includePlaceholders: true);
+            // var sheetDictionary = sheets.ToDictionary(s => s.SheetNumber); easier, but not assured in 2026+
+            Dictionary<string, ViewSheet> sheetDictionary = sheets.QuickDictionary(s => s.SheetNumber.ToLower(), s => s);
 
             // Progress bar properties
-            int pbTotal = matrix.Count;
-            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
+            var pb = new gFrm.ProgressCoordinator(total: matrix.Count, taskName: "Creating/updating sheets");
+            int updated = 0, created = 0, skipped = 0;
 
-            // Tracker variables
-            int updated = 0;
-            int created = 0;
-            int skipped = 0;
-
-            // Using a progress bar
-            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Creating/updating sheets...", pbTotal: pbTotal))
+            // Using a transaction
+            using (var t = new Transaction(doc, "geeWiz: Import sheets"))
             {
-                // Using a transaction
-                using (var t = new Transaction(doc, "geeWiz: Import sheets"))
+                // Start the transaction
+                t.Start();
+
+                // For each sheet
+                foreach (var row in matrix)
                 {
-                    // Start the transaction
-                    t.Start();
-
-                    // For each sheet
-                    foreach (var row in matrix)
+                    // Check for cancellation
+                    if (pb.CancelCheckOrUpdate(t: t))
                     {
-                        // Check for cancellation
-                        if (pb.CancelCheck(t))
-                        {
-                            return Result.Cancelled;
-                        }
+                        return Result.Cancelled;
+                    }
 
-                        // Get the data
-                        var newNumber = row[0];
-                        var newName = row[1];
+                    // Get the data
+                    string newNumber = row[0];
+                    string newName = row[1];
 
-                        // If the sheet number exists
-                        if (sheetDictionary.TryGetValue(newNumber.ToLower(), out ViewSheet exSheet))
+                    // If the sheet number exists
+                    if (sheetDictionary.TryGetValue(newNumber.ToLower(), out ViewSheet exSheet))
+                    {
+                        if (exSheet.Ext_IsEditable(doc) && exSheet.Name != newName)
                         {
-                            if (exSheet.Ext_IsEditable(doc) && exSheet.Name != newName)
-                            {
-                                exSheet.Name = newName;
-                                created++;
-                            }
-                            else
-                            {
-                                skipped++;
-                            }
+                            exSheet.Name = newName;
+                            created++;
                         }
                         else
                         {
-                            var newSheet = ViewSheet.Create(doc, titleblockTypeId);
-                            sheetDictionary[newNumber.ToLower()] = newSheet;
-                            newSheet.SheetNumber = newNumber;
-                            newSheet.Name = newName;
-                            created++;
+                            skipped++;
                         }
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pb.Increment();
                     }
-
-                    // Commit the transaction
-                    pb.Commit(t);
+                    else
+                    {
+                        ViewSheet newSheet = ViewSheet.Create(doc, titleblockTypeId);
+                        sheetDictionary[newNumber.ToLower()] = newSheet;
+                        newSheet.SheetNumber = newNumber;
+                        newSheet.Name = newName;
+                        created++;
+                    }
                 }
+
+                // Commit the transaction
+                pb.Commit(t: t);
             }
 
             // Return the result
@@ -241,6 +221,4 @@ namespace geeWiz.Cmds_Import
                 $"{skipped} sheet names not editable.");
         }
     }
-
-    #endregion
 }

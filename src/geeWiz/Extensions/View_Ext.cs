@@ -28,7 +28,7 @@ namespace geeWiz.Extensions
             if (view is null) { return "???"; }
 
             // Construct view key
-            var viewPrefix = view.ViewType.ToString();
+            string viewPrefix = view.ViewType.ToString();
 
             // Catch if view template
             if (view.IsTemplate)
@@ -37,7 +37,7 @@ namespace geeWiz.Extensions
             }
 
             // Return the name key
-            var nameKey = $"{viewPrefix}: {view.Name}";
+            string nameKey = $"{viewPrefix}: {view.Name}";
             return view.Ext_FinalizeKey(nameKey, includeId);
         }
 
@@ -55,16 +55,16 @@ namespace geeWiz.Extensions
         public static bool Ext_ViewIsEditable(this View view, Document doc = null, bool showMessage = false)
         {
             // Get editability
-            var isEdtiable = (view as Element).Ext_IsEditable(doc);
+            bool isEditable = (view as Element).Ext_IsEditable(doc);
 
             // Message if not editable
-            if (showMessage && !isEdtiable)
+            if (showMessage && !isEditable)
             {
                 gFrm.Custom.Cancelled("Active view is not editable.");
             }
 
             // Return the result
-            return isEdtiable;
+            return isEditable;
         }
 
         #endregion
@@ -172,7 +172,7 @@ namespace geeWiz.Extensions
             if (view is null) { return null; }
 
             // Get parameter
-            var parameter = (view as Element).Ext_GetBuiltInParameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP);
+            Parameter parameter = view.Ext_GetBuiltInParameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP);
 
             // Return null if it has no value or is invalid
             if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
@@ -192,7 +192,7 @@ namespace geeWiz.Extensions
             if (view is null) { return null; }
 
             // Get parameter
-            var parameter = (view as Element).Ext_GetBuiltInParameter(BuiltInParameter.VIEW_PHASE);
+            Parameter parameter = view.Ext_GetBuiltInParameter(BuiltInParameter.VIEW_PHASE);
 
             // Return null if it has no value or is invalid
             if (!parameter.HasValue || parameter.AsElementId() != ElementId.InvalidElementId) { return null; }
@@ -212,7 +212,7 @@ namespace geeWiz.Extensions
             if (view is null) { return null; }
 
             // Return view family type
-            if ((view as Element).Ext_GetElementType() is ViewFamilyType viewFamilyType)
+            if (view.Ext_GetElementType() is ViewFamilyType viewFamilyType)
             {
                 return viewFamilyType;
             }

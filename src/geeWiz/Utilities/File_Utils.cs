@@ -8,7 +8,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 // geeWiz
 using gStr = geeWiz.Utilities.String_Utils;
-using DocumentFormat.OpenXml.Spreadsheet;
 using geeWiz.Extensions;
 
 // The class belongs to the utility namespace
@@ -139,7 +138,7 @@ namespace geeWiz.Utilities
                     while (!reader.EndOfStream)
                     {
                         // Read the line
-                        var line = reader.ReadLine();
+                        string line = reader.ReadLine();
                         
                         // If the row is not empty, add it
                         if (line.Ext_HasChars())
@@ -204,7 +203,7 @@ namespace geeWiz.Utilities
             try
             {
                 // Using a stream reader...
-                using (var stream = Globals.Assembly.GetManifestResourceStream(fullResourceName))
+                using (Stream stream = Globals.Assembly.GetManifestResourceStream(fullResourceName))
                 {
                     // If there is a stream
                     if (stream is not null)
@@ -216,7 +215,7 @@ namespace geeWiz.Utilities
                             while (!reader.EndOfStream)
                             {
                                 // Read the line
-                                var line = reader.ReadLine();
+                                string line = reader.ReadLine();
 
                                 // If the row is not empty, add it
                                 if (line.Ext_HasChars())
@@ -309,9 +308,9 @@ namespace geeWiz.Utilities
         /// <returns>Void (nothing).</returns>
         public static void SetFormIcon(Form form)
         {
-            var iconPath = "geeWiz.Resources.Icons16.IconList16.ico";
+            string iconPath = "geeWiz.Resources.Icons16.IconList16.ico";
 
-            using (var stream = Globals.Assembly.GetManifestResourceStream(iconPath))
+            using (Stream stream = Globals.Assembly.GetManifestResourceStream(iconPath))
             {
                 if (stream != null)
                 {
@@ -363,10 +362,10 @@ namespace geeWiz.Utilities
         public static System.Windows.Media.ImageSource GetImageSource(string iconName, int resolution = 32, string suffix = "")
         {
             // Construct the resource path
-            var resourcePath = $"{Globals.AddinName}.Resources.Icons{resolution}.{iconName}{resolution}{suffix}.png";
+            string resourcePath = $"{Globals.AddinName}.Resources.Icons{resolution}.{iconName}{resolution}{suffix}.png";
 
             // Read the resource from its full path
-            using (var stream = Globals.Assembly.GetManifestResourceStream(resourcePath))
+            using (Stream stream = Globals.Assembly.GetManifestResourceStream(resourcePath))
             {
                 // Throw exception if stream not made
                 if (stream == null)
@@ -375,7 +374,7 @@ namespace geeWiz.Utilities
                 }
 
                 // Decode the png resource
-                var decoder = new System.Windows.Media.Imaging.PngBitmapDecoder(stream,
+                PngBitmapDecoder decoder = new System.Windows.Media.Imaging.PngBitmapDecoder(stream,
                     BitmapCreateOptions.PreservePixelFormat,
                     BitmapCacheOption.Default);
 

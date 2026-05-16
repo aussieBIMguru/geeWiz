@@ -34,16 +34,18 @@ namespace geeWiz.Utilities
             var roomsUnplaced = new List<SpatialElement>();
 
             // Construct the boundary location object
-            var boundaryLocation = AreaVolumeSettings
+            SpatialElementBoundaryLocation boundaryLocation = AreaVolumeSettings
                 .GetAreaVolumeSettings(doc)
                 .GetSpatialElementBoundaryLocation(SpatialElementType.Room);
 
             // Construct the spatial element boundary options
-            var options = new SpatialElementBoundaryOptions();
-            options.SpatialElementBoundaryLocation = boundaryLocation;
+            var options = new SpatialElementBoundaryOptions()
+            {
+                SpatialElementBoundaryLocation = boundaryLocation
+            };
 
             // For each room...
-            foreach (var room in rooms)
+            foreach (SpatialElement room in rooms)
             {
                 // Area greater than 0 = Placed
                 if (room.Area != 0)

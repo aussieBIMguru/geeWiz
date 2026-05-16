@@ -25,10 +25,10 @@ namespace geeWiz.Utilities
         public static bool Focus<T>() where T : Window
         {
             // Get type of window for comparison
-            var type = typeof(T);
+            Type type = typeof(T);
 
             // For each window in the controller...
-            foreach (var window in ControlledWindows)
+            foreach (Window window in ControlledWindows)
             {
                 // If the window is the given type...
                 if (window.GetType() == type)
@@ -69,7 +69,7 @@ namespace geeWiz.Utilities
             window.Closed += (sender, _) =>
             {
                 // Remove it from the controller
-                var modelessWindow = (Window)sender;
+                Window modelessWindow = (Window)sender;
                 ControlledWindows.Remove(modelessWindow);
             };
         }
@@ -97,10 +97,7 @@ namespace geeWiz.Utilities
             // Register the window if it isn't controlled yet
             RegisterWindow(window);
 
-            // Show the window, set pointer
-            // window.Show(handle);
-            
-            // No pointer in NET10+
+            // Show the window
             window.Show();
         }
 
@@ -111,10 +108,10 @@ namespace geeWiz.Utilities
         public static void Show<T>() where T : Window
         {
             // Get type of window for comparison
-            var type = typeof(T);
+            Type type = typeof(T);
 
             // For each controlled window...
-            foreach (var window in ControlledWindows)
+            foreach (Window window in ControlledWindows)
             {
                 // Show window if of given type
                 if (window.GetType() == type)
@@ -132,10 +129,10 @@ namespace geeWiz.Utilities
         public static void Hide<T>() where T : Window
         {
             // Get type of window for comparison
-            var type = typeof(T);
+            Type type = typeof(T);
 
             // For each controlled window...
-            foreach (var window in ControlledWindows)
+            foreach (Window window in ControlledWindows)
             {
                 // Hide window if of given type
                 if (window.GetType() == type)
@@ -152,14 +149,14 @@ namespace geeWiz.Utilities
         public static void Close<T>() where T : Window
         {
             // Get type of window for comparison
-            var type = typeof(T);
+            Type type = typeof(T);
 
             // Work back through the windows
             // We do this so that we don't get an error on i if a window is removed
             for (var i = ControlledWindows.Count - 1; i >= 0; i--)
             {
                 // Get the window
-                var window = ControlledWindows[i];
+                Window window = ControlledWindows[i];
 
                 // Close window if of given type
                 if (window.GetType() == type)

@@ -13,7 +13,7 @@ using Xceed.Wpf.AvalonDock.Controls;
 using Autodesk.Revit.ApplicationServices;
 
 // This class belongs to the root namespace
-namespace geeWiz
+namespace geeWiz.General
 {
     /// <summary>
     /// Coloured tabs will colour opened view tabs by Document title.
@@ -45,6 +45,9 @@ namespace geeWiz
         // List of unique document titles we will add to and index
         private static List<string> DOC_TITLES = new List<string>();
 
+        // Are we currently colouring tabs
+        public static bool ACTIVE = false;
+
         #endregion
 
         #region Registration to events
@@ -57,8 +60,11 @@ namespace geeWiz
         {
             ctlApp ??= Globals.CtlApp;
             uiApp ??= Globals.UiApp;
+
             ctlApp.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
             uiApp.ViewActivated += new EventHandler<ViewActivatedEventArgs>(ViewActivated);
+
+            ACTIVE = true;
         }
 
         /// <summary>
@@ -69,8 +75,11 @@ namespace geeWiz
         {
             ctlApp ??= Globals.CtlApp;
             uiApp ??= Globals.UiApp;
+
             ctlApp.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
             uiApp.ViewActivated -= new EventHandler<ViewActivatedEventArgs>(ViewActivated);
+
+            ACTIVE = false;
         }
 
         #endregion
@@ -83,9 +92,9 @@ namespace geeWiz
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
         /// <returns>Void (nothing).</returns>
-        public static void DocumentOpened(object sender, DocumentOpenedEventArgs args)
+        private static void DocumentOpened(object sender, DocumentOpenedEventArgs args)
         {
-            ColorTabs();
+            TabColouringRoutine();
         }
 
         /// <summary>
@@ -94,9 +103,9 @@ namespace geeWiz
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
         /// <returns>Void (nothing).</returns>
-        public static void ViewActivated(object sender, ViewActivatedEventArgs args)
+        private static void ViewActivated(object sender, ViewActivatedEventArgs args)
         {
-            ColorTabs();
+            TabColouringRoutine();
         }
 
         #endregion
@@ -107,21 +116,20 @@ namespace geeWiz
         /// Runs the tab recolouring routine.
         /// </summary>
         /// <returns>Void (nothing).</returns>
-        public static void ColorTabs()
+        public static void TabColouringRoutine()
         {
             // Get main window children document panes (view tabs)
-            var documentPanes = MainWindow
-                .getMainWnd()
+            IEnumerable<LayoutDocumentPaneControl> documentPanes = MainWindow.getMainWnd()
                 .FindVisualChildren<LayoutDocumentPaneControl>();
 
             // For each document pane
             foreach (var pane in documentPanes)
             {
                 // Get the tabs of the document pane
-                var tabItems = pane.FindVisualChildren<TabItem>();
+                IEnumerable<TabItem> tabItems = pane.FindVisualChildren<TabItem>();
 
                 // For each tab
-                foreach (var tabItem in tabItems)
+                foreach (TabItem tabItem in tabItems)
                 {
                     // Get its title, extract the prefix
                     string tooltip = tabItem.ToolTip.ToString();

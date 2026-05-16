@@ -7,12 +7,11 @@ using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
 using gFil = geeWiz.Utilities.File_Utils;
 using gScr = geeWiz.Utilities.Script_Utils;
+using gRib = geeWiz.Utilities.Ribbon_Utils;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Settings
+namespace geeWiz.Commands.Cmds_Settings
 {
-    #region Cmd_Warden
-
     /// <summary>
     /// Toggles light and dark mode (Revit 2024+).
     /// </summary>
@@ -25,7 +24,7 @@ namespace geeWiz.Cmds_Settings
             string action = null;
             
             // Path 1 - Warden is active
-            if (Globals.WardenActive)
+            if (General.Warden.ACTIVE)
             {
                 // Message to user
                 var formResult = gFrm.Custom.Message(title: "Warden",
@@ -40,8 +39,8 @@ namespace geeWiz.Cmds_Settings
                 if (formResult.Affirmative)
                 {
                     // Deregister Warden
-                    Warden.DeRegister(Globals.UiCtlApp);
-                    Globals.WardenActive = false;
+                    General.Warden.DeRegister(Globals.UiCtlApp);
+                    General.Warden.ACTIVE = false;
                     action = "disabled";
                 }
             }
@@ -61,8 +60,8 @@ namespace geeWiz.Cmds_Settings
                 if (formResult.Affirmative)
                 {
                     // Register Warden
-                    Warden.Register(Globals.UiCtlApp);
-                    Globals.WardenActive = true;
+                    General.Warden.Register(Globals.UiCtlApp);
+                    General.Warden.ACTIVE = true;
                     action = "enabled";
                 }
             }
@@ -82,10 +81,6 @@ namespace geeWiz.Cmds_Settings
         }
     }
 
-    #endregion
-
-    #region Cmd_ColourTabs
-
     /// <summary>
     /// Toggles tab colouring (off by default).
     /// </summary>
@@ -95,13 +90,13 @@ namespace geeWiz.Cmds_Settings
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the PushButton on the PulldownButton
-            var ribbonPanel1 = Globals.UiCtlApp.Ext_GetRibbonPanelByName(geeWiz.Application.PANEL1_NAME);
-            var pulldownSettings = ribbonPanel1.Ext_GetPulldownButtonByName("Settings");
-            var pushButton = pulldownSettings.Ext_GetPushButtonByText("Coloured Tabs");
+            RibbonPanel ribbonPanel1 = Globals.UiCtlApp.Ext_GetRibbonPanelByName(geeWiz.Application.PANEL1_NAME);
+            PulldownButton pulldownSettings = ribbonPanel1.Ext_GetPulldownButtonByName("Settings");
+            PushButton pushButton = pulldownSettings.Ext_GetPushButtonByText("Coloured Tabs");
             string action = null;
 
             // Toggle off pathway
-            if (Globals.ColouringTabs)
+            if (General.ColouredTabs.ACTIVE)
             {
                 // Message to user
                 var formResult = gFrm.Custom.Message(title: "Tab colouring",
@@ -114,8 +109,7 @@ namespace geeWiz.Cmds_Settings
                 if (formResult.Affirmative)
                 {
                     // Deregister coloring of tabs
-                    ColouredTabs.DeRegister();
-                    Globals.ColouringTabs = false;
+                    General.ColouredTabs.DeRegister();
                     action = "disabled";
 
                     // Set the icons
@@ -138,8 +132,7 @@ namespace geeWiz.Cmds_Settings
                 if (formResult.Affirmative)
                 {
                     // Register colouring of tabs
-                    ColouredTabs.Register();
-                    Globals.ColouringTabs = true;
+                    General.ColouredTabs.Register();
                     action = "enabled";
 
                     // Set the icons
@@ -147,7 +140,7 @@ namespace geeWiz.Cmds_Settings
                     pushButton.LargeImage = gFil.GetImageSource("Settings_ColourTabs", resolution: 32, suffix: "_On");
 
                     // Run the tab colouring routine
-                    ColouredTabs.ColorTabs();
+                    General.ColouredTabs.TabColouringRoutine();
                 }
             }
 
@@ -167,10 +160,6 @@ namespace geeWiz.Cmds_Settings
         }
     }
 
-    #endregion
-
-    #region Cmd_UiToggle
-
     /// <summary>
     /// Toggles light and dark mode (Revit 2024+).
     /// </summary>
@@ -179,17 +168,18 @@ namespace geeWiz.Cmds_Settings
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            #if REVIT2024_OR_GREATER
-
+#if REVIT2020 || REVIT2021 || REVIT2023
+return Result.Failed;
+#else
             // Get the button name and icon suffix
-            string oldButtonName = Globals.IsDarkMode ? "Light mode" : "Dark mode";
-            string newButtonName = Globals.IsDarkMode ? "Dark mode" : "Light mode";
-            string iconSuffix = Globals.IsDarkMode ? "_Dark" : "";
+            string oldButtonName = gRib.DARKMODE ? "Light mode" : "Dark mode";
+            string newButtonName = gRib.DARKMODE ? "Dark mode" : "Light mode";
+            string iconSuffix = gRib.DARKMODE ? "_Dark" : "";
 
             // Get the PushButton on the PulldownButton
-            var ribbonPanel1 = Globals.UiCtlApp.Ext_GetRibbonPanelByName("General");
-            var pulldownSettings = ribbonPanel1.Ext_GetPulldownButtonByName("Settings");
-            var pushButton = pulldownSettings.Ext_GetPushButtonByText(oldButtonName);
+            RibbonPanel ribbonPanel1 = Globals.UiCtlApp.Ext_GetRibbonPanelByName("General");
+            PulldownButton pulldownSettings = ribbonPanel1.Ext_GetPulldownButtonByName("Settings");
+            PushButton pushButton = pulldownSettings.Ext_GetPushButtonByText(oldButtonName);
 
             // Set the new button properties
             pushButton.ItemText = newButtonName;
@@ -197,22 +187,16 @@ namespace geeWiz.Cmds_Settings
             pushButton.LargeImage = gFil.GetImageSource("Settings_UiToggle", resolution: 32, suffix: iconSuffix);
 
             // Switch the UITheme and canvas theme (always light)
-            UIThemeManager.CurrentTheme = Globals.IsDarkMode ? UITheme.Light : UITheme.Dark;
+            UIThemeManager.CurrentTheme = gRib.DARKMODE ? UITheme.Light : UITheme.Dark;
             UIThemeManager.CurrentCanvasTheme = gScr.KeyHeldShift() ? UITheme.Dark : UITheme.Light;
-            Globals.IsDarkMode = !Globals.IsDarkMode;
+            gRib.DARKMODE = !gRib.DARKMODE;
 
             // Return message to user
             return gFrm.Custom.BubbleMessage(title: "Task completed",
                 message: $"Revit theme set to {oldButtonName}.\n\nClick me to see how this works!",
                 linkPath: @"https://github.com/aussieBIMguru/geeWiz/blob/main/geeWiz/Commands/General/Cmds_Settings.cs#L171");
 
-            #else
-
-            return Result.Failed;
-
             #endif
         }
     }
-
-    #endregion
 }

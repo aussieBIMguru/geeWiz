@@ -8,6 +8,8 @@
 		<ImplicitUsings>true</ImplicitUsings>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<PlatformTarget>x64</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
 
 		<!-- Debug/Release configurations per Revit version -->
 		<Configurations>
@@ -114,9 +116,16 @@
 
 	<!-- Third party package references -->
 	<ItemGroup>
-		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
 		<PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<PackageReference Include="ClosedXML" Version="0.100.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' != 'net48'">
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
 	</ItemGroup>
 
 	<!-- Resourcr management -->
@@ -130,6 +139,10 @@
 		<EmbeddedResource Include="Resources\Icons16\*.ico" />
 		<EmbeddedResource Include="Resources\Icons16\*.png" />
 		<EmbeddedResource Include="Resources\Icons32\*.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Commands\Cmds_Workset.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

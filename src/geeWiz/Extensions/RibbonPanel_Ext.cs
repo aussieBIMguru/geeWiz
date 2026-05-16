@@ -37,7 +37,7 @@ namespace geeWiz.Extensions
             }
 
             // Make pushbuttondata
-            var pushButtonData = gRib.NewPushButtonData<CommandClass>(buttonName);
+            PushButtonData pushButtonData = gRib.NewPushButtonData<CommandClass>(buttonName);
 
             // Make pushbutton, add to panel
             if (ribbonPanel.AddItem(pushButtonData) is PushButton pushButton)
@@ -81,7 +81,7 @@ namespace geeWiz.Extensions
             }
 
             // Make pulldownButtonData
-            var pulldownButtonData = gRib.NewPulldownButtonData(buttonName, nameSpace);
+            PulldownButtonData pulldownButtonData = gRib.NewPulldownButtonData(buttonName, nameSpace);
 
             // Make pulldown, add to panel
             if (ribbonPanel.AddItem(pulldownButtonData) is PulldownButton pulldownButton)

@@ -1,16 +1,14 @@
 ﻿// Revit API
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 // geeWiz
 using geeWiz.Extensions;
 using gFrm = geeWiz.Forms;
 
 // The class belongs to the Commands namespace
-namespace geeWiz.Cmds_Workset
-{
-    #region Cmd_Create
-
+namespace geeWiz.Commands.Cmds_Workset
+{ 
     /// <summary>
     /// Creates worksets from a predefined list.
     /// </summary>
@@ -33,16 +31,14 @@ namespace geeWiz.Cmds_Workset
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
-            var uiApp = commandData.Application;
-            var uiDoc = uiApp.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            UIApplication uiApp = commandData.Application;
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+            Document doc = uiDoc.Document;
 
             // Collect worksets and names
-            var worksets = doc.Ext_GetWorksets();
-            var worksetNames = worksets.Select(w => w.Name).ToList();
-
-            // Get unused workset names
-            var unusedNames = names.Where(n => !worksetNames.Contains(n)).ToList();
+            List<Workset> worksets = doc.Ext_GetWorksets();
+            List<string> worksetNames = worksets.Select(w => w.Name).ToList();
+            List<string> unusedNames = names.Where(n => !worksetNames.Contains(n)).ToList();
 
             // Cancel if no names
             if (unusedNames.Count == 0)
@@ -51,11 +47,11 @@ namespace geeWiz.Cmds_Workset
             }
 
             // Choose which worksets to create
-            var formResult = gFrm.Custom.SelectFromList<string>(keys: names,
-                values: names,
+            var formResult = gFrm.Custom.SelectFromList<string>(keys: unusedNames,
+                values: unusedNames,
                 title: "Select worksets to create");
             if (formResult.Cancelled) { return Result.Cancelled; }
-            var chosenNames = formResult.Objects;
+            List<string> chosenNames = formResult.Objects;
 
             // If default grids name exists, offer to rename
             if (worksetNames.Contains("Shared Levels and Grids"))
@@ -71,7 +67,7 @@ namespace geeWiz.Cmds_Workset
                 {
                     // Get the workset
                     int ind = worksetNames.IndexOf("Shared Levels and Grids");
-                    var gridsWorkset = worksets[ind];
+                    Workset gridsWorkset = worksets[ind];
 
                     // If editable
                     if (gridsWorkset.IsEditable)
@@ -99,38 +95,29 @@ namespace geeWiz.Cmds_Workset
             }
 
             // Progress bar properties
-            int pbTotal = chosenNames.Count;
-            int pbStep = gFrm.Utilities.ProgressDelay(pbTotal);
+            var pb = new gFrm.ProgressCoordinator(total: chosenNames.Count, taskName: "Creating worksets");
 
-            // Using a progress bar
-            using (var pb = new gFrm.Bases.ProgressBar(taskName: "Creating worksets...", pbTotal: pbTotal))
+            // Using a transaction
+            using (var t = new Transaction(doc, "geeWiz: Create worksets"))
             {
-                // Using a transaction
-                using (var t = new Transaction(doc, "geeWiz: Create worksets"))
+                // Start the transaction
+                t.Start();
+
+                // For each workset name
+                foreach (var name in chosenNames)
                 {
-                    // Start the transaction
-                    t.Start();
-
-                    // For each workset name
-                    foreach (var name in chosenNames)
+                    // Check for cancellation
+                    if (pb.CancelCheckOrUpdate(t: t))
                     {
-                        // Check for cancellation
-                        if (pb.CancelCheck(t))
-                        {
-                            return Result.Cancelled;
-                        }
-
-                        // Create the workset
-                        Workset.Create(doc, name);
-
-                        // Increase progress
-                        Thread.Sleep(pbStep);
-                        pb.Increment();
+                        return Result.Cancelled;
                     }
 
-                    // Commit the transaction
-                    pb.Commit(t);
+                    // Create the workset
+                    Workset.Create(doc, name);
                 }
+
+                // Commit the transaction
+                pb.Commit(t: t);
             }
 
             // Final message to user
@@ -138,6 +125,4 @@ namespace geeWiz.Cmds_Workset
                 message: $"{chosenNames.Count} worksets created.");
         }
     }
-
-    #endregion
 }

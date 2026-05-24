@@ -123,6 +123,7 @@ namespace geeWiz.Extensions
         /// </summary>
         /// <param name="room">A Room (extended).</param>
         /// <param name="options">Options to use (optional).</param>
+        /// <param name="doc">The related Document.</param>
         /// <returns>A Solid.</returns>
         public static Solid Ext_GetRoomSolid(this Room room, SpatialElementBoundaryOptions options = null, Document doc = null)
         {

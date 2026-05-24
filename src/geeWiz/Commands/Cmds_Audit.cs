@@ -12,11 +12,19 @@ using gWsh = geeWiz.Utilities.Workshare_Utils;
 namespace geeWiz.Commands.Cmds_Audit
 {
     /// <summary>
-    /// Deletes an Fill/Line Patterns beginning with the word IMPORT.
+    /// A Revit command ran from the ribbon.
+    /// Delete PatternElements from a list.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_DeletePatterns : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -48,11 +56,19 @@ namespace geeWiz.Commands.Cmds_Audit
     }
 
     /// <summary>
-    /// Purges unplaced rooms based on user selection.
+    /// A Revit command ran from the ribbon.
+    /// Purges unplaced rooms from a list.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_PurgeRooms : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -90,11 +106,19 @@ namespace geeWiz.Commands.Cmds_Audit
     }
 
     /// <summary>
-    /// Purges unused View Templates from the model.
+    /// A Revit command ran from the ribbon.
+    /// Purges unused View Templates from a list.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_PurgeTemplates : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -141,11 +165,19 @@ namespace geeWiz.Commands.Cmds_Audit
     }
 
     /// <summary>
-    /// Purges unused View Templates from the model.
+    /// A Revit command ran from the ribbon.
+    /// Purges unused View Filters from a list.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_PurgeFilters : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document

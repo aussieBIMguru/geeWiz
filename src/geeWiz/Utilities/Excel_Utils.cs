@@ -5,15 +5,13 @@ using Autodesk.Revit.UI;
 // geeWiz
 using gFrm = geeWiz.Forms;
 using gFil = geeWiz.Utilities.File_Utils;
-// ClosedXML
-using ClosedXML.Excel;
 
 // The class belongs to the utility namespace
 // using gXcl = geeWiz.Utilities.Excel_Utils
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to Excel based operations.
+    /// Static methods container related to Excel.
     /// </summary>
     public static class Excel_Utils
     {
@@ -44,10 +42,10 @@ namespace geeWiz.Utilities
             if (worksheetName is not null)
             {
                 // Get workbook
-                XLWorkbook xclWorkbook = GetWorkbook(filePath);
+                ClosedXML.Excel.XLWorkbook xclWorkbook = GetWorkbook(filePath);
 
                 // Get the worksheet, report an error if we could not
-                if (GetWorkSheet(xclWorkbook, worksheetName) is IXLWorksheet)
+                if (GetWorkSheet(xclWorkbook, worksheetName) is ClosedXML.Excel.IXLWorksheet)
                 {
                     return gFrm.Custom.Cancelled($"Worksheet '{worksheetName}' not be found in workbook.");
                 }
@@ -66,12 +64,12 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="filePath">The filepath of the Excel file.</param>
         /// <returns>A ClosedXML workbook object (null if not found).</returns>
-        public static XLWorkbook GetWorkbook(string filePath)
+        public static ClosedXML.Excel.XLWorkbook GetWorkbook(string filePath)
         {
             // Try to open the workbook
             try
             {
-                return new XLWorkbook(filePath);
+                return new ClosedXML.Excel.XLWorkbook(filePath);
             }
             catch
             {
@@ -84,18 +82,18 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="filePath">The filepath of the Excel file.</param>
         /// <returns>A ClosedXML workbook object.</returns>
-        public static XLWorkbook CreateWorkbook(string filePath)
+        public static ClosedXML.Excel.XLWorkbook CreateWorkbook(string filePath)
         {
             // Check if the file exists
             if (File.Exists(filePath))
             {
                 // If it does, return the workbook
-                return new XLWorkbook(filePath);
+                return new ClosedXML.Excel.XLWorkbook(filePath);
             }
             else
             {
                 // Otherwise, create a new workbok object (unsaved)
-                return new XLWorkbook();
+                return new ClosedXML.Excel.XLWorkbook();
             }
         }
 
@@ -110,7 +108,8 @@ namespace geeWiz.Utilities
         /// <param name="worksheetName">A worksheet name to find.</param>
         /// <param name="getFirstOtherwise">Return first worksheet if not found.</param>
         /// <returns>An IXLWorksheet object.</returns>
-        public static IXLWorksheet GetWorkSheet(XLWorkbook workbook, string worksheetName, bool getFirstOtherwise = false)
+        public static ClosedXML.Excel.IXLWorksheet GetWorkSheet(ClosedXML.Excel.XLWorkbook workbook,
+            string worksheetName, bool getFirstOtherwise = false)
         {
             // Null check for workbook
             if (workbook is null) { return null; }
@@ -141,13 +140,13 @@ namespace geeWiz.Utilities
         /// <param name="workbook">A closedXML workbook object.</param>
         /// <param name="worksheetName">A worksheet name to find.</param>
         /// <returns>An IXLWorksheet object.</returns>
-        public static IXLWorksheet AddWorksheet(XLWorkbook workbook, string worksheetName)
+        public static ClosedXML.Excel.IXLWorksheet AddWorksheet(ClosedXML.Excel.XLWorkbook workbook, string worksheetName)
         {
             // Catch if workbook is null
             if (workbook is null) { return null; }
             
             // Try to get the worksheet
-            if (GetWorkSheet(workbook, worksheetName) is IXLWorksheet worksheet)
+            if (GetWorkSheet(workbook, worksheetName) is ClosedXML.Excel.IXLWorksheet worksheet)
             {
                 return worksheet;
             }
@@ -170,7 +169,7 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="workbook">A closedXML workbook object.</param>
         /// <returns>A list of Strings.</returns>
-        public static List<string> GetWorksheetNames(XLWorkbook workbook)
+        public static List<string> GetWorksheetNames(ClosedXML.Excel.XLWorkbook workbook)
         {
             // Default list to add names to
             var names = new List<string>();
@@ -195,7 +194,7 @@ namespace geeWiz.Utilities
         /// <param name="readRows">Number of rows to read (entire range if left as 0).</param>
         /// <param name="readCols">Number of columns to read (entire range if left as 0).</param>
         /// <returns>A list of list of strings.</returns>
-        public static List<List<string>> ReadFromWorksheet(IXLWorksheet worksheet, int readRows = 0, int readCols = 0)
+        public static List<List<string>> ReadFromWorksheet(ClosedXML.Excel.IXLWorksheet worksheet, int readRows = 0, int readCols = 0)
         {
             // Matrix to construct
             var matrix = new List<List<string>>();
@@ -204,7 +203,7 @@ namespace geeWiz.Utilities
             if (worksheet is null) { return matrix; }
 
             // Get range used, ensure we aren't reading more than what is available
-            IXLRange rangeUsed = worksheet.RangeUsed();
+            ClosedXML.Excel.IXLRange rangeUsed = worksheet.RangeUsed();
             if (rangeUsed.RowCount() <= readRows) { readRows = 0; }
             if (rangeUsed.ColumnCount() <= readCols) { readCols = 0; }
 
@@ -212,7 +211,7 @@ namespace geeWiz.Utilities
             int rowsRead = 0;
 
             // For each row
-            foreach (IXLRangeRow row in rangeUsed.RowsUsed())
+            foreach (ClosedXML.Excel.IXLRangeRow row in rangeUsed.RowsUsed())
             {
                 var dataList = new List<string>();
                 
@@ -223,7 +222,7 @@ namespace geeWiz.Utilities
                     int colsRead = 0;
 
                     // For each cell in the row
-                    foreach (IXLCell cell in row.Cells())
+                    foreach (ClosedXML.Excel.IXLCell cell in row.Cells())
                     {
                         // If we can still read, or if read all
                         if (colsRead < readCols || readCols == 0)
@@ -255,8 +254,7 @@ namespace geeWiz.Utilities
         /// <param name="matrix">A matrix of strings.</param>
         /// <param name="startRow">Begin at row (starts from 1).</param>
         /// <param name="startCol">Begin at column (starts from 1).</param>
-        /// <returns>Void (nothing).</returns>
-        public static void WriteToWorksheet(IXLWorksheet worksheet, List<List<string>> matrix, int startRow = 1, int startCol = 1)
+        public static void WriteToWorksheet(ClosedXML.Excel.IXLWorksheet worksheet, List<List<string>> matrix, int startRow = 1, int startCol = 1)
         {
             // Catch null worksheet
             if (worksheet is null) { return; }

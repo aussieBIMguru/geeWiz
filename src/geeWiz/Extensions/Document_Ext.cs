@@ -274,6 +274,7 @@ namespace geeWiz.Extensions
         /// <summary>
         /// Collects all elements of a given class.
         /// </summary>
+        /// <typeparam name="T">The class to collect.</typeparam>
         /// <param name="doc">A Revit document (extended).</param>
         /// <param name="view">A Revit view.</param>
         /// <returns>A list of elements of type T.</returns>

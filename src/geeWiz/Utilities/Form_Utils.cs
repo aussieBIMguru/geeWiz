@@ -10,11 +10,13 @@ using Window = System.Windows.Window;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Controller for modeless windows, to be handled by the class.
+    /// This class handles modeless windows.
     /// </summary>
     public static class WindowController
     {
-        // Property - list of windows the controller handles
+        /// <summary>
+        /// The windows handles by the controller.
+        /// </summary>
         private static readonly List<Window> ControlledWindows = new();
 
         /// <summary>
@@ -91,8 +93,7 @@ namespace geeWiz.Utilities
         /// Opens a window and registers it to the controller.
         /// </summary>
         /// <param name="window">The window to show.</param>
-        /// <param name="handle">The window handle pointer (obsolete).</param> 
-        public static void ShowWindow(Window window, IntPtr handle = default)
+        public static void ShowWindow(Window window)
         {
             // Register the window if it isn't controlled yet
             RegisterWindow(window);
@@ -168,10 +169,75 @@ namespace geeWiz.Utilities
     }
 
     /// <summary>
-    /// Methods of this class generally relate to Mvvm based operations.
+    /// Static methods container related to Forms.
     /// </summary>
-    public static class Mvvm_Utils
+    public static class Form_Utils
     {
-        // Nothing yet, just a place for WindowController to live
+        /// <summary>
+        /// Sets the selection behavior of a listbox in Wpf.
+        /// </summary>
+        /// <param name="multiSelect">If we want multiselection behavior.</param>
+        /// <param name="listBox">The related listbox.</param>
+        /// <param name="checkAllButton">Optional button for check all.</param>
+        /// <param name="uncheckAllButton">Optional button for uncheck all.</param>
+        /// <returns>The name of the item template to use.</returns>
+        public static string Wpf_SetListBoxMode(bool multiSelect, System.Windows.Controls.ListBox listBox,
+            System.Windows.Controls.Button checkAllButton = null, System.Windows.Controls.Button uncheckAllButton = null)
+        {
+            // Set state of check all buttons (single select = off)
+            checkAllButton?.IsEnabled = multiSelect;
+            uncheckAllButton?.IsEnabled = multiSelect;
+
+            // Return resource and set the behavior of the listbox
+            if (multiSelect)
+            {
+                listBox.SelectionMode = System.Windows.Controls.SelectionMode.Extended;
+                return "DataTemplate_MultiSelect";
+            }
+            else
+            {
+                listBox.SelectionMode = System.Windows.Controls.SelectionMode.Single;
+                return "DataTemplate_SingleSelect";
+            }
+        }
+
+        /// <summary>
+        /// Runs a shift click process on a listbox.
+        /// </summary>
+        /// <typeparam name="T">The type of object bound to the checkbox.</typeparam>
+        /// <param name="sender">The </param>
+        /// <param name="multiSelect"></param>
+        /// <param name="listBox"></param>
+        public static void Wpf_ShiftClickProcess<T>(object sender, bool multiSelect, System.Windows.Controls.ListBox listBox)
+        {
+            // Stop here if we are single selecting
+            if (!multiSelect) { return; }
+
+            // Ensure a valid check box sent the event
+            if (sender is not System.Windows.Controls.CheckBox cb) { return; }
+            if (cb.DataContext is not KeyedValue<T> clickedItem) { return; }
+
+            // State to assign to other selected objects
+            bool newState = cb.IsChecked == true;
+
+            // Switch to checkbox if it was not selected
+            if (!listBox.SelectedItems.Contains(clickedItem))
+            {
+                listBox.SelectedItems.Clear();
+                listBox.SelectedItem = clickedItem;
+            }
+
+            // Apply the state to all selected items
+            foreach (var obj in listBox.SelectedItems)
+            {
+                if (obj is KeyedValue<T> t)
+                {
+                    t.Checked = newState;
+                }
+            }
+
+            // Force UI to refresh all item states
+            listBox.Items.Refresh();
+        }
     }
 }

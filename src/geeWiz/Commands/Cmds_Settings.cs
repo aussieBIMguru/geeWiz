@@ -13,11 +13,19 @@ using gRib = geeWiz.Utilities.Ribbon_Utils;
 namespace geeWiz.Commands.Cmds_Settings
 {
     /// <summary>
-    /// Toggles light and dark mode (Revit 2024+).
+    /// A Revit command ran from the ribbon.
+    /// Toggles the Warden system.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_Warden : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Action to report
@@ -82,11 +90,19 @@ namespace geeWiz.Commands.Cmds_Settings
     }
 
     /// <summary>
-    /// Toggles tab colouring (off by default).
+    /// A Revit command ran from the ribbon.
+    /// Toggles the tab colouring system.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_ColourTabs : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the PushButton on the PulldownButton
@@ -113,8 +129,8 @@ namespace geeWiz.Commands.Cmds_Settings
                     action = "disabled";
 
                     // Set the icons
-                    pushButton.Image = gFil.GetImageSource("Settings_ColourTabs", resolution: 16, suffix: "");
-                    pushButton.LargeImage = gFil.GetImageSource("Settings_ColourTabs", resolution: 32, suffix: "");
+                    pushButton.Image = gRib.GetImageSource("Settings_ColourTabs", resolution: 16, suffix: "");
+                    pushButton.LargeImage = gRib.GetImageSource("Settings_ColourTabs", resolution: 32, suffix: "");
                 }
             }
             // Toggle on pathway
@@ -136,8 +152,8 @@ namespace geeWiz.Commands.Cmds_Settings
                     action = "enabled";
 
                     // Set the icons
-                    pushButton.Image = gFil.GetImageSource("Settings_ColourTabs", resolution: 16, suffix: "_On");
-                    pushButton.LargeImage = gFil.GetImageSource("Settings_ColourTabs", resolution: 32, suffix: "_On");
+                    pushButton.Image = gRib.GetImageSource("Settings_ColourTabs", resolution: 16, suffix: "_On");
+                    pushButton.LargeImage = gRib.GetImageSource("Settings_ColourTabs", resolution: 32, suffix: "_On");
 
                     // Run the tab colouring routine
                     General.ColouredTabs.TabColouringRoutine();
@@ -161,11 +177,19 @@ namespace geeWiz.Commands.Cmds_Settings
     }
 
     /// <summary>
-    /// Toggles light and dark mode (Revit 2024+).
+    /// A Revit command ran from the ribbon.
+    /// Toggles dark mode.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_UiToggle : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 #if REVIT2020 || REVIT2021 || REVIT2023
@@ -183,8 +207,8 @@ return Result.Failed;
 
             // Set the new button properties
             pushButton.ItemText = newButtonName;
-            pushButton.Image = gFil.GetImageSource("Settings_UiToggle", resolution: 16, suffix: iconSuffix);
-            pushButton.LargeImage = gFil.GetImageSource("Settings_UiToggle", resolution: 32, suffix: iconSuffix);
+            pushButton.Image = gRib.GetImageSource("Settings_UiToggle", resolution: 16, suffix: iconSuffix);
+            pushButton.LargeImage = gRib.GetImageSource("Settings_UiToggle", resolution: 32, suffix: iconSuffix);
 
             // Switch the UITheme and canvas theme (always light)
             UIThemeManager.CurrentTheme = gRib.DARKMODE ? UITheme.Light : UITheme.Dark;

@@ -16,13 +16,15 @@ using Autodesk.Revit.ApplicationServices;
 namespace geeWiz.General
 {
     /// <summary>
-    /// Coloured tabs will colour opened view tabs by Document title.
+    /// This class manages the colouring of View tabs by Document.
     /// </summary>
-    public class ColouredTabs
+    public static class ColouredTabs
     {
         #region Constants
 
-        // A list of colours (will wrap around to start if needed)
+        /// <summary>
+        /// A default list of Colours to use for tab colouring.
+        /// </summary>
         private static readonly List<Brush> COLOURS = new List<Brush>()
         {
             new SolidColorBrush(Colors.Blue),
@@ -37,15 +39,29 @@ namespace geeWiz.General
             new SolidColorBrush(Colors.Teal)
         };
 
-        // Other private variables used in the class
+        /// <summary>
+        /// The Regex to detect a valid Document title.
+        /// </summary>
         private static readonly string REGEX_TITLE = @"^(.*?)(\.\w{3,5} - )";
+
+        /// <summary>
+        /// Invalid Documents will use this title.
+        /// </summary>
         private static readonly string ERROR_TITLE = "Error.xxx";
+
+        /// <summary>
+        /// The Colour to use for coloured tab text.
+        /// </summary>
         private static readonly Brush COLOUR_WHITE = new SolidColorBrush(Colors.White);
 
-        // List of unique document titles we will add to and index
+        /// <summary>
+        /// A list of Document titles involved in the tab colouring process.
+        /// </summary>
         private static List<string> DOC_TITLES = new List<string>();
 
-        // Are we currently colouring tabs
+        /// <summary>
+        /// If the system is activated.
+        /// </summary>
         public static bool ACTIVE = false;
 
         #endregion
@@ -53,9 +69,10 @@ namespace geeWiz.General
         #region Registration to events
 
         /// <summary>
-        /// Register the events to the document opened/activated events.
+        /// Registers the system to related Revit events.
         /// </summary>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="ctlApp">The ControlledApplication.</param>
+        /// <param name="uiApp">The UIApplication.</param>
         public static void Register(ControlledApplication ctlApp = null, UIApplication uiApp = null)
         {
             ctlApp ??= Globals.CtlApp;
@@ -68,9 +85,10 @@ namespace geeWiz.General
         }
 
         /// <summary>
-        /// De-register the events from the document opened/activated events.
+        /// Deregisters the system from related Revit events.
         /// </summary>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="ctlApp">The ControlledApplication.</param>
+        /// <param name="uiApp">The UIApplication.</param>
         public static void DeRegister(ControlledApplication ctlApp = null, UIApplication uiApp = null)
         {
             ctlApp ??= Globals.CtlApp;
@@ -87,22 +105,20 @@ namespace geeWiz.General
         #region Event triggered methods
 
         /// <summary>
-        /// Activated when a document is opened (if tabs are being coloured).
+        /// Runs the routine when a Document is opened.
         /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="args">Related event arguments.</param>
         private static void DocumentOpened(object sender, DocumentOpenedEventArgs args)
         {
             TabColouringRoutine();
         }
 
         /// <summary>
-        /// Activated when a view is activated (if tabs are being coloured).
+        /// Runs the routine when a View is activated.
         /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="args">Related event arguments.</param>
         private static void ViewActivated(object sender, ViewActivatedEventArgs args)
         {
             TabColouringRoutine();
@@ -113,9 +129,8 @@ namespace geeWiz.General
         #region Color tabs method
 
         /// <summary>
-        /// Runs the tab recolouring routine.
+        /// The core Tab colouring routine.
         /// </summary>
-        /// <returns>Void (nothing).</returns>
         public static void TabColouringRoutine()
         {
             // Get main window children document panes (view tabs)
@@ -171,7 +186,7 @@ namespace geeWiz.General
         /// Given a valid tooltip value, returns the document title.
         /// </summary>
         /// <param name="toolTip">A TabItem tooltip.</param>
-        /// <returns>A string.</returns>
+        /// <returns>A String.</returns>
         private static string TitleFromTooltip(string toolTip)
         {
             // Return error value if invalid

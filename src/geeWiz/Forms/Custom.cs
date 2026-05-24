@@ -13,15 +13,31 @@ using MsDialogs = Microsoft.WindowsAPICodePack.Dialogs;
 // using gFrm = geeWiz.Forms (+ .Custom)
 namespace geeWiz.Forms
 {
-    // These classes all form the front end selection forms in Revit
+    /// <summary>
+    /// Static wrapper methods for forms.
+    /// </summary>
     public static class Custom
     {
         #region File filter constants
 
-        // File filter constant values
+        /// <summary>
+        /// File filter string for tsv files.
+        /// </summary>
         public static string FILTER_TSV = "TSV Files (*.tsv)|*.tsv";
+
+        /// <summary>
+        /// File filter string for Excel files.
+        /// </summary>
         public static string FILTER_EXCEL = "Excel Files (*.xls;*.xlsx;*.xlsm)|*.xls;*.xlsx;*.xlsm";
+
+        /// <summary>
+        /// File filter string for Revit Family files.
+        /// </summary>
         public static string FILTER_RFA = "Family Files|*.rfa";
+
+        /// <summary>
+        /// File filter string for txt files.
+        /// </summary>
         public static string FILTER_TXT = "Text Files (*.txt)|*.txt";
 
         #endregion
@@ -489,7 +505,9 @@ namespace geeWiz.Forms
         #endregion
     }
 
-    // These classes provide alternative Wpf based form examples
+    /// <summary>
+    /// Static wrapper methods for Wpf forms.
+    /// </summary>
     public static class CustomWpf
     {
         #region SelectFromList
@@ -551,96 +569,35 @@ namespace geeWiz.Forms
         #endregion
     }
 
-    // These classes provide form utility
-    public static class Utilities
-    {
-        #region Wpf utilities
-
-        /// <summary>
-        /// Sets the selection behavior of a listbox in Wpf.
-        /// </summary>
-        /// <param name="multiSelect">If we want multiselection behavior.</param>
-        /// <param name="listBox">The related listbox.</param>
-        /// <param name="checkAllButton">Optional button for check all.</param>
-        /// <param name="uncheckAllButton">Optional button for uncheck all.</param>
-        /// <returns>The name of the item template to use.</returns>
-        public static string Wpf_SetListBoxMode(bool multiSelect, System.Windows.Controls.ListBox listBox,
-            System.Windows.Controls.Button checkAllButton = null, System.Windows.Controls.Button uncheckAllButton = null)
-        {
-            // Set state of check all buttons (single select = off)
-            checkAllButton?.IsEnabled = multiSelect;
-            uncheckAllButton?.IsEnabled = multiSelect;
-
-            // Return resource and set the behavior of the listbox
-            if (multiSelect)
-            {
-                listBox.SelectionMode = System.Windows.Controls.SelectionMode.Extended;
-                return "DataTemplate_MultiSelect";
-            }
-            else
-            {
-                listBox.SelectionMode = System.Windows.Controls.SelectionMode.Single;
-                return "DataTemplate_SingleSelect";
-            }
-        }
-
-        /// <summary>
-        /// Runs a shift click process on a listbox.
-        /// </summary>
-        /// <typeparam name="T">The type of object bound to the checkbox.</typeparam>
-        /// <param name="sender">The </param>
-        /// <param name="multiSelect"></param>
-        /// <param name="listBox"></param>
-        public static void Wpf_ShiftClickProcess<T>(object sender, bool multiSelect, System.Windows.Controls.ListBox listBox)
-        {
-            // Stop here if we are single selecting
-            if (!multiSelect) { return; }
-
-            // Ensure a valid check box sent the event
-            if (sender is not System.Windows.Controls.CheckBox cb) { return; }
-            if (cb.DataContext is not gDat.KeyedValue<T> clickedItem) { return; }
-
-            // State to assign to other selected objects
-            bool newState = cb.IsChecked == true;
-
-            // Switch to checkbox if it was not selected
-            if (!listBox.SelectedItems.Contains(clickedItem))
-            {
-                listBox.SelectedItems.Clear();
-                listBox.SelectedItem = clickedItem;
-            }
-
-            // Apply the state to all selected items
-            foreach (var obj in listBox.SelectedItems)
-            {
-                if (obj is gDat.KeyedValue<T> t)
-                {
-                    t.Checked = newState;
-                }
-            }
-
-            // Force UI to refresh all item states
-            listBox.Items.Refresh();
-        }
-
-        #endregion
-    }
-
-    #region FormResult class
-
     /// <summary>
     /// A class for holding form outcomes, used by custom forms.
     /// </summary>
     /// <typeparam name="T">The type of object being stored.</typeparam>
     public class FormResult<T>
     {
-        // These properties hold the resulting object or objects from the form
+        /// <summary>
+        /// Returned objects from the form.
+        /// </summary>
         public List<T> Objects { get; set; }
+        
+        /// <summary>
+        /// Returned object from the form.
+        /// </summary>
         public T Object { get; set; }
 
-        // These properties allow us to verify the outcome of the form
+        /// <summary>
+        /// Was the form cancelled.
+        /// </summary>
         public bool Cancelled { get; set; }
+
+        /// <summary>
+        /// Was the outcome of the form valid.
+        /// </summary>
         public bool Valid { get; set; }
+
+        /// <summary>
+        /// Was the outcome of the form affirmative.
+        /// </summary>
         public bool Affirmative { get; set; }
 
         /// <summary>
@@ -691,6 +648,4 @@ namespace geeWiz.Forms
             this.Objects = objs;
         }
     }
-
-    #endregion
 }

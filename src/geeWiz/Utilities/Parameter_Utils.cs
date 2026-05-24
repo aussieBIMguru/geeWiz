@@ -13,11 +13,34 @@ namespace geeWiz.Utilities
     {
         #region Class Properties
 
+        /// <summary>
+        /// The related Element.
+        /// </summary>
         public Element Element { get; set; }
+
+        /// <summary>
+        /// The related Parameter.
+        /// </summary>
         public Parameter Parameter { get; set; }
+
+        /// <summary>
+        /// The related Parameter StorageType.
+        /// </summary>
         public StorageType StorageType { get; set; }
+
+        /// <summary>
+        /// The related UnitTypeId.
+        /// </summary>
         public ForgeTypeId UnitTypeId { get; set; }
+
+        /// <summary>
+        /// The related Value of the Parameter.
+        /// </summary>
         public DataConverter ParameterValue { get; set; }
+
+        /// <summary>
+        /// The related existing value of the Parameter.
+        /// </summary>
         public DataConverter StoredValue { get; set; }
 
         #endregion
@@ -25,10 +48,10 @@ namespace geeWiz.Utilities
         #region Constructor
 
         /// <summary>
-        /// Constructs a ParameterHelper object.
+        /// Default constructor.
         /// </summary>
-        /// <param name="element"></param>
-        /// <param name="parameterName"></param>
+        /// <param name="element">The related Element.</param>
+        /// <param name="parameterName">The Parameter name.</param>
         public ParameterHelper(Element element, string parameterName)
         {
             // Store the element
@@ -231,7 +254,7 @@ namespace geeWiz.Utilities
     }
 
     /// <summary>
-    /// Methods of this class generally relate to string based operations.
+    /// Static methods container related to Parameters.
     /// </summary>
     public static class Parameter_Utils
     {

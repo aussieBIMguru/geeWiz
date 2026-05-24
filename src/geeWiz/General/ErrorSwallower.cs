@@ -15,8 +15,14 @@ namespace geeWiz.General
     {
         #region Private variables
 
-        // Private variables for the class
+        /// <summary>
+        /// The related Failure Swallower.
+        /// </summary>
         private readonly FailureSwallower _failureSwallower;
+
+        /// <summary>
+        /// A flag if the object is disposed already.
+        /// </summary>
         private bool _disposed = false;
 
         #endregion
@@ -24,10 +30,9 @@ namespace geeWiz.General
         #region Constructor
 
         /// <summary>
-        /// Constructs an ErrorSwallower.
+        /// Constructs a new instance.
         /// </summary>
-        /// <param name="transaction">An optional transaction to add the swallower to.</param>
-        /// <returns>An ErrorSwallower object</returns>
+        /// <param name="transaction">The associated Transaction (optional).</param>
         public ErrorSwallower(Transaction transaction = null)
         {
             // Set the failure swallower variable
@@ -54,9 +59,8 @@ namespace geeWiz.General
         /// <summary>
         /// Called by the ProcessingFailures event in the FailureAccessor.
         /// </summary>
-        /// <param name="sender">The failure accessor.</param>
-        /// <param name="args">Related event arguments.</param>
-        /// <returns>Void (nothing)</returns>
+        /// <param name="sender">Event sender (Failure accessor).</param>
+        /// <param name="args">Event arguments.</param>
         private void OnFailureProcessing(object sender, FailuresProcessingEventArgs args)
         {
             // Try to process failures
@@ -82,18 +86,16 @@ namespace geeWiz.General
         #region Start and dispose
 
         /// <summary>
-        /// On creation, add to failure processing event.
+        /// Registers the FailureProcessing event.
         /// </summary>
-        /// <returns>Void (nothing)</returns>
         public void Start()
         {
             Globals.CtlApp.FailuresProcessing += OnFailureProcessing;
         }
 
         /// <summary>
-        /// Override to delay the finalizer.
+        /// On disposal, delays the finalizer.
         /// </summary>
-        /// <returns>Void (nothing)</returns>
         public void Dispose()
         {
             // Dispose the object
@@ -107,7 +109,6 @@ namespace geeWiz.General
         /// Disposes and unsubscribes from the event.
         /// </summary>
         /// <param name="disposing">If we should try to dispose.</param>
-        /// <returns>Void (nothing)</returns>
         protected virtual void Dispose(bool disposing)
         {
             // If we have not disposed yet...
@@ -126,7 +127,7 @@ namespace geeWiz.General
         }
 
         /// <summary>
-        /// Deconstructor to ensure disposal
+        /// Deconstructor to ensure final disposal.
         /// </summary>
         ~ErrorSwallower()
         {
@@ -138,13 +139,15 @@ namespace geeWiz.General
     }
 
     /// <summary>
-    /// This class deals with failures when provided to the preprocessor.
+    /// This class processes common bypassable errors/failures.
     /// </summary>
     public class FailureSwallower : IFailuresPreprocessor
     {
         #region Private variables
 
-        // Private variable for resolvable failures
+        /// <summary>
+        /// A list of common failures we can generally bypass.
+        /// </summary>
         private static readonly List<FailureResolutionType> RESOLUTIONS = new List<FailureResolutionType>()
         {
             FailureResolutionType.CreateElements,
@@ -163,7 +166,11 @@ namespace geeWiz.General
 
         #region PreprocessFailures
 
-        // Interface method for processing failures
+        /// <summary>
+        /// Process failures (provided via the interface).
+        /// </summary>
+        /// <param name="failureAccessor">The related FailureAccessor.</param>
+        /// <returns>A FailureProcessingResult.</returns>
         public FailureProcessingResult PreprocessFailures(FailuresAccessor failureAccessor)
         {
             // Get severity, no commit by default

@@ -19,11 +19,19 @@ using ClosedXML.Excel;
 namespace geeWiz.Commands.Cmds_Export
 {
     /// <summary>
-    /// Exports active schedule to Excel.
+    /// A Revit command ran from the ribbon.
+    /// Exports a Revit schedule to Excel.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_Schedule : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -128,11 +136,19 @@ namespace geeWiz.Commands.Cmds_Export
     }
 
     /// <summary>
-    /// Exports sheets to Pdf.
+    /// A Revit command ran from the ribbon.
+    /// Exports selected Sheets to PDF.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_SheetsPdf : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -192,11 +208,19 @@ namespace geeWiz.Commands.Cmds_Export
     }
 
     /// <summary>
-    /// Exports sheets to Dwg.
+    /// A Revit command ran from the ribbon.
+    /// Exports selected Sheets to DWG.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_SheetsDwg : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document

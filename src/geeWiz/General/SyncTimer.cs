@@ -10,23 +10,25 @@ using gFrm = geeWiz.Forms;
 namespace geeWiz.General
 {
     /// <summary>
-    /// The sync timer informs the user of total sync times.
+    /// This class is used to track Synchronization times.
     /// </summary>
-    public class SyncTimer
+    public static class SyncTimer
     {
         #region Constants
 
-        // Sync time variable
+        /// <summary>
+        /// The time the last sync started at.
+        /// </summary>
         private static DateTime SYNC_START = default;
 
         #endregion
 
-        #region Registration
+        #region Registration to events
 
         /// <summary>
-        /// Registers the sync timer.
+        /// Registers the system to related Revit events.
         /// </summary>
-        /// <param name="ctlApp">The controlled application to subscribe to.</param>
+        /// <param name="ctlApp">The ControlledApplication.</param>
         public static void Register(ControlledApplication ctlApp = null)
         {
             ctlApp ??= Globals.CtlApp;
@@ -36,9 +38,9 @@ namespace geeWiz.General
         }
 
         /// <summary>
-        /// Deregisters the sync timer.
+        /// Deregisters the system from related Revit events.
         /// </summary>
-        /// <param name="ctlApp">The controlled application to unsubscribe from.</param>
+        /// <param name="ctlApp">The ControlledApplication.</param>
         public static void DeRegister(ControlledApplication ctlApp = null)
         {
             ctlApp ??= Globals.CtlApp;
@@ -55,7 +57,7 @@ namespace geeWiz.General
         /// Store the time when the sync begins.
         /// </summary>
         /// <param name="sender">Event sender.</param>
-        /// <param name="args">Event arguments.</param>
+        /// <param name="args">Related event arguments.</param>
         private static void DocumentSynchronizingWithCentral_SyncStart(object sender, DocumentSynchronizingWithCentralEventArgs args)
         {
             // This should always work, but to be safe we try - otherwise the sync will fail
@@ -73,7 +75,7 @@ namespace geeWiz.General
         /// Checks the sync time when the sync ends.
         /// </summary>
         /// <param name="sender">Event sender.</param>
-        /// <param name="args">Event arguments.</param>
+        /// <param name="args">Related event arguments.</param>
         private static void DocumentSynchronizedWithCentral_SyncEnds(object sender, DocumentSynchronizedWithCentralEventArgs args)
         {
             // Catch if sync start is invalid
@@ -130,7 +132,7 @@ namespace geeWiz.General
         /// Returns a rating for a given sync time.
         /// </summary>
         /// <param name="totalSeconds">The total sync seconds.</param>
-        /// <returns>A string.</returns>
+        /// <returns>A String.</returns>
         private static string RateSync(double totalSeconds)
         {
             return totalSeconds switch

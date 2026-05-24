@@ -20,11 +20,19 @@ using ClosedXML.Excel;
 namespace geeWiz.Commands.Cmds_Revision
 {
     /// <summary>
-    /// Adds or removes revisions from sheets.
+    /// A Revit command ran from the ribbon.
+    /// Adds or removes a Revision from Sheets.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_BulkRev : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -98,11 +106,19 @@ namespace geeWiz.Commands.Cmds_Revision
     }
 
     /// <summary>
-    /// Creates a sheet set with revised sheets.
+    /// A Revit command ran from the ribbon.
+    /// Creates a ViewSheetSet for all sheets with a selected Revision.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_RevSet : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -172,7 +188,7 @@ namespace geeWiz.Commands.Cmds_Revision
                 printManager.PrintRange = PrintRange.Select;
                 ViewSheetSetting viewSheetSetting = printManager.ViewSheetSetting;
 
-                /// Save the sheet set
+                // Save the sheet set
                 viewSheetSetting.CurrentViewSheetSet.Views = viewSet;
                 viewSheetSetting.SaveAs(sheetSetName);
 
@@ -187,11 +203,19 @@ namespace geeWiz.Commands.Cmds_Revision
     }
 
     /// <summary>
+    /// A Revit command ran from the ribbon.
     /// Creates a document transmittal.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_DocTrans : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document

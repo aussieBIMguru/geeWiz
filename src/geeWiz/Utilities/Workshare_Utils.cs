@@ -9,7 +9,29 @@ using geeWiz.Extensions;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to checking for editability.
+    /// Class to store and process editable element checks.
+    /// </summary>
+    /// <typeparam name="T">The type of object to process.</typeparam>
+    public class WorksharingResult<T>
+    {
+        /// <summary>
+        /// Editable elements.
+        /// </summary>
+        public List<T> Editable { get; set; }
+
+        /// <summary>
+        /// Non-editable elements.
+        /// </summary>
+        public List<T> NotEditable { get; set; }
+
+        /// <summary>
+        /// Was the routine cancelled.
+        /// </summary>
+        public bool Cancelled { get; set; }
+    }
+
+    /// <summary>
+    /// Static methods container related to Worksharing.
     /// </summary>
     public static class Workshare_Utils
     {
@@ -19,6 +41,7 @@ namespace geeWiz.Utilities
         /// Reviews multiple elements for editability, allowing for further processing.
         /// </summary>
         /// <param name="objects">Elements to process.</param>
+        /// <param name="doc">Related Document.</param>
         /// <typeparam name="T">The type of object to process.</typeparam>
         /// <returns>A WorksharingResult object.</returns>
         public static WorksharingResult<T> ProcessElements<T>(List<T> objects, Document doc = null)
@@ -91,19 +114,4 @@ namespace geeWiz.Utilities
 
         #endregion
     }
-
-    #region WorksharingResult class
-
-    /// <summary>
-    /// Class to store and process editable element checks.
-    /// </summary>
-    /// <typeparam name="T">The type of object to process.</typeparam>
-    public class WorksharingResult<T>
-    {
-        public List<T> Editable { get; set; }
-        public List<T> NotEditable { get; set; }
-        public bool Cancelled { get; set; }
-    }
-
-    #endregion
 }

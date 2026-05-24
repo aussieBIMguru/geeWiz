@@ -1,5 +1,6 @@
 ﻿// geeWiz
 using geeWiz.Extensions;
+using geeWiz.Utilities;
 using gDat = geeWiz.Utilities.Data_Utils;
 using gFil = geeWiz.Utilities.File_Utils;
 
@@ -17,10 +18,24 @@ namespace geeWiz.Forms.Bases
     {
         #region Class properties
 
-        // Properties belonging to the form
+        /// <summary>
+        /// If we can select multiple items.
+        /// </summary>
         private bool MultiSelect;
-        private List<gDat.KeyedValue<T>> FormPairs;
+
+        /// <summary>
+        /// The keyed values to show.
+        /// </summary>
+        private List<KeyedValue<T>> FormPairs;
+
+        /// <summary>
+        /// The current value of the text filter.
+        /// </summary>
         private string FilterString;
+
+        /// <summary>
+        /// Indices of visible items.
+        /// </summary>
         private List<int> VisibleIndices;
 
         #endregion
@@ -77,7 +92,6 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Load all items to be shown.
         /// </summary>
-        /// <returns>Void (nothing).</returns>
         private void LoadShownItems()
         {
             // Reset the ListView
@@ -105,9 +119,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when text filter changes.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void txtFilter_TextChanged(object sender, EventArgs e)
         {
             // Store the checked status
@@ -175,9 +188,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when check all button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnCheckAll_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView.Items)
@@ -194,9 +206,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when uncheck all button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnUncheckAll_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listView.Items)
@@ -213,9 +224,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when OK button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnSelect_Click(object sender, EventArgs e)
         {
             // Store the checked status
@@ -260,9 +270,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when cancel button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Close();

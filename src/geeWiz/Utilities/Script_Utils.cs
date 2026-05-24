@@ -11,7 +11,7 @@ using gFrm = geeWiz.Forms;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to script behavior and states.
+    /// Static methods container related to State and Script management.
     /// </summary>
     public static class Script_Utils
     {
@@ -22,7 +22,7 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="text">Text to send.</param>
         /// <param name="showMessage">Shows error messages (if any).</param>
-        /// <returns>A result.</returns>
+        /// <returns>A Result.</returns>
         [STAThread]
         public static Result ClipboardSend(string text, bool showMessage = true)
         {
@@ -40,7 +40,7 @@ namespace geeWiz.Utilities
                 {
                     gFrm.Custom.Cancelled("Clipboard could not be accessed.");
                 }
-                return Result.Failed;
+                return Result.Cancelled;
             }
         }
 
@@ -77,7 +77,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Verifies if the user is holding down the shift key.
         /// </summary>
-        /// <returns>A boolean.</returns>
+        /// <returns>A Boolean.</returns>
         public static bool KeyHeldShift()
         {
             return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
@@ -86,7 +86,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Verifies if the user is holding down the control key.
         /// </summary>
-        /// <returns>A boolean.</returns>
+        /// <returns>A Boolean.</returns>
         public static bool KeyHeldControl()
         {
             return Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
@@ -95,7 +95,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Verifies if the user is holding down the alt key.
         /// </summary>
-        /// <returns>A boolean.</returns>
+        /// <returns>A Boolean.</returns>
         public static bool KeyHeldAlt()
         {
             return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
@@ -188,7 +188,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Verifies if the user is the developer (change name as desired).
         /// </summary>
-        /// <returns>A boolean.</returns>
+        /// <returns>A Boolean.</returns>
         public static bool UserIsDeveloper()
         {
             return Globals.UsernameWindows.Equals("gavin.crump",
@@ -200,7 +200,7 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="uiApp">The UI Application.</param>
         /// <param name="commandName">The name of the command to post.</param>
-        /// <returns>A result.</returns>
+        /// <returns>A Result.</returns>
         public static Result PostCommand(string commandName, UIApplication uiApp = null)
         {
             uiApp ??= Globals.UiApp;
@@ -213,7 +213,7 @@ namespace geeWiz.Utilities
             }
             catch
             {
-                return Result.Failed;
+                return Result.Cancelled;
             }
         }
 

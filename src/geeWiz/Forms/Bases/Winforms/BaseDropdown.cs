@@ -13,9 +13,19 @@ namespace geeWiz.Forms.Bases
     {
         #region Class properties
 
-        // Properties belonging to the form
+        /// <summary>
+        /// Keys to show in the list.
+        /// </summary>
         private List<string> keys;
+
+        /// <summary>
+        /// Values aligned to keys.
+        /// </summary>
         private List<T> values;
+
+        /// <summary>
+        /// Default index to select.
+        /// </summary>
         private int defaultIndex;
 
         #endregion
@@ -100,9 +110,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when OK button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnSelect_Click(object sender, EventArgs e)
         {
             // Process the outcomes
@@ -127,9 +136,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when cancel button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Close();

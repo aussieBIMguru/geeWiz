@@ -8,15 +8,30 @@ using ProgressBar = System.Windows.Controls.ProgressBar;
 namespace geeWiz.Forms.Mvvm.Views
 {
     /// <summary>
-    /// Manages the Mvvm model.
+    /// The View of the MVC Progress Bar system.
     /// </summary>
     public partial class ViewProgress : Window
     {
         #region Properties
 
+        /// <summary>
+        /// The message to show on cancellation.
+        /// </summary>
         public string CancelMessage { get; set; }
+
+        /// <summary>
+        /// The name of the related task.
+        /// </summary>
         public string TaskName { get; set; }
+
+        /// <summary>
+        /// Has the form been cancelled by the user.
+        /// </summary>
         public bool CancelledByUser { get; set; }
+
+        /// <summary>
+        /// Function to run when finished.
+        /// </summary>
         public Func<bool> FunctionIfCompleted { get; set; }
 
         #endregion
@@ -41,8 +56,8 @@ namespace geeWiz.Forms.Mvvm.Views
         /// <summary>
         /// Executes when the form loads.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             // AI Written - removes the close button in principle
@@ -56,7 +71,7 @@ namespace geeWiz.Forms.Mvvm.Views
         #region Constructor
 
         /// <summary>
-        /// Form constructor.
+        /// Default constructor.
         /// </summary>
         /// <param name="viewModel">ViewModel to relate to the view.</param>
         /// <param name="total">Total steps to take.</param>
@@ -116,8 +131,9 @@ namespace geeWiz.Forms.Mvvm.Views
         }
 
         /// <summary>
-        /// Runs when form is closed to tell the model we closed also.
+        /// Cancel the progress bar.
         /// </summary>
+        /// <param name="cancelledByUser">Was the cancellation by the user.</param>
         public void Cancel(bool cancelledByUser = false)
         {
             // If the model is valid (nearly always should be)...
@@ -131,7 +147,7 @@ namespace geeWiz.Forms.Mvvm.Views
         /// <summary>
         /// Run an action on the View thread safely.
         /// </summary>
-        /// <param name="action"></param>
+        /// <param name="action">Action to undertake on the thread.</param>
         public void ThreadSafeAction(Action action)
         {
             // Null check

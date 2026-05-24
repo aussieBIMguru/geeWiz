@@ -12,7 +12,9 @@ namespace geeWiz.Forms.Bases
     {
         #region Class properties
 
-        // Properties belonging to the form
+        /// <summary>
+        /// If the form only accepts numbers.
+        /// </summary>
         private bool numberOnly;
 
         #endregion
@@ -50,9 +52,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when OK button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnSelect_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.OK;
@@ -67,9 +68,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when Cancel button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Tag = null;
@@ -83,9 +83,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when a character would be entered into the textbox.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             // If we are numbers only, and the character isn't numerically valid
@@ -103,7 +102,7 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Return it a character is numerically acceptable.
         /// </summary>
-        /// <param name="keyChar"">The entered key.</param>
+        /// <param name="keyChar">The entered key.</param>
         /// <returns>A boolean.</returns>
         private bool CharIsNumericallyValid(char keyChar)
         {

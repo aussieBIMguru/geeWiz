@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 using View = Autodesk.Revit.DB.View;
 
-// The class belongs to the root namespace
+// The class belongs to the ISelectionFilters (ISF) namespace
 namespace geeWiz.ISF
 {
     /// <summary>
@@ -11,16 +11,25 @@ namespace geeWiz.ISF
     /// </summary>
     public class ByBuiltInCategory : ISelectionFilter
     {
-        // Private variable to store and give access to Id
+        /// <summary>
+        /// The BuiltInCategory Id to filter by.
+        /// </summary>
         private ElementId _builtinCategoryId;
 
-        // Default constructor, internalize the builtin category
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="builtInCategory">The BuiltInCategory to filter by.</param>
         public ByBuiltInCategory(BuiltInCategory builtInCategory)
         {
             this._builtinCategoryId = new ElementId(builtInCategory);
         }
 
-        // Condition for allowing elements by category
+        /// <summary>
+        /// Checks if an Element passes the filter.
+        /// </summary>
+        /// <param name="element">The Element to check.</param>
+        /// <returns>If the Element is selectable.</returns>
         public bool AllowElement(Element element)
         {
             // Check if the element has a category
@@ -35,7 +44,12 @@ namespace geeWiz.ISF
             }
         }
 
-        // Do not allow reference selection
+        /// <summary>
+        /// Checks if a Reference passes the filter.
+        /// </summary>
+        /// <param name="reference">Reference to check.</param>
+        /// <param name="position">Point to check.</param>
+        /// <returns>If the Reference is selectable.</returns>
         public bool AllowReference(Reference reference, XYZ position)
         {
             return false;
@@ -48,10 +62,15 @@ namespace geeWiz.ISF
     /// </summary>
     public class ByViewOwnership : ISelectionFilter
     {
-        // Private variable to store and give access to Id
+        /// <summary>
+        /// The owner View Id to filter by.
+        /// </summary>
         private ElementId _ownerViewId;
 
-        // Default constructor, internalize the builtin category
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="view">The owner View to filter by.</param>
         public ByViewOwnership(View view)
         {
             if (view is null)
@@ -64,7 +83,11 @@ namespace geeWiz.ISF
             }
         }
 
-        // Condition for allowing elements by owner view Id
+        /// <summary>
+        /// Checks if an Element passes the filter.
+        /// </summary>
+        /// <param name="element">The Element to check.</param>
+        /// <returns>If the Element is selectable.</returns>
         public bool AllowElement(Element element)
         {
             // If element has an owner view id
@@ -80,7 +103,12 @@ namespace geeWiz.ISF
             }
         }
 
-        // Do not allow reference selection
+        /// <summary>
+        /// Checks if a Reference passes the filter.
+        /// </summary>
+        /// <param name="reference">Reference to check.</param>
+        /// <param name="position">Point to check.</param>
+        /// <returns>If the Reference is selectable.</returns>
         public bool AllowReference(Reference reference, XYZ position)
         {
             return false;
@@ -93,20 +121,31 @@ namespace geeWiz.ISF
     /// </summary>
     public class AnyElement : ISelectionFilter
     {
-        // Default constructor
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public AnyElement()
         {
             // Any element
         }
 
-        // Condition for allowing elements by owner view Id
+        /// <summary>
+        /// Checks if an Element passes the filter.
+        /// </summary>
+        /// <param name="element">The Element to check.</param>
+        /// <returns>If the Element is selectable.</returns>
         public bool AllowElement(Element element)
         {
             // Always true
             return true;
         }
 
-        // Do not allow reference selection
+        /// <summary>
+        /// Checks if a Reference passes the filter.
+        /// </summary>
+        /// <param name="reference">Reference to check.</param>
+        /// <param name="position">Point to check.</param>
+        /// <returns>If the Reference is selectable.</returns>
         public bool AllowReference(Reference reference, XYZ position)
         {
             return false;

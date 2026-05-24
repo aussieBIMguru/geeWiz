@@ -4,175 +4,291 @@ using Autodesk.Revit.UI;
 
 // The class belongs to the root namespace
 // using gAva = geeWiz.Availability.AvailabilityNames;
-namespace geeWiz.General
+namespace geeWiz.General.Availability
 {
     /// <summary>
-    /// Methods of this class generally relate to availability/context.
-    /// This is assigned to commands on startup.
+    /// Provides a shorter means of referencing availability class names.
     /// </summary>
-    public static class Availability
+    public static class AvailabilityNames
     {
-        #region AvailabilityNames class
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string Disabled = typeof(Availability_Disabled).FullName;
 
-        // Limit the options we can choose as availabilities using a class
-        public static class AvailabilityNames
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string ZeroDoc = typeof(Availability_ZeroDoc).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string Document = typeof(Availability_Document).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string Project = typeof(Availability_Project).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string Family = typeof(Availability_Family).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string Workshared = typeof(Availability_Workshared).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string Selection = typeof(Availability_Selection).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string ActiveViewSchedule = typeof(Availability_ActiveViewSchedule).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string SelectionIncludesSheets = typeof(Availability_SelectionIncludesSheets).FullName;
+
+        /// <summary>
+        /// The full name of the availability class.
+        /// </summary>
+        public static readonly string SelectionOnlySheets = typeof(Availability_SelectionOnlySheets).FullName;
+    }
+
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to always be unavailable.
+    /// </summary>
+    public class Availability_Disabled : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public static readonly string Disabled = typeof(Disabled).FullName;
-            public static readonly string ZeroDoc = typeof(ZeroDoc).FullName;
-            public static readonly string Document = typeof(Document).FullName;
-            public static readonly string Project = typeof(Project).FullName;
-            public static readonly string Family = typeof(Family).FullName;
-            public static readonly string Workshared = typeof(Workshared).FullName;
-            public static readonly string Selection = typeof(Selection).FullName;
-            public static readonly string ActiveViewSchedule = typeof(ActiveViewSchedule).FullName;
-            public static readonly string SelectionIncludesSheets = typeof(SelectionIncludesSheets).FullName;
-            public static readonly string SelectionOnlySheets = typeof(SelectionOnlySheets).FullName;
+            return false;
         }
+    }
 
-        #endregion
-
-        #region Availability classes
-
-        // Command is disabled
-        private class Disabled : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to always be available.
+    /// </summary>
+    public class Availability_ZeroDoc : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if there is an active Document.
+    /// </summary>
+    public class Availability_Document : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+        {
+            return uiApp.ActiveUIDocument is not null;
+        }
+    }
+
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if there is an active Project Document.
+    /// </summary>
+    public class Availability_Project : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+        {
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
+            {
+                return !uiDoc.Document.IsFamilyDocument;
+            }
+            else
             {
                 return false;
             }
         }
+    }
 
-        // Command can only be ran even if a document is not opened
-        private class ZeroDoc : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if there is an active Family Document.
+    /// </summary>
+    public class Availability_Family : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
             {
-                return true;
+                return uiDoc.Document.IsFamilyDocument;
+            }
+            else
+            {
+                return false;
             }
         }
+    }
 
-        // Command can only be ran in a document
-        private class Document : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if there is an active Workshared Document.
+    /// </summary>
+    public class Availability_Workshared : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
             {
-                return uiApp.ActiveUIDocument is not null;
+                return uiDoc.Document.IsWorkshared;
+            }
+            else
+            {
+                return false;
             }
         }
+    }
 
-        // Command can only be ran in a project (non-family) document
-        private class Project : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if there are Elements in the current selection.
+    /// </summary>
+    public class Availability_Selection : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            if (uiApp.ActiveUIDocument is not null)
             {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
-                {
-                    return !uiDoc.Document.IsFamilyDocument;
-                }
-                else
-                {
-                    return false;
-                }
+                return categories.Size > 0;
+            }
+            else
+            {
+                return false;
             }
         }
+    }
 
-        // Command can only be ran in a family document
-        private class Family : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if the Active View is a Schedule.
+    /// </summary>
+    public class Availability_ActiveViewSchedule : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
             {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
-                {
-                    return uiDoc.Document.IsFamilyDocument;
-                }
-                else
-                {
-                    return false;
-                }
+                return uiDoc.ActiveGraphicalView is ViewSchedule;
+            }
+            else
+            {
+                return false;
             }
         }
+    }
 
-        // Command can only be ran in a workshared document
-        private class Workshared : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if Sheets are in the current selection.
+    /// </summary>
+    public class Availability_SelectionIncludesSheets : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
             {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
-                {
-                    return uiDoc.Document.IsWorkshared;
-                }
-                else
-                {
-                    return false;
-                }
+                return categories.Contains(Category.GetCategory(uiDoc.Document, BuiltInCategory.OST_Sheets));
+            }
+            else
+            {
+                return false;
             }
         }
+    }
 
-        // Command can only be ran when elements are selected (even if in family document)
-        private class Selection : IExternalCommandAvailability
+    /// <summary>
+    /// This class is used by commands to check if they are available in the current context.
+    /// This availability tells a command to be available if only Sheets are in the current selection.
+    /// </summary>
+    public class Availability_SelectionOnlySheets : IExternalCommandAvailability
+    {
+        /// <summary>
+        /// Returns if a Command using this is available.
+        /// </summary>
+        /// <param name="uiApp">The UIApplication.</param>
+        /// <param name="categories">Categories of selected elements.</param>
+        /// <returns>A Boolean indicating if the command is available.</returns>
+        public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
         {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
+            if (uiApp.ActiveUIDocument is UIDocument uiDoc)
             {
-                if (uiApp.ActiveUIDocument is not null)
-                {
-                    return categories.Size > 0;
-                }
-                else
-                {
-                    return false;
-                }
+                if (categories.Size > 1) { return false; } // More than one category not permitted
+                return categories.Contains(Category.GetCategory(uiDoc.Document, BuiltInCategory.OST_Sheets));
+            }
+            else
+            {
+                return false;
             }
         }
-
-        // Command can only be ran when active view is a schedule
-        private class ActiveViewSchedule : IExternalCommandAvailability
-        {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
-            {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
-                {
-                    return uiDoc.ActiveGraphicalView is ViewSchedule;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        // Command can only be ran when sheets are in selection
-        private class SelectionIncludesSheets : IExternalCommandAvailability
-        {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
-            {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
-                {
-                    return categories.Contains(Category.GetCategory(uiDoc.Document, BuiltInCategory.OST_Sheets));
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        // Command can only be ran when only sheets are in selection
-        private class SelectionOnlySheets : IExternalCommandAvailability
-        {
-            public bool IsCommandAvailable(UIApplication uiApp, CategorySet categories)
-            {
-                if (uiApp.ActiveUIDocument is UIDocument uiDoc)
-                {
-                    if (categories.Size > 1) { return false; } // More than one category not permitted
-                    return categories.Contains(Category.GetCategory(uiDoc.Document, BuiltInCategory.OST_Sheets));
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        #endregion
     }
 }

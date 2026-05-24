@@ -14,24 +14,78 @@ namespace geeWiz.Utilities
     /// </summary>
     public class DataConverter
     {
+        /// <summary>
+        /// String representation of value.
+        /// </summary>
         public string StringValue { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Integer representation of value.
+        /// </summary>
         public int IntegerValue { get; set; } = 0;
+
+        /// <summary>
+        /// Double representation of value.
+        /// </summary>
         public double DoubleValue { get; set; } = 0.0;
+
+        /// <summary>
+        /// ValueString representation of value in project units.
+        /// </summary>
         public string ProjectStringValue { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Integer representation of value in project units.
+        /// </summary>
         public int ProjectIntegerValue { get; set; } = 0;
+
+        /// <summary>
+        /// Double representation of value in project units.
+        /// </summary>
         public double ProjectDoubleValue { get; set; } = 0.0;
+
+        /// <summary>
+        /// ElementId representation of value.
+        /// </summary>
         public ElementId ElementIdValue { get; set; } = ElementId.InvalidElementId;
+
+        /// <summary>
+        /// If the value can be a valid String.
+        /// </summary>
         public bool CanBeString { get; set; } = false;
+
+        /// <summary>
+        /// If the value can be a valid Integer.
+        /// </summary>
         public bool CanBeInt { get; set; } = false;
+
+        /// <summary>
+        /// If the value can be a valid Double.
+        /// </summary>
         public bool CanBeDouble { get; set; } = false;
+
+        /// <summary>
+        /// If the value can be a valid ElementId.
+        /// </summary>
         public bool CanBeElementId { get; set; } = false;
+
+        /// <summary>
+        /// Related UnitTypeId to the value.
+        /// </summary>
         public ForgeTypeId UnitTypeId { get; set; } = null;
+
+        /// <summary>
+        /// Related Document to the context of the value.
+        /// </summary>
         public Document Document { get; set; } = null;
         
         /// <summary>
-        /// Converts a string to all possible representations.
+        /// Intializes all possible values based on a value that is primarily a string.
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="str">The provided value.</param>
+        /// <param name="parameter">Related Parameter.</param>
+        /// <param name="doc">Related Document.</param>
+        /// <param name="givenAsProjectValue">If the value provided in Project Units.</param>
         public DataConverter(string str, Parameter parameter = null, Document doc = null, bool givenAsProjectValue = false)
         {
             // Store core values
@@ -68,9 +122,12 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Converts an integer to all possible representations.
+        /// Intializes all possible values based on a value that is primarily an Integer.
         /// </summary>
-        /// <param name="integer"></param>
+        /// <param name="integer">The provided value.</param>
+        /// <param name="parameter">Related Parameter.</param>
+        /// <param name="doc">Related Document.</param>
+        /// <param name="givenAsProjectValue">If the value provided in Project Units.</param>
         public DataConverter(int integer, Parameter parameter = null, Document doc = null, bool givenAsProjectValue = false)
         {
             // Store core values
@@ -93,10 +150,12 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Converts a double to all possible representations.
+        /// Intializes all possible values based on a value that is primarily a Double.
         /// </summary>
-        /// <param name="dbl"></param>
-        /// <param name="floor"></param>
+        /// <param name="dbl">The provided value.</param>
+        /// <param name="parameter">Related Parameter.</param>
+        /// <param name="doc">Related Document.</param>
+        /// <param name="givenAsProjectValue">If the value provided in Project Units.</param>
         public DataConverter(double dbl, Parameter parameter = null, Document doc = null, bool givenAsProjectValue = false)
         {
             // Store core values
@@ -119,9 +178,10 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Converts an ElementId to all possible representations.
+        /// Intializes all possible values based on a value that is primarily an ElementId.
         /// </summary>
-        /// <param name="elementId"></param>
+        /// <param name="elementId">The provided value.</param>
+        /// <param name="parameter">Related Parameter.</param>
         public DataConverter(ElementId elementId, Parameter parameter = null)
         {
             this.UnitTypeId = parameter?.GetUnitTypeId();
@@ -140,6 +200,13 @@ namespace geeWiz.Utilities
             this.CanBeElementId = elementId.Ext_IsValid();
         }
 
+        /// <summary>
+        /// A routine to process a Double value that considers project units.
+        /// </summary>
+        /// <param name="value">The provided value.</param>
+        /// <param name="str">Related ValueString value.</param>
+        /// <param name="parameter">Related Parameter.</param>
+        /// <param name="givenAsProjectValue">If the value provided in Project Units.</param>
         public void ComplexDoubleRoutine(double value, string str, Parameter parameter, bool givenAsProjectValue)
         {
             // Get the spec type of the parameter
@@ -174,6 +241,10 @@ namespace geeWiz.Utilities
             }
         }
 
+        /// <summary>
+        /// A routine to process a Double value, assumed as project units.
+        /// </summary>
+        /// <param name="value">The provided value.</param>
         private void SimpleDoubleRoutine(double value)
         {
             this.DoubleValue = this.ProjectDoubleValue = value;
@@ -182,29 +253,42 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Converts the double value to an integer.
+        /// Rounds a double to the nearest integer.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>An Integer.</returns>
         private int RoundToInt(double value)
         {
             return (int)Math.Round(value, 0);
         }
 
+        /// <summary>
+        /// Processes a double into a string, with trailing zeroes removed.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>A String.</returns>
         private string FormatDoubleAsString(double value)
         {
             int intVal = (int)Math.Round(value);
             return Math.Abs(value - intVal) < 1e-6 ? intVal.ToString() : value.ToString();
         }
     }
-    
-    /// Methods of this class generally relate to converting units
+
+    /// <summary>
+    /// Static methods container related to Conversion.
     /// </summary>
     public static class Convert_Utils
     {
         #region Constants
 
-        // Mathematical constants
+        /// <summary>
+        /// The Pi constant.
+        /// </summary>
         public const double MATH_PI = Math.PI;
+
+        /// <summary>
+        /// The E constant.
+        /// </summary>
         public const double MATH_E = Math.E;
 
         #endregion
@@ -216,8 +300,8 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <param name="text">The string to convert.</param>
         /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
-        /// <returns>A nullable double.</returns>
-        public static Nullable<double> StringToDouble(string text, Nullable<double> valueOnFailure = null)
+        /// <returns>A nullable Double.</returns>
+        public static double? StringToDouble(string text, double? valueOnFailure = null)
         {
             // Default double value
             double value = 0.0;
@@ -233,15 +317,15 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Convert a string to a double, with a backup value if it fails.
+        /// Convert a string to a double, with a double fallback value.
         /// </summary>
         /// <param name="text">The string to convert.</param>
         /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
-        /// <returns>A double.</returns>
+        /// <returns>A Double.</returns>
         public static double StringToDouble(string text, double valueOnFailure)
         {
-            // Default double value
-            double value = 0.0;
+            // Double value
+            double value;
 
             // If we can convert to a double, return it
             if (double.TryParse(text, out value))
@@ -258,12 +342,12 @@ namespace geeWiz.Utilities
         #region String => Integer
 
         /// <summary>
-        /// Convert a string to a nullable integer.
+        /// Convert a string to a nullable Integer.
         /// </summary>
         /// <param name="text">The string to convert.</param>
         /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
-        /// <returns>A nullable integer.</returns>
-        public static Nullable<int> StringToInt(string text, Nullable<int> valueOnFailure = null)
+        /// <returns>A nullable Integer.</returns>
+        public static int? StringToInt(string text, int? valueOnFailure = null)
         {
             // Default int value
             int value = 0;
@@ -279,7 +363,7 @@ namespace geeWiz.Utilities
         }
 
         /// <summary>
-        /// Convert a string to an integer, with a backup value if it fails.
+        /// Convert a string to an integer, with a fallback Integer value.
         /// </summary>
         /// <param name="text">The string to convert.</param>
         /// <param name="valueOnFailure">The value to use if it cannot convert.</param>
@@ -287,7 +371,7 @@ namespace geeWiz.Utilities
         public static int StringToInt(string text, int valueOnFailure)
         {
             // Default int value
-            int value = 0;
+            int value;
 
             // If we can convert to a int, return it
             if (int.TryParse(text, out value))
@@ -307,7 +391,7 @@ namespace geeWiz.Utilities
         /// Convert a value to degrees from radians.
         /// </summary>
         /// <param name="radians">The value to convert.</param>
-        /// <returns>A double.</returns>
+        /// <returns>A Double.</returns>
         public static double RadiansToDegrees(double radians)
         {
             return radians * ((double)180 / MATH_PI);
@@ -317,7 +401,7 @@ namespace geeWiz.Utilities
         /// Convert a value to radians from degrees.
         /// </summary>
         /// <param name="degrees">The value to convert.</param>
-        /// <returns>A double.</returns>
+        /// <returns>A Double.</returns>
         public static double DegreesToRadians(double degrees)
         {
             return degrees * (MATH_PI / (double)180);
@@ -333,7 +417,7 @@ namespace geeWiz.Utilities
         /// <param name="value">The value to convert.</param>
         /// <param name="doc">The related document.</param>
         /// <param name="unitType">The ForgeTypeId (use SpecTypeId enum).</param>
-        /// <returns>A double.</returns>
+        /// <returns>A Double.</returns>
         public static double ValueToProject(double value, Document doc, ForgeTypeId unitType = null)
         {
             // Default unit type is length
@@ -352,7 +436,7 @@ namespace geeWiz.Utilities
         /// <param name="value">The value to convert.</param>
         /// <param name="doc">The related document.</param>
         /// <param name="unitType">The ForgeTypeId (use SpecTypeId enum).</param>
-        /// <returns>A double.</returns>
+        /// <returns>A Double.</returns>
         public static double ValueToInternal(double value, Document doc, ForgeTypeId unitType = null)
         {
             // Default unit type is length
@@ -376,12 +460,10 @@ namespace geeWiz.Utilities
         /// Creates an ElementId from an integer (in 2024+ needs to be Int64).
         /// </summary>
         /// <param name="integer">The integer value.</param>
+        /// <param name="valueOnFailure">The fallback value on failure.</param>
         /// <returns>An ElementId.</returns>
         public static ElementId IntToElementId(int integer, ElementId valueOnFailure = null)
         {
-            // ElementId begins as null
-            ElementId elementId = valueOnFailure;
-
 #if REVIT2020 || REVIT2021 || REVIT2022 || REVIT2023
             // Try to get ElementId using Int
             try
@@ -392,17 +474,17 @@ namespace geeWiz.Utilities
 #else
             try
             {
-                elementId = new ElementId((Int64)integer);
+                return new ElementId((Int64)integer);
             }
             catch {; }
 #endif
 
             // Return the elementId
-            return elementId;
+            return valueOnFailure;
         }
 
         /// <summary>
-        /// Returns the integer value of an ElementId (in 2024+ needs to come from Value).
+        /// Returns the integer value of an ElementId.
         /// </summary>
         /// <param name="elementId">The ElementId.</param>
         /// <returns>An integer.</returns>

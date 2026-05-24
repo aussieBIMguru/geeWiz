@@ -11,11 +11,19 @@ using gFrm = geeWiz.Forms;
 namespace geeWiz.Commands.Cmds_Select
 {
     /// <summary>
-    /// Provides a filtered selection for rooms.
+    /// A Revit command ran from the ribbon.
+    /// Select Rooms with a filter pre-applied.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_PickRooms : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -36,11 +44,19 @@ namespace geeWiz.Commands.Cmds_Select
     }
 
     /// <summary>
-    /// Provides a filtered selection for walls.
+    /// A Revit command ran from the ribbon.
+    /// Select Walls with a filter pre-applied.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_PickWalls : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -61,11 +77,19 @@ namespace geeWiz.Commands.Cmds_Select
     }
 
     /// <summary>
-    /// Gets all hidden elements in view.
+    /// A Revit command ran from the ribbon.
+    /// Select all Elements hidden in the active View.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_GetHidden : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -108,11 +132,19 @@ namespace geeWiz.Commands.Cmds_Select
     }
 
     /// <summary>
-    /// Gets all title blocks on selected sheets.
+    /// A Revit command ran from the ribbon.
+    /// Select all Titleblocks on selected Sheets.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_GetTtbs : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -136,11 +168,19 @@ namespace geeWiz.Commands.Cmds_Select
     }
 
     /// <summary>
-    /// Removes grouped elements from selection.
+    /// A Revit command ran from the ribbon.
+    /// Removes all grouped Elements from the active selection.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_RemoveGrouped : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document

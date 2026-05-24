@@ -15,12 +15,34 @@ namespace geeWiz.Forms.Bases
     {
         #region Class properties
 
-        // Properties belonging to the form
+        /// <summary>
+        /// Has the progress bar been cancelled.
+        /// </summary>
         private bool isCancelled;
+
+        /// <summary>
+        /// The step of progress we are at.
+        /// </summary>
         private int pbCount;
+
+        /// <summary>
+        /// Total number of steps to take.
+        /// </summary>
         private int pbTotal;
+
+        /// <summary>
+        /// Show the progress bar.
+        /// </summary>
         private bool showProgress;
+
+        /// <summary>
+        /// Is the process cancellable.
+        /// </summary>
         private bool cancellable;
+
+        /// <summary>
+        /// The name of the task being processed.
+        /// </summary>
         private string taskName;
 
         #endregion
@@ -72,7 +94,6 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Increase progress.
         /// </summary>
-        /// <returns>Void (nothing).</returns>
         public void Increment()
         {
             // Increase the progress value
@@ -103,7 +124,7 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Check if cancelled, rollback related trasnsaction if provided.
         /// </summary>
-        /// <param name="transaction"">A related transaction (optional).</param>
+        /// <param name="transaction">A related transaction (optional).</param>
         /// <returns>True if cancelled, false if not.</returns>
         public bool CancelCheck(Transaction transaction = null)
         {
@@ -125,8 +146,7 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Check if cancelled, commit a transaction if not.
         /// </summary>
-        /// <param name="transaction"">A related transaction (optional).</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="transaction">A related transaction (optional).</param>
         public void Commit(Transaction transaction)
         {
             // If we did not cancel
@@ -144,7 +164,6 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Cancel the progress bar.
         /// </summary>
-        /// <returns>Void (nothing).</returns>
         private void Cancel()
         {
             // If we have not cancelled yet
@@ -164,9 +183,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler when cancel button is clicked.
         /// </summary>
-        /// <param name="sender"">The event sender.</param>
-        /// <param name="e"">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             Cancel();
@@ -179,7 +197,7 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Event handler to catch escape press.
         /// </summary>
-        /// <param name="keyData"">Used keys.</param>
+        /// <param name="keyData">Used keys.</param>
         /// <returns>A boolean.</returns>
         protected override bool ProcessDialogKey(Keys keyData)
         {

@@ -18,11 +18,19 @@ using ClosedXML.Excel;
 namespace geeWiz.Commands.Cmds_Import
 {
     /// <summary>
-    /// Creates an Excel template.
+    /// A Revit command ran from the ribbon.
+    /// Provides the template to create Sheets from.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_SheetsExcel : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document
@@ -110,11 +118,19 @@ namespace geeWiz.Commands.Cmds_Import
     }
 
     /// <summary>
-    /// Creates/updates sheets from Excel.
+    /// A Revit command ran from the ribbon.
+    /// Creates sheets from Excel data.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_CreateSheets : IExternalCommand
     {
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document

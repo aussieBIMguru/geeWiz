@@ -6,33 +6,75 @@ using Autodesk.Revit.DB;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to geometry.
+    /// Static methods container related to geometry.
     /// </summary>
     public static class Geometry_Utils
     {
         #region Constants
 
-        // Point and vector origins/zeroes
+        /// <summary>
+        /// The world origin.
+        /// </summary>
         public static readonly XYZ POINT_ZERO = XYZ.Zero;
+
+        /// <summary>
+        /// A vector of zero length.
+        /// </summary>
         public static readonly XYZ VECTOR_ZERO = XYZ.Zero;
 
-        // Axis (canonical vectors)
+        /// <summary>
+        /// Canonical X vector.
+        /// </summary>
         public static readonly XYZ AXIS_X = XYZ.BasisX;
+
+        /// <summary>
+        /// Canonical Y vector.
+        /// </summary>
         public static readonly XYZ AXIS_Y = XYZ.BasisY;
+
+        /// <summary>
+        /// Canonical Z vector.
+        /// </summary>
         public static readonly XYZ AXIS_Z = XYZ.BasisZ;
 
-        // Reverse axis (canonical negated vectors)
+        /// <summary>
+        /// Canonical reversed X vector.
+        /// </summary>
         public static readonly XYZ AXIS_NEGX = AXIS_X.Negate();
+
+        /// <summary>
+        /// Canonical reversed Y vector.
+        /// </summary>
         public static readonly XYZ AXIS_NEGY = AXIS_Y.Negate();
+
+        /// <summary>
+        /// Canonical reversed Z vector.
+        /// </summary>
         public static readonly XYZ AXIS_NEGZ = AXIS_Z.Negate();
 
-        // UV values
+        /// <summary>
+        /// UV value of 0.0, 0.0.
+        /// </summary>
         public static readonly UV UV_ZERO = UV.Zero;
+
+        /// <summary>
+        /// UV value of 0.5, 0.5.
+        /// </summary>
         public static readonly UV UV_MID = new UV((double)0.5, (double)0.5);
 
-        // Base planes
+        /// <summary>
+        /// Canonical reversed XY vector.
+        /// </summary>
         public static readonly Plane PLANE_XY = Plane.CreateByNormalAndOrigin(AXIS_Z, POINT_ZERO);
+
+        /// <summary>
+        /// Canonical reversed YZ vector.
+        /// </summary>
         public static readonly Plane PLANE_YZ = Plane.CreateByNormalAndOrigin(AXIS_X, POINT_ZERO);
+
+        /// <summary>
+        /// Canonical reversed XZ vector.
+        /// </summary>
         public static readonly Plane PLANE_XZ = Plane.CreateByNormalAndOrigin(AXIS_Y, POINT_ZERO);
 
         #endregion

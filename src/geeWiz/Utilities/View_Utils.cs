@@ -6,13 +6,15 @@ using Autodesk.Revit.DB;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to view based operations.
+    /// Static methods container related to Views.
     /// </summary>
     public static class View_Utils
     {
         #region Constants - ViewType
 
-        // All view types which generally correlate to a graphical view
+        /// <summary>
+        /// Graphical view related ViewType values.
+        /// </summary>
         public static readonly List<ViewType> VIEWTYPES_GRAPHICAL = new List<ViewType>()
         {
             ViewType.AreaPlan, ViewType.CeilingPlan, ViewType.Detail, ViewType.DraftingView,
@@ -20,7 +22,9 @@ namespace geeWiz.Utilities
             ViewType.ThreeD, ViewType.Rendering, ViewType.Walkthrough
         };
 
-        // All view types which generally correlate to a plan view
+        /// <summary>
+        /// Plan view related ViewType values.
+        /// </summary>
         public static readonly List<ViewType> VIEWTYPES_PLAN = new List<ViewType>()
         {
             ViewType.AreaPlan, ViewType.CeilingPlan, ViewType.EngineeringPlan, ViewType.FloorPlan
@@ -30,7 +34,9 @@ namespace geeWiz.Utilities
 
         #region Constants - ViewFamily
 
-        // All view families which generally correlate to a graphical view (aligned to view types)
+        /// <summary>
+        /// Graphical view related ViewFamily values.
+        /// </summary>
         public static readonly List<ViewFamily> VIEWFAMILIES_GRAPHICAL = new List<ViewFamily>()
         {
             ViewFamily.AreaPlan, ViewFamily.CeilingPlan, ViewFamily.Detail, ViewFamily.Drafting,
@@ -38,7 +44,9 @@ namespace geeWiz.Utilities
             ViewFamily.ThreeDimensional, ViewFamily.ImageView, ViewFamily.Walkthrough
         };
 
-        // All view families which generally correlate to a plan view (aligned to view types)
+        /// <summary>
+        /// Plan view related ViewFamily values.
+        /// </summary>
         public static readonly List<ViewFamily> VIEWFAMILIES_PLAN = new List<ViewFamily>()
         {
             ViewFamily.AreaPlan, ViewFamily.CeilingPlan, ViewFamily.StructuralPlan, ViewFamily.FloorPlan
@@ -51,7 +59,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Return default PDF export options.
         /// </summary>
-        /// <param name="hideCrop"">Hide crop boundaries.</param>
+        /// <param name="hideCrop">Hide crop boundaries.</param>
         /// <returns>A PDFExportOptions object.</returns>
         public static PDFExportOptions DefaultPdfExportOptions(bool hideCrop = true)
         {
@@ -80,7 +88,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Return default DWG export options.
         /// </summary>
-        /// <param name="shared"">Export as shared coordinates.</param>
+        /// <param name="shared">Export as shared coordinates.</param>
         /// <returns>A DWGExportOptions object.</returns>
         public static DWGExportOptions DefaultDwgExportOptions(bool shared = false)
         {

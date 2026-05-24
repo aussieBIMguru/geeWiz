@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to SpatialElements
+    /// Static methods container related to SpatialElements.
     /// </summary>
     public static class Spatial_Utils
     {
@@ -20,7 +20,6 @@ namespace geeWiz.Utilities
         /// - Index 1: Redundant
         /// - Index 2: Unenclosed
         /// - Index 3: Unplaced
-        /// 
         /// </summary>
         /// <param name="rooms">The Rooms to sort.</param>
         /// <param name="doc">The related document.</param>

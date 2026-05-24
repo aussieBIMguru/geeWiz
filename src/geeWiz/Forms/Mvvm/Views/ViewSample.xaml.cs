@@ -5,11 +5,14 @@ using System.Windows;
 namespace geeWiz.Forms.Mvvm.Views
 {
     /// <summary>
-    /// Manages the Mvvm model.
+    /// The View of the MVVM Sample system.
     /// </summary>
     public partial class ViewSample : Window
     {
-        // Constructor using view model
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="viewModel">The related Model.</param>
         public ViewSample(Models.ModelSample viewModel)
         {
             InitializeComponent();

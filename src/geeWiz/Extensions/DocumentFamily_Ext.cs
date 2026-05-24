@@ -156,7 +156,7 @@ namespace geeWiz.Extensions
             processingOutcome.LoadingFamilyName = familyDoc.Title;
 
             // Default options
-            options ??= new gFil.FamilyLoadOptions(true, false);
+            options ??= new FamilyLoadOptions(true, false);
 
             // Try to load the family
             try
@@ -191,7 +191,7 @@ namespace geeWiz.Extensions
             processingOutcome.RelatedFilePath = filePath;
 
             // Default options
-            options ??= new gFil.FamilyLoadOptions(true, false);
+            options ??= new FamilyLoadOptions(true, false);
 
             // Try to load and return the family
             try

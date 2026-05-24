@@ -96,6 +96,7 @@ namespace geeWiz.Extensions
         /// <typeparam name="T">The type of Element to check for.</typeparam>
         /// <param name="str">The name of the element to get.</param>
         /// <param name="doc">The document to get the ElementId from.</param>
+        /// <param name="isElementType">Is the Element an ElementType.</param>
         /// <returns>An Element.</returns>
         public static T Ext_StringToElementByName<T>(this string str, Document doc = null, bool isElementType = false) where T : Element
         {

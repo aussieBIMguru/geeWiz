@@ -5,16 +5,30 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace geeWiz.Forms.Mvvm.Models
 {
     /// <summary>
-    /// The code to manage the Wpf model
+    /// The Model of the MVC Progress Bar system.
     /// </summary>
     public sealed partial class ModelProgress : ObservableObject
     {
         #region Properties
 
+        /// <summary>
+        /// Has the progress bar been closed.
+        /// </summary>
         public bool IsClosed = false;
+
+        /// <summary>
+        /// Has the progress bar been cancelled.
+        /// </summary>
         public bool IsCancelled = false;
 
+        /// <summary>
+        /// The current progress bar value.
+        /// </summary>
         private int _progressValue;
+
+        /// <summary>
+        /// The total steps to take.
+        /// </summary>
         private int _progressTotal;
 
         /// <summary>
@@ -83,6 +97,7 @@ namespace geeWiz.Forms.Mvvm.Models
         /// <summary>
         /// Shortcut to mark as complete (typically without cancellation).
         /// </summary>
+        /// <param name="cancelledByUser">Was the form cancelled by the user.</param>
         public void Complete(bool cancelledByUser = false)
         {
             this.CloseWindow(cancelledByUser: cancelledByUser);

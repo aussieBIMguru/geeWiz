@@ -13,33 +13,75 @@ using geeWiz.Extensions;
 namespace geeWiz.Forms
 {
     /// <summary>
-    /// Mvvm Progress bar coordinator.
+    /// MVC Progress bar coordinator.
     /// </summary>
     public class ProgressCoordinator
     {
         #region Properties
 
-        // Mvvm and thread
+        /// <summary>
+        /// Related View to the coordinator.
+        /// </summary>
         private Mvvm.Views.ViewProgress _view { get; set; }
+
+        /// <summary>
+        /// Related Model to the coordinator.
+        /// </summary>
         private Mvvm.Models.ModelProgress _model { get; set; }
+
+        /// <summary>
+        /// Related Thread to the coordinator.
+        /// </summary>
         private Thread _thread { get; set; }
 
-        // Title and taskname
+        /// <summary>
+        /// Title of the task.
+        /// </summary>
         private string _title { get; set; }
+
+        /// <summary>
+        /// Description of the task.
+        /// </summary>
         private string _taskName { get; set; }
 
-        // Internal properties
+        /// <summary>
+        /// Total number of steps to take.
+        /// </summary>
         private int _totalSteps { get; set; }
+
+        /// <summary>
+        /// Message to show if cancelled.
+        /// </summary>
         private string _cancelMessage { get; set; }
+
+        /// <summary>
+        /// Delay between steps in ms.
+        /// </summary>
         private int _stepDelay { get; set; }
 
-        // Check for cancellation
+        /// <summary>
+        /// If the progress bar has been cancelled by the user.
+        /// </summary>
         public bool CancelledByUser { get; set; }
 
-        // Thread safety
+        /// <summary>
+        /// The related thread dispatcher.
+        /// </summary>
         private Dispatcher _dispatcher { get; set; }
+
+        /// <summary>
+        /// Has shutdown of the thread been requested yet.
+        /// </summary>
         private bool _shutdownRequested { get; set; } = false;
+
+        /// <summary>
+        /// Has the coordinator been intialized yet.
+        /// </summary>
         private readonly ManualResetEventSlim _initialised = new ManualResetEventSlim(false);
+
+        /// <summary>
+        /// Is the progress related task completed.
+        /// </summary>
         private bool _isCompleted { get; set; } = false;
 
         #endregion
@@ -135,7 +177,9 @@ namespace geeWiz.Forms
             this._thread.Start();
         }
 
-        // Helper to ensure initialization has occured
+        /// <summary>
+        /// Wait until initiailization has finished.
+        /// </summary>
         private void WaitUntilReady()
         {
             this._initialised.Wait();
@@ -255,6 +299,8 @@ namespace geeWiz.Forms
         /// </summary>
         /// <param name="delay">Delay option.</param>
         /// <param name="stepsTaken">Increment (+1 by default).</param>
+        /// <param name="t">The related transaction.</param>
+        /// <param name="tg">The related transaction group.</param>
         /// <returns></returns>
         public bool CancelCheckOrUpdate(bool delay = true, int stepsTaken = 1, Transaction t = null, TransactionGroup tg = null)
         {
@@ -303,8 +349,11 @@ namespace geeWiz.Forms
         }
 
         /// <summary>
-        /// Cancels the progress bar functionally.
+        /// Cancels the progress bar.
         /// </summary>
+        /// <param name="t">The related transaction.</param>
+        /// <param name="tg">The related transaction group.</param>
+        /// <param name="cancelledByUser">Has the user caused this cancellation.</param>
         public void Cancel(Transaction t = null, TransactionGroup tg = null, bool cancelledByUser = true)
         {
             // Rollback any transactions/groups

@@ -14,6 +14,7 @@ namespace geeWiz.Extensions
         /// Returns a linked instance's transform.
         /// </summary>
         /// <param name="linkInstance">The linked instance (extended).</param>
+        /// <param name="invert">Invert the transform result.</param>
         /// <returns>A Transform.</returns>
         public static Transform Ext_GetLinkTransform(this RevitLinkInstance linkInstance, bool invert = false)
         {

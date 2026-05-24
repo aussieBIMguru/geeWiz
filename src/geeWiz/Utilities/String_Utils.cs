@@ -6,12 +6,72 @@ using System.Text;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to string based operations.
+    /// A class to assess matrix properties for use.
+    /// </summary>
+    public class MatrixProperties
+    {
+        /// <summary>
+        /// Number of rows in matrix.
+        /// </summary>
+        public int RowCount { get; set; }
+
+        /// <summary>
+        /// Number of columns in matrix.
+        /// </summary>
+        public int ColumnCount { get; set; }
+
+        /// <summary>
+        /// Number of objects in matrix.
+        /// </summary>
+        public int ObjectCount { get; set; }
+
+        /// <summary>
+        /// Are all rows of equal length.
+        /// </summary>
+        public bool IsUniform { get; set; }
+
+        /// <summary>
+        /// Are there any nulls in the matrix.
+        /// </summary>
+        public bool ContainsNulls { get; set; }
+
+        /// <summary>
+        /// Constructor from string matrix.
+        /// </summary>
+        /// <param name="matrix">The matrix to base the properties from.</param>
+        public MatrixProperties(List<List<string>> matrix)
+        {
+            // Counts and uniformity verification
+            this.RowCount = matrix.Count;
+            this.ColumnCount = matrix.Select(x => x.Count).Max();
+            this.ObjectCount = matrix.Select(x => x.Count).Sum();
+            this.IsUniform = ObjectCount == RowCount * ColumnCount;
+
+            // Set nulls as false
+            this.ContainsNulls = false;
+
+            // Check each row for nulls
+            foreach (List<string> row in matrix)
+            {
+                if (row.Contains(null))
+                {
+                    this.ContainsNulls = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Static methods container related to Strings.
     /// </summary>
     public static class String_Utils
     {
         #region String validation
 
+        /// <summary>
+        /// Invalid characters to catch.
+        /// </summary>
         private static readonly List<char> CHARS_INVALID = new List<char>()
         {
             '/', '?', '<', '>', '\\', ':', '*', '|', '"', '^'
@@ -58,8 +118,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Joins each row of a matrix of strings, returning a list.
         /// </summary>
-        /// <param name="matrix"">A list of list of strings.</param>
-        /// <param name="separator"">A string to put between elements.</param>
+        /// <param name="matrix">A list of list of strings.</param>
+        /// <param name="separator">A string to put between elements.</param>
         /// <returns>A list of strings.</returns>
         public static List<string> MatrixToList(List<List<string>> matrix, string separator = ",")
         {
@@ -79,8 +139,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Splits each string into a list, and constructs a matrix from that.
         /// </summary>
-        /// <param name="dataRows"">A list of strings.</param>
-        /// <param name="separator"">A string to split each row by.</param>
+        /// <param name="dataRows">A list of strings.</param>
+        /// <param name="separator">A string to split each row by.</param>
         /// <returns>A list of list of strings.</returns>
         public static List<List<string>> ListToMatrix(List<string> dataRows, string separator = ",")
         {
@@ -104,7 +164,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Returns a matrix with the provided list as one row.
         /// </summary>
-        /// <param name="dataRows"">A list of strings.</param>
+        /// <param name="dataRows">A list of strings.</param>
         /// <returns>A list of list of strings.</returns>
         public static List<List<string>> ListAsMatrix(List<string> dataRows)
         {
@@ -118,8 +178,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Fills the end of each list in a matrix to the longest list.
         /// </summary>
-        /// <param name="matrix"">A list of list of strings.</param>
-        /// <param name="padString"">Pad the lists with this string. If null, will pad the last string.</param>
+        /// <param name="matrix">A list of list of strings.</param>
+        /// <param name="padString">Pad the lists with this string. If null, will pad the last string.</param>
         /// <returns>A list of list of strings.</returns>
         public static List<List<string>> PadMatrix(List<List<string>> matrix, string padString = "")
         {
@@ -171,8 +231,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Flips the columns and rows of a matrix of strings, padding if needed.
         /// </summary>
-        /// <param name="matrix"">A list of list of strings.</param>
-        /// <param name="padString"">Pad the lists with this string. If null, will pad the last string.</param>
+        /// <param name="matrix">A list of list of strings.</param>
+        /// <param name="padString">Pad the lists with this string. If null, will pad the last string.</param>
         /// <returns>A list of list of strings.</returns>
         public static List<List<string>> FlipMatrix(List<List<string>> matrix, string padString = "")
         {
@@ -212,8 +272,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Replaces all nulls in a list of strings.
         /// </summary>
-        /// <param name="dataRow"">A list of strings.</param>
-        /// <param name="replaceString"">The string to replace nulls with.</param>
+        /// <param name="dataRow">A list of strings.</param>
+        /// <param name="replaceString">The string to replace nulls with.</param>
         /// <returns>A list of strings.</returns>
         public static List<string> ReplaceListNulls(List<string> dataRow, string replaceString = "")
         {
@@ -244,8 +304,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Replaces all nulls in a list of list of strings.
         /// </summary>
-        /// <param name="matrix"">A list of list of strings.</param>
-        /// <param name="replaceString"">The string to replace nulls with.</param>
+        /// <param name="matrix">A list of list of strings.</param>
+        /// <param name="replaceString">The string to replace nulls with.</param>
         /// <returns>A list of list of strings.</returns>
         public static List<List<string>> ReplaceMatrixNulls(List<List<string>> matrix, string replaceString = "")
         {
@@ -256,44 +316,4 @@ namespace geeWiz.Utilities
 
         #endregion
     }
-
-    #region MatrixProperties class
-
-    /// <summary>
-    /// A class to assess matrix properties for use.
-    /// </summary>
-    public class MatrixProperties
-    {
-        // Properties of the matrix
-        public int RowCount { get; set; }
-        public int ColumnCount { get; set; }
-        public int ObjectCount { get; set; }
-        public bool IsUniform { get; set; }
-        public bool ContainsNulls { get; set; }
-
-        // Matrix properties constructor from matrix
-        public MatrixProperties(List<List<string>> matrix)
-        {
-            // Counts and uniformity verification
-            this.RowCount = matrix.Count;
-            this.ColumnCount = matrix.Select(x => x.Count).Max();
-            this.ObjectCount = matrix.Select(x => x.Count).Sum();
-            this.IsUniform = ObjectCount == RowCount * ColumnCount;
-
-            // Set nulls as false
-            this.ContainsNulls = false;
-
-            // Check each row for nulls
-            foreach (List<string> row in matrix)
-            {
-                if (row.Contains(null))
-                {
-                    this.ContainsNulls = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    #endregion
 }

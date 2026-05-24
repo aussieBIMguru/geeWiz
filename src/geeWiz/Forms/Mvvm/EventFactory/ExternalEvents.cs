@@ -3,39 +3,58 @@ using Autodesk.Revit.UI;
 
 namespace geeWiz.Forms.Mvvm
 {
-    // This was AI written/guided for the most part
-    // Comments have been added to break down what this is achieving
-    // The goal is to make a simpler way of creating handled events for Mvvm
-    // Revit/UI have to be on different threads, so we generally use async
-
     /// <summary>
-    /// Wraps a simple sync Action<UIApplication> into an IExternalEventHandler.
+    /// Wraps a simple sync Action into an IExternalEventHandler.
+    /// 
+    /// This was AI written/guided for the most part.
+    /// Comments have been added to break down what this is achieving.
+    /// The goal is to make a simpler way of creating handled events for Mvvm.
+    /// Revit/UI have to be on different threads, so we generally use async.
     /// </summary>
     public sealed class ActionExternalEventHandler : IExternalEventHandler
     {
+        /// <summary>
+        /// Name of event handler.
+        /// </summary>
         private readonly string _name;
 
-    // The actual logic to run inside Revit
-    private readonly Action<UIApplication> _action;
+        /// <summary>
+        /// The actual logic to run inside Revit
+        /// </summary>
+        private readonly Action<UIApplication> _action;
 
-        // The Revit ExternalEvent associated with this handler
+        /// <summary>
+        /// The Revit ExternalEvent associated with this handler.
+        /// </summary>
         public ExternalEvent ExternalEvent { get; }
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="name">Name of handler.</param>
+        /// <param name="action">Action for handler.</param>
         public ActionExternalEventHandler(string name, Action<UIApplication> action)
         {
-            _name = name;
-            _action = action;
+            this._name = name;
+            this._action = action;
 
             // Register THIS handler with Revit
-            ExternalEvent = ExternalEvent.Create(this);
+            this.ExternalEvent = ExternalEvent.Create(this);
         }
 
-        // This is called by Revit when the event is executed
+        /// <summary>
+        /// This is called by Revit when the event is executed.
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
         public void Execute(UIApplication app)
         {
-            _action?.Invoke(app);
+            this._action?.Invoke(app);
         }
 
+        /// <summary>
+        /// Get the name of the handler.
+        /// </summary>
+        /// <returns>A String.</returns>
         public string GetName() => _name;
     }
 
@@ -45,46 +64,66 @@ namespace geeWiz.Forms.Mvvm
     /// </summary>
     public abstract class AsyncExternalEventHandler : IExternalEventHandler
     {
-        // This bridges Revit → Task (async/await world)
+        /// <summary>
+        /// This bridges Revit → Task (async/await world).
+        /// </summary>
         private TaskCompletionSource<object> _tcs;
 
-        // Prevents concurrent execution
+        /// <summary>
+        /// Prevents concurrent execution.
+        /// </summary>
         private readonly object _lock = new object();
 
+        /// <summary>
+        /// Related event.
+        /// </summary>
         public ExternalEvent ExternalEvent { get; }
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         protected AsyncExternalEventHandler()
         {
-            ExternalEvent = ExternalEvent.Create(this);
+            this.ExternalEvent = ExternalEvent.Create(this);
         }
 
-        // Called by YOUR code
+
+        /// <summary>
+        /// Called by YOUR code.
+        /// </summary>
+        /// <returns></returns>
         public Task RaiseAsync()
         {
             lock (_lock)
             {
                 // Prevent re-entry (Revit can't handle concurrent external events well)
-                if (_tcs != null && !_tcs.Task.IsCompleted)
+                if (this._tcs != null && !this._tcs.Task.IsCompleted)
                     throw new InvalidOperationException("ExternalEvent already running.");
 
                 // Create a new TaskCompletionSource for this invocation
-                _tcs = new TaskCompletionSource<object>();
+                this._tcs = new TaskCompletionSource<object>();
             }
 
             // Tell Revit: "run this handler soon"
-            ExternalEvent.Raise();
+            this.ExternalEvent.Raise();
 
             // Return the Task so caller can await it
             return _tcs.Task;
         }
 
-        // Called by Revit on its main thread
+        /// <summary>
+        /// Called by Revit on its main thread.
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
         public void Execute(UIApplication app)
         {
-            ExecuteInternalAsync(app);
+            this.ExecuteInternalAsync(app);
         }
 
-        // Async bridge method (fire-and-forget from Revit's perspective)
+        /// <summary>
+        /// Async bridge method (fire-and-forget from Revit's perspective).
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
         private async void ExecuteInternalAsync(UIApplication app)
         {
             try
@@ -107,9 +146,17 @@ namespace geeWiz.Forms.Mvvm
             }
         }
 
-        // YOU implement this in derived classes
+        /// <summary>
+        /// YOU implement this in derived classes.
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
+        /// <returns>A Task.</returns>
         protected abstract Task ExecuteAsyncCore(UIApplication app);
 
+        /// <summary>
+        /// Get handler name.
+        /// </summary>
+        /// <returns>A String.</returns>
         public abstract string GetName();
     }
 
@@ -118,18 +165,33 @@ namespace geeWiz.Forms.Mvvm
     /// </summary>
     public abstract class AsyncExternalEventHandler<TResult> : IExternalEventHandler
     {
-        // Same as above, but strongly typed result
+        /// <summary>
+        /// Same as above, but strongly typed result.
+        /// </summary>
         private TaskCompletionSource<TResult> _tcs;
 
+        /// <summary>
+        /// Lock the handler.
+        /// </summary>
         private readonly object _lock = new object();
 
+        /// <summary>
+        /// Related event.
+        /// </summary>
         public ExternalEvent ExternalEvent { get; }
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         protected AsyncExternalEventHandler()
         {
             ExternalEvent = ExternalEvent.Create(this);
         }
 
+        /// <summary>
+        /// Raise the event.
+        /// </summary>
+        /// <returns>A Task.</returns>
         public Task<TResult> RaiseAsync()
         {
             lock (_lock)
@@ -144,11 +206,19 @@ namespace geeWiz.Forms.Mvvm
             return _tcs.Task;
         }
 
+        /// <summary>
+        /// Execute the task.
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
         public void Execute(UIApplication app)
         {
             ExecuteInternalAsync(app);
         }
 
+        /// <summary>
+        /// Execute the task.
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
         private async void ExecuteInternalAsync(UIApplication app)
         {
             try
@@ -169,9 +239,17 @@ namespace geeWiz.Forms.Mvvm
             }
         }
 
-        // YOU implement this
+        /// <summary>
+        /// YOU implement this.
+        /// </summary>
+        /// <param name="app">The UIApplication.</param>
+        /// <returns>A Task.</returns>
         protected abstract Task<TResult> ExecuteAsyncCore(UIApplication app);
 
+        /// <summary>
+        /// Get the name of the event.
+        /// </summary>
+        /// <returns>A String.</returns>
         public abstract string GetName();
     }
 }

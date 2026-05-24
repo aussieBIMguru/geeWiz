@@ -8,12 +8,15 @@ using gFrm = geeWiz.Forms;
 namespace geeWiz.General
 {
     /// <summary>
-    /// Warden will intercept and cross check command use.
+    /// Warden intercepts problematic Revit commands.
     /// </summary>
     public static class Warden
     {
         #region Properties
 
+        /// <summary>
+        /// A list of CommandId names to intercept.
+        /// </summary>
         private static readonly List<string> COMMANDS_LIST = new List<string>()
         {
             "ID_INPLACE_COMPONENT",
@@ -21,8 +24,19 @@ namespace geeWiz.General
             "ID_EDIT_PAINT"
         };
 
+        /// <summary>
+        /// Is the system active.
+        /// </summary>
         public static bool ACTIVE = true;
+
+        /// <summary>
+        /// The CommandId that was last intercepted.
+        /// </summary>
         public static string LASTCOMMANDNAME = null;
+
+        /// <summary>
+        /// If the system is Idling in Revit.
+        /// </summary>
         public static bool IDLING = false;
 
         #endregion
@@ -30,10 +44,9 @@ namespace geeWiz.General
         #region Register/deregister commands
 
         /// <summary>
-        /// Registers all commands to Warden.
+        /// Registers the system to related Revit events.
         /// </summary>
-        /// <param name="uiCtlApp">The UIControlleApplication.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="uiCtlApp">The UIControlledApplication.</param>
         public static void Register(UIControlledApplication uiCtlApp = null)
         {
             uiCtlApp ??= Globals.UiCtlApp;
@@ -45,10 +58,9 @@ namespace geeWiz.General
         }
 
         /// <summary>
-        /// Registers all commands to Warden.
+        /// Deregisters the system from related Revit events.
         /// </summary>
         /// <param name="uiCtlApp">The UIControlledApplication.</param>
-        /// <returns>Void (nothing).</returns>
         public static void DeRegister(UIControlledApplication uiCtlApp = null)
         {
             uiCtlApp ??= Globals.UiCtlApp;
@@ -67,8 +79,7 @@ namespace geeWiz.General
         /// Try to add a command to Warden.
         /// </summary>
         /// <param name="uiApp">The UIApplication.</param>
-        /// <param name="commandName">The internal name of the Command to watch.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="commandName">The CommandId of the command to watch.</param>
         private static void WatchCommand(UIControlledApplication uiApp, string commandName)
         {
             // Look up the command Id by name
@@ -86,8 +97,7 @@ namespace geeWiz.General
         /// Try to remove a command from Warden.
         /// </summary>
         /// <param name="uiApp">The UIApplication.</param>
-        /// <param name="commandName">The internal name of the Command to watch.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="commandName">The CommandId of the command to watch.</param>
         private static void IgnoreCommand(UIControlledApplication uiApp, string commandName)
         {
             // Look up the command Id by name
@@ -108,9 +118,8 @@ namespace geeWiz.General
         /// <summary>
         /// This fires whenever the watched command is ran.
         /// </summary>
-        /// <param name="sender">The event sender (command).</param>
-        /// <param name="args">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender (command).</param>
+        /// <param name="args">Related event arguments.</param>
         private static void CatchCommand(object sender, ExecutedEventArgs args)
         {
             // A variable as to whether we will let the command execute
@@ -151,9 +160,8 @@ namespace geeWiz.General
         /// <summary>
         /// This fires to rebind the command after being permitted.
         /// </summary>
-        /// <param name="sender">The event sender (not used).</param>
-        /// <param name="args">The event arguments.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="args">Related event arguments.</param>
         private static void RebindCommand(object sender, IdlingEventArgs args)
         {
             // If we are idling

@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Form = System.Windows.Forms.Form;
 // Revit API
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 // geeWiz
 using gStr = geeWiz.Utilities.String_Utils;
@@ -15,7 +14,7 @@ using geeWiz.Extensions;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to file based operations.
+    /// Static methods container related to Files.
     /// </summary>
     public static class File_Utils
     {
@@ -24,8 +23,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Used to verify if a URL is valid (will open).
         /// </summary>
-        /// <param name="linkPath"">The path, typically a URL.</param>
-        /// <returns>A boolean.</returns>
+        /// <param name="linkPath">The path, typically a URL.</param>
+        /// <returns>A Boolean.</returns>
         public static bool LinkIsAccessible(string linkPath)
         {
             return Uri.TryCreate(linkPath, UriKind.Absolute, out Uri uriResult)
@@ -36,8 +35,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Attempts to open a link in the default browser.
         /// </summary>
-        /// <param name="linkPath"">The path, typically a URL.</param>
-        /// <returns>A result.</returns>
+        /// <param name="linkPath">The path, typically a URL.</param>
+        /// <returns>A Result.</returns>
         public static Result OpenLinkPath(string linkPath)
         {
             if (LinkIsAccessible(linkPath))
@@ -50,13 +49,13 @@ namespace geeWiz.Utilities
                 catch (Exception ex)
                 {
                     Console.WriteLine($"An error occurred while trying to open the URL: {ex.Message} ({linkPath})");
-                    return Result.Failed;
+                    return Result.Cancelled;
                 }
             }
             else
             {
                 Console.WriteLine($"ERROR: Link path could not be opened ({linkPath})");
-                return Result.Failed;
+                return Result.Cancelled;
             }
         }
 
@@ -67,8 +66,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Runs an accessibility check on a file path.
         /// </summary>
-        /// <param name="filePath"">The path.</param>
-        /// <returns>A boolean.</returns>
+        /// <param name="filePath">The path.</param>
+        /// <returns>A Boolean.</returns>
         public static bool FileIsAccessible(string filePath)
         {
             // If the file doesn't exist, we return true (to allow creation)
@@ -97,8 +96,8 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Attempts to open a file path.
         /// </summary>
-        /// <param name="filePath"">The file path.</param>
-        /// <returns>A result.</returns>
+        /// <param name="filePath">The file path.</param>
+        /// <returns>A Result.</returns>
         public static Result OpenFilePath(string filePath)
         {
             try
@@ -109,7 +108,7 @@ namespace geeWiz.Utilities
             catch (Exception ex)
             {
                 Debug.WriteLine($"ERROR: File path could not be opened {ex.Message} ({filePath})");
-                return Result.Failed;
+                return Result.Cancelled;
             }
         }
 
@@ -276,7 +275,7 @@ namespace geeWiz.Utilities
             // Make sure file path is valid
             if (filePath is null || !FileIsAccessible(filePath))
             {
-                return Result.Failed;
+                return Result.Cancelled;
             }
 
             // Write to the file as list
@@ -294,7 +293,7 @@ namespace geeWiz.Utilities
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while trying to write file: {ex.Message}");
-                return Result.Failed;
+                return Result.Cancelled;
             }
 
             // Return success
@@ -304,8 +303,7 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Applies the standard form logo
         /// </summary>
-        /// <param name="form"">The form to set the icon for.</param>
-        /// <returns>Void (nothing).</returns>
+        /// <param name="form">The form to set the icon for.</param>
         public static void SetFormIcon(Form form)
         {
             string iconPath = "geeWiz.Resources.Icons16.IconList16.ico";
@@ -326,14 +324,14 @@ namespace geeWiz.Utilities
         /// <summary>
         /// Attempts to open a directory.
         /// </summary>
-        /// <param name="directoryPath"">The directory path.</param>
+        /// <param name="directoryPath">The directory path.</param>
         /// <returns>A Result.</returns>
         public static Result OpenDirectory(string directoryPath)
         {
             // Fail if it does not exist
             if (!Directory.Exists(directoryPath))
             {
-                return Result.Failed;
+                return Result.Cancelled;
             }
 
             // Try to open the directory with Explorer.exe
@@ -344,111 +342,7 @@ namespace geeWiz.Utilities
             }
             catch
             {
-                return Result.Failed;
-            }
-        }
-
-        #endregion
-
-        #region Ribbon management
-
-        /// <summary>
-        /// Prepares an image source from a Png resource.
-        /// </summary>
-        /// <param name="iconName"">The name of the icon (without format, resolution).</param>
-        /// <param name="resolution"">The resolution suffix (16 or 32, typically).</param>
-        /// <param name="suffix"">An additional suffix (optional).</param>
-        /// <returns>An ImageSource object.</returns>
-        public static System.Windows.Media.ImageSource GetImageSource(string iconName, int resolution = 32, string suffix = "")
-        {
-            // Construct the resource path
-            string resourcePath = $"{Globals.AddinName}.Resources.Icons{resolution}.{iconName}{resolution}{suffix}.png";
-
-            // Read the resource from its full path
-            using (Stream stream = Globals.Assembly.GetManifestResourceStream(resourcePath))
-            {
-                // Throw exception if stream not made
-                if (stream == null)
-                {
-                    return null;
-                }
-
-                // Decode the png resource
-                PngBitmapDecoder decoder = new System.Windows.Media.Imaging.PngBitmapDecoder(stream,
-                    BitmapCreateOptions.PreservePixelFormat,
-                    BitmapCacheOption.Default);
-
-                // Decode to image source
-                return decoder.Frames[0];
-            }
-        }
-
-        /// <summary>
-        /// Returns a value based on a key from a dictionary.
-        /// </summary>
-        /// <param name="dictionary">The dictionary of keys/values to search.</param>
-        /// <param name="key">The key to search for.</param>
-        /// <param name="defaultValue">The value to return if no key is found.</param>
-        /// <returns>The related tooltip, if found.</returns>
-        public static string GetDictValue(Dictionary<string, string> dictionary, string key, string defaultValue = "Value not found.")
-        {
-            if (dictionary.TryGetValue(key, out string value))
-            {
-                return value;
-            }
-            return defaultValue;
-        }
-
-        #endregion
-
-        #region FamilyLoadOptions
-
-        /// <summary>
-        /// Family load options interfaced class.
-        /// </summary>
-        public class FamilyLoadOptions : IFamilyLoadOptions
-        {
-            // Private values to pass into
-            private readonly bool _overwriteValues;
-            private readonly bool _overwriteNested;
-
-            /// <summary>
-            /// Construct a FamilyLoadOptions object.
-            /// </summary>
-            /// <param name="overwriteValues">Overwrite parameter values.</param>
-            /// <param name="overwriteNested">Overwrite shared, nested families.</param>
-            public FamilyLoadOptions(bool overwriteValues = true, bool overwriteNested = false)
-            {
-                _overwriteValues = overwriteValues;
-                _overwriteNested = overwriteNested;
-            }
-
-            /// <summary>
-            /// Handle what to do if family already exists.
-            /// </summary>
-            /// <param name="familyInUse">If the family is in use.</param>
-            /// <param name="overwriteParameterValues">If parameters will be overwritten.</param>
-            /// <returns>A boolean.</returns>
-            public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues)
-            {
-                overwriteParameterValues = _overwriteValues;
-                return true;
-            }
-
-            /// <summary>
-            /// Handle what to do if a shared, nested family exists.
-            /// </summary>
-            /// <param name="sharedFamily">The nested family.</param>
-            /// <param name="familyInUse">If the family is in use.</param>
-            /// <param name="source">The FamilySource to use.</param>
-            /// <param name="overwriteParameterValues">If parameters will be overwritten.</param>
-            /// <returns>A boolean.</returns>
-            public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse,
-                out FamilySource source, out bool overwriteParameterValues)
-            {
-                source = _overwriteNested ? FamilySource.Family : FamilySource.Project;
-                overwriteParameterValues = _overwriteValues;
-                return true;
+                return Result.Cancelled;
             }
         }
 

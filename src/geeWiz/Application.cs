@@ -10,25 +10,41 @@ using gRib = geeWiz.Utilities.Ribbon_Utils;
 namespace geeWiz
 {
     /// <summary>
-    /// This interface handles startup and shutdown of the application.
+    /// Handles the startup and shutdown behavior of the addin.
     /// </summary>
     public class Application : IExternalApplication
     {
         #region Class properties
 
-        // Temporary variable to pass the UI controlled app to an idling event
+        /// <summary>
+        /// Used to catch the UIControlledApplication globally as soon as Revit idles.
+        /// </summary>
         private static UIControlledApplication _uiCtlApp;
 
-        // Ribbon construction constants
+        /// <summary>
+        /// Constant to assist ribbon construction.
+        /// </summary>
         public const string PANEL1_NAME = "General";
+
+        /// <summary>
+        /// Constant to assist ribbon construction.
+        /// </summary>
         public const string PANEL2_NAME = "Tools";
+
+        /// <summary>
+        /// Constant to assist ribbon construction.
+        /// </summary>
         public const string PANELD_NAME = "DEBUG";
 
         #endregion
 
         /// <summary>
         /// Runs when the application starts.
-        /// We use this part of the interface to initialize geeWiz.
+        /// 
+        /// Handles the following steps:
+        /// - Register global variables
+        /// - Register General utilities to Revit events
+        /// - Add panels, pulldowns and buttons to a new tab
         /// </summary>
         public Result OnStartup(UIControlledApplication uiCtlApp)
         {
@@ -64,10 +80,6 @@ namespace geeWiz
             #endregion
 
             #region Construct Panel 1
-
-            /// <summary>
-            /// We will load our commands here later on.
-            /// </summary>
 
             // Root command namespace
             string commandNamespace = $"{Globals.AddinName}.Commands";
@@ -266,8 +278,12 @@ namespace geeWiz
         }
 
         /// <summary>
-        /// Runs when the application closes down.
-        /// We use this part of the interface to cleanup geeWiz.
+        /// Runs when the application starts.
+        /// 
+        /// Handles the following steps:
+        /// - Register global variables
+        /// - Register General utilities to Revit events
+        /// - Add panels, pulldowns and buttons to a new tab
         /// </summary>
         public Result OnShutdown(UIControlledApplication uiCtlApp)
         {
@@ -291,10 +307,11 @@ namespace geeWiz
         #region Register UiApp on Idling
 
         /// <summary>
-        /// Registers the uiApp global whenever first possible.
+        /// Registers the UIApplication as soon as Revit idles.
+        /// Unsubscribes the event once it fires once.
         /// </summary>
-        /// <param name="sender"">The event sender object (the uiApp).</param>
-        /// <param name="e"">The idling event arguments, unused.</param>
+        /// <param name="sender">The event sender object (the UIApplication).</param>
+        /// <param name="e">Event related arguments..</param>
         /// <returns>Void (nothing).</returns>
         private void OnIdling(object sender, IdlingEventArgs e)
         {

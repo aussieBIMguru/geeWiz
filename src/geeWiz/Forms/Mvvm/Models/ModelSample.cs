@@ -12,41 +12,36 @@ using CommunityToolkit.Mvvm.Input;
 // Using the Mvvm Models namespace
 namespace geeWiz.Forms.Mvvm.Models
 {
-    #region Example implementation
-
-    /*
- 
-    if (gWin.Focus<View>())
-    {
-        return Result.Succeeded;
-    }
-    
-    var viewModel = new Model();
-    viewModel.WireExternalEvents(uiApp); < IMPORTANT, DO NOT MISS!
-
-    var view = new TestView(viewModel);
-    gWin.Show(view, Globals.UiApp.MainWindowHandle);
-
-    return Result.Succeeded;
-
-    */
-
-    #endregion
-
     /// <summary>
-    /// The code to manage the Wpf model
+    /// The Model of the MVVM Sample system.
     /// </summary>
     public sealed partial class ModelSample : ObservableObject
     {
         #region Event wiring
 
-        // Track if events are wired
+        /// <summary>
+        /// Have events been wired yet.
+        /// </summary>
         private bool _eventsWired;
+
+        /// <summary>
+        /// Prevents wiring more than once.
+        /// </summary>
         private readonly object _eventLock = new object();
 
-        // Events to handle
+        /// <summary>
+        /// Event to show element summary.
+        /// </summary>
         public IExternalEventAdapter ShowSummaryEvent { get; private set; }
+
+        /// <summary>
+        /// Event to delete element.
+        /// </summary>
         public IExternalEventAdapterAsync<ElementId> DeleteElementEvent { get; private set; }
+
+        /// <summary>
+        /// Event to select element with a delay.
+        /// </summary>
         public IExternalEventAdapterAsync SelectDelayedEvent { get; private set; }
 
         /// <summary>
@@ -72,7 +67,7 @@ namespace geeWiz.Forms.Mvvm.Models
 
                 // Handlers belong logically to the model
                 var showSummaryHandler = new ShowSummaryHandler(this);
-                var deleteElementHandler = new DeleteElementHandler();
+                var deleteElementHandler = new DeleteElementHandler(this);
                 var delayedSelectHandler = new SelectDelayedElementHandler(this);
 
                 // ExternalEvents must be created here (inside Revit API context)
@@ -93,13 +88,21 @@ namespace geeWiz.Forms.Mvvm.Models
 
         #region Observable properties
 
-        // Generate properties for bound strings
+        /// <summary>
+        /// Binding to form for element name.
+        /// </summary>
         [ObservableProperty]
         private string _strBind_Element;
 
+        /// <summary>
+        /// Binding to form for category name.
+        /// </summary>
         [ObservableProperty]
         private string _strBind_Category;
 
+        /// <summary>
+        /// Binding to form for status of form.
+        /// </summary>
         [ObservableProperty]
         private string _strBind_Status;
 
@@ -107,7 +110,9 @@ namespace geeWiz.Forms.Mvvm.Models
 
         #region Command bindings
 
-        // Bound command to the Wpf form - summarize
+        /// <summary>
+        /// Relayed command to show element summary.
+        /// </summary>
         [RelayCommand]
         private void ShowSummary()
         {
@@ -115,7 +120,9 @@ namespace geeWiz.Forms.Mvvm.Models
             this.ShowSummaryEvent?.Raise();
         }
 
-        // Bound command to the Wpf form - delete
+        /// <summary>
+        /// Relayed command to delete element.
+        /// </summary>
         [RelayCommand]
         private async Task DeleteElementAsync()
         {
@@ -132,7 +139,9 @@ namespace geeWiz.Forms.Mvvm.Models
             }
         }
 
-        // Bound command to the Wpf form - delayed selection
+        /// <summary>
+        /// Relayed command to select element with delay.
+        /// </summary>
         [RelayCommand]
         private async Task SelectDelayedElementAsync()
         {
@@ -181,13 +190,24 @@ namespace geeWiz.Forms.Mvvm.Models
         /// </summary>
         public sealed class ShowSummaryHandler : IExternalEventHandler
         {
+            /// <summary>
+            /// The related Model.
+            /// </summary>
             private readonly ModelSample _vm;
 
+            /// <summary>
+            /// Default constructor.
+            /// </summary>
+            /// <param name="vm">Related Model.</param>
             public ShowSummaryHandler(ModelSample vm)
             {
                 this._vm = vm;
             }
 
+            /// <summary>
+            /// Execute the event.
+            /// </summary>
+            /// <param name="app">The UIApplication.</param>
             public void Execute(UIApplication app)
             {
                 // Select the element
@@ -198,6 +218,10 @@ namespace geeWiz.Forms.Mvvm.Models
                 this._vm.UpdateElementProperties(element);
             }
 
+            /// <summary>
+            /// Return name of handler.
+            /// </summary>
+            /// <returns>A string.</returns>
             public string GetName() => nameof(ShowSummaryHandler);
         }
 
@@ -206,6 +230,24 @@ namespace geeWiz.Forms.Mvvm.Models
         /// </summary>
         public sealed class DeleteElementHandler : AsyncExternalEventHandler<ElementId>
         {
+            /// <summary>
+            /// The related Model.
+            /// </summary>
+            private readonly ModelSample _vm;
+
+            /// <summary>
+            /// Default constructor.
+            /// </summary>
+            /// <param name="vm">Related Model.</param>
+            public DeleteElementHandler(ModelSample vm)
+            {
+                this._vm = vm;
+            }
+
+            /// <summary>
+            /// Execute the event.
+            /// </summary>
+            /// <param name="app">The UIApplication.</param>
             protected override Task<ElementId> ExecuteAsyncCore(UIApplication app)
             {
                 // Select the element
@@ -241,6 +283,10 @@ namespace geeWiz.Forms.Mvvm.Models
                 return Task.FromResult(id);
             }
 
+            /// <summary>
+            /// Return name of handler.
+            /// </summary>
+            /// <returns>A string.</returns>
             public override string GetName() => nameof(DeleteElementHandler);
         }
 
@@ -249,13 +295,24 @@ namespace geeWiz.Forms.Mvvm.Models
         /// </summary>
         public sealed class SelectDelayedElementHandler : AsyncExternalEventHandler
         {
+            /// <summary>
+            /// The related Model.
+            /// </summary>
             private readonly ModelSample _vm;
 
+            /// <summary>
+            /// Default constructor.
+            /// </summary>
+            /// <param name="vm">Related Model.</param>
             public SelectDelayedElementHandler(ModelSample vm)
             {
                 this._vm = vm;
             }
 
+            /// <summary>
+            /// Execute the event.
+            /// </summary>
+            /// <param name="app">The UIApplication.</param>
             protected override Task ExecuteAsyncCore(UIApplication app)
             {
                 // Hide the view
@@ -275,6 +332,10 @@ namespace geeWiz.Forms.Mvvm.Models
                 return Task.CompletedTask;
             }
 
+            /// <summary>
+            /// Return name of handler.
+            /// </summary>
+            /// <returns>A string.</returns>
             public override string GetName() => nameof(SelectDelayedElementHandler);
         }
     }

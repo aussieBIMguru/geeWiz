@@ -8,13 +8,17 @@ using gFrm = geeWiz.Forms;
 
 // The class belongs to the Commands namespace
 namespace geeWiz.Commands.Cmds_Workset
-{ 
+{
     /// <summary>
-    /// Creates worksets from a predefined list.
+    /// A Revit command ran from the ribbon.
+    /// Create Worksets from a default list.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class Cmd_Create : IExternalCommand
     {
+        /// <summary>
+        /// Standard list of BIM Guru worksets.
+        /// </summary>
         private static readonly List<string> names = new List<string>()
         {
             "AR Interior",
@@ -27,7 +31,14 @@ namespace geeWiz.Commands.Cmds_Workset
             "Z_Link RVT Services",
             "Z_Link RVT Structure"
         };
-        
+
+        /// <summary>
+        /// Execute the command.
+        /// </summary>
+        /// <param name="commandData">Command related data.</param>
+        /// <param name="message">Command related message.</param>
+        /// <param name="elements">Command related elements.</param>
+        /// <returns>A Result.</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // Get the document

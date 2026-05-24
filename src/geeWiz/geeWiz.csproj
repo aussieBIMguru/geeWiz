@@ -88,10 +88,16 @@
 		<StartAction>Program</StartAction>
 		<StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
 		<StartArguments>/language ENG</StartArguments>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<!-- Revit specific dll references -->
 	<ItemGroup>
+		<!-- Delete this reference in project if not using -->
+		<Reference Include="Navi">
+		  <HintPath>C:\Users\Gavin\Documents\GitHub\Navi\src\Navi\bin\Debug\netstandard2.0\Navi.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
 		<Reference Include="RevitAPI">
 			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
 			<Private>false</Private>
@@ -104,7 +110,7 @@
 			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\AdWindows.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
-		<Reference Include="AdWindows">
+		<Reference Include="Xceed.Wpf.AvalonDock">
 			<HintPath>$(ProgramFiles)\Autodesk\Revit $(RevitVersion)\Xceed.Wpf.AvalonDock.dll</HintPath>
 			<Private>false</Private>
 		</Reference>

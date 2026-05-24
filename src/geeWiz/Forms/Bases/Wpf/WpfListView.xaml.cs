@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 // geeWiz
 using geeWiz.Extensions;
-using KeyedValue = geeWiz.Utilities.Data_Utils.KeyedValue<object>;
+using KeyedValue = geeWiz.Utilities.KeyedValue<object>;
 
 // Associated to form bases namespace
 namespace geeWiz.Forms.Bases
@@ -17,11 +17,29 @@ namespace geeWiz.Forms.Bases
     {
         #region Properties
 
-        // Properties of form class
+        /// <summary>
+        /// List of keyed values in list.
+        /// </summary>
         private readonly List<KeyedValue> _objects = new List<KeyedValue>();
+
+        /// <summary>
+        /// View of thr listview.
+        /// </summary>
         private readonly ICollectionView _view;
+
+        /// <summary>
+        /// If we can select multiple items.
+        /// </summary>
         private readonly bool _multiSelect;
+
+        /// <summary>
+        /// If we can select no items and select OK.
+        /// </summary>
         private readonly bool _allowNoSelection;
+
+        /// <summary>
+        /// If we are currently bulk updating the listview.
+        /// </summary>
         private bool _bulkUpdating = false;
 
         #endregion
@@ -29,12 +47,12 @@ namespace geeWiz.Forms.Bases
         #region Constructor
 
         /// <summary>
-        /// 
+        /// Wpf form to select item(s) from a listview.
         /// </summary>
-        /// <param name="objects"></param>
-        /// <param name="multiSelect"></param>
-        /// <param name="title"></param>
-        /// <param name="allowNoSelection"></param>
+        /// <param name="objects">KeyedValues to dispaly in the listview.</param>
+        /// <param name="multiSelect">If we can select multiple items.</param>
+        /// <param name="title">The title of the form.</param>
+        /// <param name="allowNoSelection">If we can select OK with no items chosen.</param>
         public WpfListView(List<KeyedValue> objects, bool multiSelect = true, string title = null, bool allowNoSelection = false)
         {
             // Initialize the form
@@ -54,7 +72,7 @@ namespace geeWiz.Forms.Bases
             this._view.Filter = FilterByText;
 
             // Configure the behavior for multi or single select
-            var templateName = Utilities.Wpf_SetListBoxMode(this._multiSelect, this.ListBox, this.CheckAllButton, this.UncheckAllButton);
+            var templateName = geeWiz.Utilities.Form_Utils.Wpf_SetListBoxMode(this._multiSelect, this.ListBox, this.CheckAllButton, this.UncheckAllButton);
 
             // Apply the related item template from shared styles
             if ((DataTemplate)FindResource(templateName) is DataTemplate template)
@@ -70,22 +88,22 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Runs whenever a checkbox is clicked on/off.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             // Make sure this wasn't triggered during an check or uncheck all
             if (this._bulkUpdating) { return; }
 
             // Run a shift click check
-            Utilities.Wpf_ShiftClickProcess<object>(sender, this._multiSelect, this.ListBox);
+            geeWiz.Utilities.Form_Utils.Wpf_ShiftClickProcess<object>(sender, this._multiSelect, this.ListBox);
         }
 
         /// <summary>
         /// Filter an object based on the text filter.
         /// </summary>
         /// <param name="obj">Object to check.</param>
-        /// <returns></returns>
+        /// <returns>A Boolean.</returns>
         private bool FilterByText(object obj)
         {
             // Get the filter value
@@ -110,8 +128,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Runs when the text filter changes.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Refresh the view (applies the filter)
@@ -125,8 +143,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Check all visible objects.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void CheckAll_Click(object sender, RoutedEventArgs e)
         {
             // Flag that we are bulk updating (avoids checkbox trigger)
@@ -149,8 +167,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Unchecks all visible objects.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void UncheckAll_Click(object sender, RoutedEventArgs e)
         {
             // Flag that we are bulk updating (avoids checkbox trigger)
@@ -177,7 +195,7 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Gets the checked items or selected item.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of KeyedValues.</returns>
         public List<KeyedValue> GetChosenItems()
         {
             // Multiselect, return all checked
@@ -202,8 +220,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Runs when OK is clicked.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             // Ensure we have required output before finishing
@@ -221,8 +239,8 @@ namespace geeWiz.Forms.Bases
         /// <summary>
         /// Runs when Cancel is clicked.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Related event arguments.</param>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             // Close the form with a false outcome

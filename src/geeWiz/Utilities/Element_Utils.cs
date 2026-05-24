@@ -8,7 +8,7 @@ using geeWiz.Extensions;
 namespace geeWiz.Utilities
 {
     /// <summary>
-    /// Methods of this class generally relate to managing elements.
+    /// Static methods container related to Elements.
     /// </summary>
     public static class Element_Utils
     {
@@ -33,7 +33,7 @@ namespace geeWiz.Utilities
         /// </summary>
         /// <typeparam name="T">The type of the elements.</typeparam>
         /// <param name="elements">A list of elements.</param>
-        /// <param name="T">The replacement to make.</param>
+        /// <param name="replaceWith">The replacement to make.</param>
         /// <returns>A list of elements as T.</returns>
         public static List<T> ReplaceNulls<T>(this List<T> elements, T replaceWith)
         {
